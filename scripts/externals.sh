@@ -34,8 +34,9 @@ missing_externals() {
   wants MAVEN_LINUX && { [ -x "$ext/maven/bin/mvn" ] || m="$m maven/"; }
   wants GRADLE && { [ -x "$ext/gradle/bin/gradle" ] || m="$m gradle/"; }
   wants NODE_LINUX && { [ -x "$ext/node/bin/node" ] || m="$m node/"; }
-  wants JRE_LINUX && { [ -s "$ext/jre-linux.tar.gz" ] || m="$m jre-linux.tar.gz"; }
-  wants JRE_WINDOWS && { [ -s "$ext/jre-windows.zip" ] || m="$m jre-windows.zip"; }
+  wants JDK_LINUX && { [ -s "$ext/jdk-linux.tar.gz" ] || m="$m jdk-linux.tar.gz"; }
+  wants JDK_WINDOWS && { [ -s "$ext/jdk-windows.zip" ] || m="$m jdk-windows.zip"; }
+  wants JDK_MACOS && { [ -s "$ext/jdk-macos.tar.gz" ] || m="$m jdk-macos.tar.gz"; }
   if declare -F missing_local_externals >/dev/null; then m="$m$(missing_local_externals)"; fi
   echo "$m"
 }

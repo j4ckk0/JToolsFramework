@@ -22,10 +22,11 @@ The generated project is four modules — `core` (the business), `api` (its HTTP
 | | What | Where it came from |
 |---|---|---|
 | `parent/` | **jtools-parent**: Java 21, JUnit 5, the plugins; the page built by npm in any module with an `angular.json`; the program's one jar; with `-Pdist` the Linux and Windows distributions, each with its JRE, `.exe`, launchers and `.ini` ([doc/BUILD.md](doc/BUILD.md)) | the poms of DCSBuilder, MythoStory, WhichPaint |
-| `support/` | **jtools-support**: `Json`, `Installation` (home, version, `.ini`) | DCSBuilder, SensorSimulator |
-| `server/` | **jtools-server**: `WebServer` (JSON routes, the single-page application's files, the presence), `PageWatch` (the stop), `Http`, `DesktopOpener` | the four `PageWatch`es, the three servers |
-| `launcher/` | **jtools-launcher**: `WebApp` — `--port --host --no-browser --keep-alive --log-level --help`, the program's own options, the `.ini`, the logging, the browser, the stop, the failure dialog of an `.exe` | the four launchers |
-| `dist/` | **jtools-dist**: the assembly descriptors, `app.sh`, `app.bat`, `app.ini` | the five `src/assembly` and `src/dist` |
+| `support/` | **jtools-support**: `Json` (`Json.raw` for JSON already written), `I18n` (texts in each language, `Accept-Language`), `Installation` | DCSBuilder, SensorSimulator |
+| `server/` | **jtools-server**: `WebServer` — routes exact or by prefix, plain handlers, JDK filters, the Host and Origin checks, `{"error"}` refusals, the page with ETags, the presence — `Exchange`, `Answer`, `PageWatch` (the stop), `DesktopOpener` | the four `PageWatch`es, the three servers |
+| `launcher/` | **jtools-launcher**: `WebApp` — `--port --host --no-browser --keep-alive --log-level --verbose --log-file --lang --help` and the program's own options, the port's order (command line, Settings menu, `.ini`), the log (`~/.<id>/logs`, in English), `/api/settings`, `/api/about`, `/api/quit`, `/api/log/open`, the failure dialog of an `.exe` — `UserSettings` | the four launchers |
+| `desktop/` | **jtools-desktop**: `FileDialogs`, the native dialogs (kdialog, zenity, AWT, Swing) | XsdViewer |
+| `dist/` | **jtools-dist**: `build.xml` — jdeps, jlink, the Linux, macOS and Windows archives — `app.sh`, `app.bat`, `app.ini` | the five `src/assembly` and `src/dist`, XsdViewer's `runtimes.xml` |
 | `web/` | **@jtools/web**: `provideJTools()`, `PagePresenceService`, `apiErrorMessage()` — TypeScript, compiled with the project's page | SensorSimulator, MythoStory |
 | `scripts/` | the managed scripts every project gets — `setup build ci run stop package` (`.sh`, `.bat`) — and the framework's tools: `install`, `new-project`, `jtools-sync` ([doc/SCRIPTS.md](doc/SCRIPTS.md)) | the five `scripts/` folders, which had drifted apart |
 | `templates/webapp/` | the project `new-project.sh` writes | SensorSimulator |

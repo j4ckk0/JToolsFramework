@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jtools.framework</groupId>
+    <artifactId>jtools-parent</artifactId>
+    <version>1.1.0</version>
+    <relativePath>../parent/pom.xml</relativePath>
+  </parent>
+  <artifactId>jtools-desktop</artifactId>
+  <packaging>jar</packaging>
+  <name>JToolsFramework desktop</name>
+  <description>The native file dialogs a local web application's server opens on its own desktop, the browser being unable to give it a file's path: kdialog or zenity on Linux, AWT's on Windows and macOS, Swing's as the fallback. A module of its own, so that a program without dialogs does not carry them.</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.jtools.framework</groupId>
+      <artifactId>jtools-support</artifactId>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <!-- the Apache 2.0 header on every Java source (jtools-parent configures it) -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Automatic-Module-Name>org.jtools.framework.desktop</Automatic-Module-Name>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

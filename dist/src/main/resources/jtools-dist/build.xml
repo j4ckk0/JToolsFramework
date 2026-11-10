@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The distributions of a program, run by jtools-parent's dist profile once its jar is made (mvn package -Pdist):
+
+    modules        the modules the program needs: what jdeps finds in its jar, and jtools.dist.modules.extra
+                   besides (what no class names: the charsets, the elliptic curves of TLS)
+    runtimes       for each platform whose JDK archive is in jdk.archives (jdk-linux.tar.gz, jdk-windows.zip,
+                   jdk-macos.tar.gz: what scripts/setup.sh deploys), its jmods unpacked and a trimmed runtime linked
+                   from them — by this machine's own jlink, of the same version (externals.conf names one version)
+    distributions  <id>-<version>-linux.tar.gz and -macos.tar.gz (<id>.sh), -windows.zip (<name>.exe without a
+                   console, <id>.bat with one): the jar, the launchers, <id>.ini, the README, LICENSE and NOTICE when
+                   the project has them, the module's src/dist/files/, and the runtime as jre/
+
+  A platform without its archive is not built; jtools-dist's launchers carry ${jtools.app.*} that the copy fills in.
+-->
+<project name="jtools-dist" default="distributions">
+
+  <property name="work" location="${target}/jtools-dist-work"/>
+  <property name="runtime" location="${target}/runtime"/>
+  <property name="jmods" location="${target}/jmods"/>
+  <property name="dist.name" value="${jtools.app.id}-${version}"/>
+  <property name="exec.suffix" value=""/>
+  <condition property="exec.suffix" value=".exe"><os family="windows"/></condition>
+
+  <target name="detect">
+    <available property="jdk.linux" file="${jdk.archives}/jdk-linux.tar.gz"/>
+    <available property="jdk.windows" file="${jdk.archives}/jdk-windows.zip"/>
+    <available property="jdk.macos" file="${jdk.archives}/jdk-macos.tar.gz"/>
+    <condition property="jdk.none"><not><or><isset property="jdk.linux"/><isset property="jdk.windows"/><isset property="jdk.macos"/></or></not></condition>
+    <fail if="jdk.none" message="no JDK archive in ${jdk.archives} (jdk-linux.tar.gz, jdk-windows.zip, jdk-macos.tar.gz): run scripts/setup.sh (see README: Externals)"/>
+  </target>
+
+  <target name="modules" depends="detect">
+    <exec executable="${java.home}/bin/jdeps${exec.suffix}" outputproperty="modules.found" failonerror="true">
+      <arg value="--ignore-missing-deps"/>
+      <arg value="--print-module-deps"/>
+      <arg value="--multi-release"/><arg value="${java.release}"/>
+      <arg value="${jar}"/>
+    </exec>
+    <property name="modules" value="${modules.found},${modules.extra}"/>
+    <echo message="the runtimes' modules: ${modules}"/>
+  </target>
+
+  <!-- only the jmods of each archive: the rest of a JDK is of no use to jlink -->
+  <target name="unpack-linux" if="jdk.linux">
+    <delete dir="${jmods}/linux"/>
+    <untar src="${jdk.archives}/jdk-linux.tar.gz" dest="${jmods}/linux" compression="gzip">
+      <patternset includes="*/jmods/**"/>
+      <cutdirsmapper dirs="2"/>
+    </untar>
+  </target>
+  <target name="unpack-windows" if="jdk.windows">
+    <delete dir="${jmods}/windows"/>
+    <unzip src="${jdk.archives}/jdk-windows.zip" dest="${jmods}/windows">
+      <patternset includes="*/jmods/**"/>
+      <cutdirsmapper dirs="2"/>
+    </unzip>
+  </target>
+  <target name="unpack-macos" if="jdk.macos">
+    <delete dir="${jmods}/macos"/>
+    <untar src="${jdk.archives}/jdk-macos.tar.gz" dest="${jmods}/macos" compression="gzip">
+      <patternset includes="*/Contents/Home/jmods/**"/>
+      <cutdirsmapper dirs="4"/>
+    </untar>
+  </target>
+
+  <macrodef name="link">
+    <attribute name="os"/>
+    <sequential>
+      <delete dir="${runtime}/@{os}"/>
+      <echo message="jlink: the @{os} runtime"/>
+      <exec executable="${java.home}/bin/jlink${exec.suffix}" failonerror="true">
+        <arg value="--module-path"/><arg value="${jmods}/@{os}"/>
+        <arg value="--add-modules"/><arg value="${modules}"/>
+        <arg value="--output"/><arg value="${runtime}/@{os}"/>
+        <arg value="--strip-debug"/>
+        <arg value="--no-man-pages"/>
+        <arg value="--no-header-files"/>
+        <arg value="--compress"/><arg value="zip-6"/>
+      </exec>
+    </sequential>
+  </macrodef>
+  <target name="link-linux" if="jdk.linux"><link os="linux"/></target>
+  <target name="link-windows" if="jdk.windows"><link os="windows"/></target>
+  <target name="link-macos" if="jdk.macos"><link os="macos"/></target>
+
+  <target name="runtimes" depends="modules, unpack-linux, unpack-windows, unpack-macos, link-linux, link-windows, link-macos"/>
+
+  <!-- the launchers filled in with ${jtools.app.*}, and what is text, in each family's line endings -->
+  <target name="texts">
+    <delete dir="${work}"/>
+    <copy todir="${work}/unix" encoding="UTF-8">
+      <fileset dir="${launchers}" includes="app.sh, app.ini"/>
+      <filterchain><expandproperties/><fixcrlf eol="lf"/></filterchain>
+    </copy>
+    <copy todir="${work}/windows" encoding="UTF-8">
+      <fileset dir="${launchers}" includes="app.bat, app.ini"/>
+      <filterchain><expandproperties/><fixcrlf eol="crlf"/></filterchain>
+    </copy>
+    <copy todir="${work}/unix" encoding="UTF-8">
+      <fileset dir="${root}" includes="README.md, LICENSE, NOTICE"/>
+      <filterchain><fixcrlf eol="lf"/></filterchain>
+    </copy>
+    <copy todir="${work}/windows" encoding="UTF-8">
+      <fileset dir="${root}" includes="README.md, LICENSE, NOTICE"/>
+      <filterchain><fixcrlf eol="crlf"/></filterchain>
+    </copy>
+  </target>
+
+  <macrodef name="unix-dist">
+    <attribute name="os"/>
+    <sequential>
+      <tar destfile="${release.dir}/${dist.name}-@{os}.tar.gz" compression="gzip" longfile="gnu">
+        <tarfileset file="${jar}" fullpath="${dist.name}/${jtools.app.id}.jar" filemode="644"/>
+        <tarfileset file="${work}/unix/app.sh" fullpath="${dist.name}/${jtools.app.id}.sh" filemode="755"/>
+        <tarfileset file="${work}/unix/app.ini" fullpath="${dist.name}/${jtools.app.id}.ini" filemode="644"/>
+        <tarfileset dir="${work}/unix" includes="README.md, LICENSE, NOTICE" prefix="${dist.name}" filemode="644"/>
+        <tarfileset dir="${files}" prefix="${dist.name}" filemode="644" dirmode="755" erroronmissingdir="false"/>
+        <tarfileset dir="${runtime}/@{os}" prefix="${dist.name}/jre" filemode="755" dirmode="755" includes="bin/**, lib/jspawnhelper, lib/jexec"/>
+        <tarfileset dir="${runtime}/@{os}" prefix="${dist.name}/jre" filemode="644" dirmode="755" excludes="bin/**, lib/jspawnhelper, lib/jexec"/>
+      </tar>
+    </sequential>
+  </macrodef>
+  <target name="dist-linux" if="jdk.linux"><unix-dist os="linux"/></target>
+  <target name="dist-macos" if="jdk.macos"><unix-dist os="macos"/></target>
+  <target name="dist-windows" if="jdk.windows">
+    <zip destfile="${release.dir}/${dist.name}-windows.zip">
+      <zipfileset file="${jar}" fullpath="${dist.name}/${jtools.app.id}.jar"/>
+      <zipfileset file="${exe}" fullpath="${dist.name}/${jtools.app.name}.exe"/>
+      <zipfileset file="${work}/windows/app.bat" fullpath="${dist.name}/${jtools.app.id}.bat"/>
+      <zipfileset file="${work}/windows/app.ini" fullpath="${dist.name}/${jtools.app.id}.ini"/>
+      <zipfileset dir="${work}/windows" includes="README.md, LICENSE, NOTICE" prefix="${dist.name}"/>
+      <zipfileset dir="${files}" prefix="${dist.name}" erroronmissingdir="false"/>
+      <zipfileset dir="${runtime}/windows" prefix="${dist.name}/jre"/>
+    </zip>
+  </target>
+
+  <target name="distributions" depends="runtimes, texts, dist-linux, dist-macos, dist-windows"/>
+</project>

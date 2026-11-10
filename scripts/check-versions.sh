@@ -3,7 +3,7 @@
 # Checks that the framework says one version everywhere: each module's <parent> version, jtools-parent's own
 # <version>, and its jtools.version property (what the projects' dependencies on the framework use). Run by
 # scripts/install.sh and scripts/ci.local.sh; a new version is set in all of them at once:
-#   sed -i 's/1.0.0/1.1.0/' pom.xml */pom.xml   (then read the diff: only the framework's versions may change)
+#   sed -i 's/1.1.0/1.2.0/' pom.xml */pom.xml   (then read the diff: only the framework's versions may change)
 #
 set -euo pipefail
 cd "$(dirname "$(readlink -f "$0")")/.."   # the framework's root

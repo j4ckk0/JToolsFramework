@@ -23,9 +23,11 @@ beyond what it displays; it asks `api/…` and shows the answer. A rule found in
 | `frontend` | — (Angular) | the page, as a jar of `static/` resources |
 | `app` | `org.jtools.__APP_ID__.app` | the program: `Launcher`, a `WebApp` serving the API |
 
-What is not here is JToolsFramework's: `WebServer` (the routes, the page, the presence), `PageWatch` (the stop once
-the last page has gone), `WebApp` (the command line, the `.ini`, the browser), `@jtools/web` (the page's presence,
-the server's errors), the build (`jtools-parent`) and the scripts. Its `doc/PATTERN.md` says the conventions.
+What is not here is JToolsFramework's: `WebServer` (the routes, the page, the presence, the Host and Origin checks),
+`Exchange` (what a route reads of a request), `PageWatch` (the stop once the last page has gone), `WebApp` (the command
+line, the Settings menu's port, the `.ini`, the log, the browser, and the routes `/api/settings`, `/api/about`,
+`/api/quit`, `/api/log/open`), `@jtools/web` (the page's presence, the server's errors), the build (`jtools-parent`:
+the page, the program's jar, the jlink distributions) and the scripts. Its `doc/PATTERN.md` says the conventions.
 
 ## The API
 

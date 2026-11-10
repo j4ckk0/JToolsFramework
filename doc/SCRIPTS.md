@@ -24,7 +24,9 @@ extras in `scripts/*.local.sh`.
 ## externals.conf
 
 Each tool is deployed only when `externals.conf` names it: `JDK_*` → `external/jdk`, `MAVEN_*` → `external/maven`,
-`NODE_*` → `external/node`, `GRADLE` → `external/gradle`, `JRE_LINUX`/`JRE_WINDOWS` → the JRE archives. A project
+`NODE_*` → `external/node`, `GRADLE` → `external/gradle`; `JDK_LINUX`, `JDK_WINDOWS`, `JDK_MACOS` → also the archives
+`external/jdk-linux.tar.gz`, `jdk-windows.zip`, `jdk-macos.tar.gz` the distributions' runtimes are linked from (hard
+links to the downloads). A project
 without a page drops `NODE_*`; one that wants Gradle adds `GRADLE`. The framework's `externals.conf` is the
 reference: `new-project.sh` copies it, `jtools-sync.sh` reports where a project's versions differ (it never changes
 them: they are the project's to decide). `JTOOLS_DOWNLOADS=<dir>` in the environment shares one downloads folder

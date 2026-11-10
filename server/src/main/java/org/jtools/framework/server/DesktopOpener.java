@@ -21,16 +21,18 @@ package org.jtools.framework.server;
  */
 
 import java.awt.Desktop;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/** The page in the browser, as a double-click would open it. */
+/** What the desktop opens for the program, as a double-click would: the page in the browser, a file in its viewer. */
 public final class DesktopOpener {
 
     private static final Logger LOG = Logger.getLogger(DesktopOpener.class.getName());
-    private static final String OPEN_LINUX = "xdg-open", OS_LINUX = "linux", OS_NAME = "os.name";
+    private static final String OPEN_LINUX = "xdg-open", OPEN_MAC = "open", OS_LINUX = "linux", OS_MAC = "mac", OS_NAME = "os.name";
 
     private DesktopOpener() {}
 
@@ -43,11 +45,23 @@ public final class DesktopOpener {
             }
         } catch (Exception e) { LOG.log(Level.FINE, "Desktop.browse failed", e); }
         try {
-            if (System.getProperty(OS_NAME, "").toLowerCase(Locale.ROOT).contains(OS_LINUX)) {
+            if (os().contains(OS_LINUX)) {
                 new ProcessBuilder(OPEN_LINUX, url).start();
                 return true;
             }
         } catch (Exception e) { LOG.log(Level.FINE, "xdg-open failed", e); }
         return false;
+    }
+
+    /** A file in the application its type opens with: xdg-open on Linux, open on macOS, the desktop's association elsewhere. */
+    public static void open(Path file) throws IOException {
+        String os = os();
+        if (os.contains(OS_LINUX)) new ProcessBuilder(OPEN_LINUX, file.toString()).start();
+        else if (os.contains(OS_MAC)) new ProcessBuilder(OPEN_MAC, file.toString()).start();
+        else Desktop.getDesktop().open(file.toFile());
+    }
+
+    private static String os() {
+        return System.getProperty(OS_NAME, "").toLowerCase(Locale.ROOT);
     }
 }

@@ -47,8 +47,9 @@ call :wanted JDK_WINDOWS && if not exist "%EXT%\jdk\bin\java.exe" set "MISSING=%
 call :wanted MAVEN_WINDOWS && if not exist "%EXT%\maven\bin\mvn.cmd" set "MISSING=%MISSING% maven\"
 call :wanted GRADLE && if not exist "%EXT%\gradle\bin\gradle.bat" set "MISSING=%MISSING% gradle\"
 call :wanted NODE_WINDOWS && if not exist "%EXT%\node\node.exe" set "MISSING=%MISSING% node\"
-call :wanted JRE_LINUX && if not exist "%EXT%\jre-linux.tar.gz" set "MISSING=%MISSING% jre-linux.tar.gz"
-call :wanted JRE_WINDOWS && if not exist "%EXT%\jre-windows.zip" set "MISSING=%MISSING% jre-windows.zip"
+call :wanted JDK_LINUX && if not exist "%EXT%\jdk-linux.tar.gz" set "MISSING=%MISSING% jdk-linux.tar.gz"
+call :wanted JDK_WINDOWS && if not exist "%EXT%\jdk-windows.zip" set "MISSING=%MISSING% jdk-windows.zip"
+call :wanted JDK_MACOS && if not exist "%EXT%\jdk-macos.tar.gz" set "MISSING=%MISSING% jdk-macos.tar.gz"
 exit /b 0
 
 :wanted

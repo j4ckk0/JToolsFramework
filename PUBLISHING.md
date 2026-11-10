@@ -15,7 +15,8 @@ Every artifact with its pom, the version written out in each (the framework's po
 | `org.jtools.framework:jtools-support` | `Json`, `Installation` | jar, sources, javadoc |
 | `org.jtools.framework:jtools-server` | `WebServer`, `PageWatch`, `Http`, `DesktopOpener` | jar, sources, javadoc |
 | `org.jtools.framework:jtools-launcher` | `WebApp`, `LaunchOptions` | jar, sources, javadoc |
-| `org.jtools.framework:jtools-dist` | the assembly descriptors and launchers of the distributions | jar, sources; its javadoc jar is a README |
+| `org.jtools.framework:jtools-desktop` | `FileDialogs`: the native file dialogs | jar, sources, javadoc |
+| `org.jtools.framework:jtools-dist` | the distributions' build (jlink runtimes, archives) and launchers | jar, sources; its javadoc jar is a README |
 | `org.jtools.framework:jtools-web` | `@jtools/web`, as TypeScript sources | jar, sources; its javadoc jar is a README |
 
 `jtools-dist` and `jtools-web` hold no Java, and Maven Central refuses a jar without its javadoc: theirs is one
@@ -61,7 +62,7 @@ project of its own.
 
 4. Nothing is released until **Publish** is pressed on <https://central.sonatype.com> (`autoPublish` is off), so a
    mistake costs nothing: drop the deployment there, fix, upload again.
-5. Then tag the version (`git tag v1.0.0 && git push origin v1.0.0`) and, in the projects, name the new version as
+5. Then tag the version (`git tag v1.1.0 && git push origin v1.1.0`) and, in the projects, name the new version as
    their parent's (`scripts/jtools-sync.sh` reports the ones behind).
 
 ## 4. Learnt with XsdViewer (5 September 2026), true here too

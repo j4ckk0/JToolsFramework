@@ -10,8 +10,8 @@ map, `doc/PATTERN.md` the conventions, `doc/BUILD.md` the parent pom, `doc/SCRIP
 | Path | What |
 |---|---|
 | `parent/pom.xml` | jtools-parent: properties `jtools.app.*`, `jtools.program.skip`, profiles `jtools-frontend` (an `angular.json` switches it on) and `dist` |
-| `support/`, `server/`, `launcher/` | `Json`, `Installation`; `WebServer`, `PageWatch`, `Http`, `DesktopOpener`; `WebApp`, `LaunchOptions` — the JDK only |
-| `dist/src/main/resources/jtools-dist/` | the assembly descriptors and the launchers, `${jtools.app.*}` left for the project's build |
+| `support/`, `server/`, `launcher/`, `desktop/` | `Json`, `I18n`, `Catalogue`, `Installation`; `WebServer`, `Exchange`, `Answer`, `PageWatch`, `Http`, `DesktopOpener`; `WebApp`, `UserSettings`, `SettingsFields`, `LaunchOptions`, `LogFormatter`; `FileDialogs` — the JDK only. doc/DESIGN-1.1.md says why each is as it is |
+| `dist/src/main/resources/jtools-dist/` | `build.xml` (jdeps, jlink, the archives) and the launchers, `${jtools.app.*}` left for the project's build |
 | `web/src/lib/` | `@jtools/web` (shipped as sources in `jtools-web.jar`); `web/src/main.ts` is a harness, not shipped |
 | `scripts/` | the managed scripts (`managed-files.list`) — the very files projects get — and the framework's tools |
 | `templates/webapp/` | the generated project; `__APP_NAME__`, `__APP_ID__`, `__APP_PORT__`, `__JTOOLS_VERSION__`, `__JTOOLS_HOME__` in contents and paths |

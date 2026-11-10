@@ -1,13 +1,14 @@
 @echo off
 rem Managed by JToolsFramework (scripts/jtools-sync.sh refreshes it): change it there, not here.
 rem
-rem Build the self-contained distributions (jar + bundled JRE + launchers; <name>.exe without a console), into releases\:
-rem   releases\<id>-<version>-linux.tar.gz, releases\<id>-<version>-windows.zip
+rem Build the self-contained distributions (jar + a runtime jlink trims to what the program needs + launchers;
+rem <name>.exe without a console), into releases\:
+rem   releases\<id>-<version>-linux.tar.gz, -windows.zip, and -macos.tar.gz when externals.conf names JDK_MACOS
 rem
 rem   scripts\package.bat
 rem   scripts\package.bat -DskipTests      extra arguments are passed to mvn
 rem
-rem The JRE archives come from external\ (scripts\setup.bat deploys them). The version is the root pom's <revision>.
+rem The runtimes are linked from the JDKs of external\ (scripts\setup.bat deploys them). The version is the root pom's <revision>.
 rem The releases of the previous versions are removed once the new one is built.
 rem
 cd /d "%~dp0.."
@@ -28,13 +29,14 @@ if not defined VERSION_LINE (
 )
 set "VERSION=%VERSION_LINE:*<revision>=%"
 set "VERSION=%VERSION:</revision>=%"
-for %%a in (releases\%APP_ID%-*-windows.zip releases\%APP_ID%-*-linux.tar.gz) do call :previous "%%a"
+for %%a in (releases\%APP_ID%-*-windows.zip releases\%APP_ID%-*-linux.tar.gz releases\%APP_ID%-*-macos.tar.gz) do call :previous "%%a"
 
-rem What every distribution must carry: the jar, its launchers, the .ini and the JRE.
+rem What every distribution must carry: the jar, its launchers, the .ini and the runtime.
 set "BASE=%APP_ID%-%VERSION%"
-call :check "releases\%BASE%-windows.zip" %APP_ID%.jar "%APP_NAME%.exe" %APP_ID%.bat %APP_ID%.ini README.md jre/bin/java.exe || exit /b 1
-call :check "releases\%BASE%-linux.tar.gz" %APP_ID%.jar %APP_ID%.sh %APP_ID%.ini README.md jre/bin/java || exit /b 1
-echo == releases\ checked: %BASE%-windows.zip and %BASE%-linux.tar.gz, each with its JRE and launchers
+call :check "releases\%BASE%-windows.zip" %APP_ID%.jar "%APP_NAME%.exe" %APP_ID%.bat %APP_ID%.ini README.md jre/bin/java.exe jre/release || exit /b 1
+call :check "releases\%BASE%-linux.tar.gz" %APP_ID%.jar %APP_ID%.sh %APP_ID%.ini README.md jre/bin/java jre/release || exit /b 1
+if exist external\jdk-macos.tar.gz call :check "releases\%BASE%-macos.tar.gz" %APP_ID%.jar %APP_ID%.sh %APP_ID%.ini README.md jre/bin/java jre/release || exit /b 1
+echo == releases\ checked: each with its runtime and launchers
 exit /b 0
 
 rem ---- one archive (%1) and the files it must carry (%2...)

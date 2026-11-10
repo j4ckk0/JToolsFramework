@@ -45,6 +45,15 @@ class JsonTest {
     }
 
     @Test
+    void writesRawJsonAsItIs() {
+        Map<String, Object> out = Json.obj();
+        out.put("graph", Json.raw("{\"nodes\":[1,2]}"));
+        out.put("name", "g");
+        assertEquals("{\"graph\":{\"nodes\":[1,2]},\"name\":\"g\"}", Json.write(out));
+        assertEquals("[true]", Json.write(Json.raw("[true]")));
+    }
+
+    @Test
     void refusesWhatIsNotJson() {
         assertThrows(IllegalArgumentException.class, () -> Json.parse("{\"a\":1"));
         assertThrows(IllegalArgumentException.class, () -> Json.parse("[1] trailing"));

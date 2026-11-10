@@ -6,13 +6,13 @@
   <parent>
     <groupId>org.jtools.framework</groupId>
     <artifactId>jtools-parent</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <relativePath>../parent/pom.xml</relativePath>
   </parent>
   <artifactId>jtools-dist</artifactId>
   <packaging>jar</packaging>
   <name>JToolsFramework dist</name>
-  <description>What the distributions of a project are made of: the assembly descriptors of the Linux tar.gz and the Windows zip, and the launchers and .ini they carry, written for any program by the jtools.app.* properties. The parent's dist profile unpacks it; nothing here runs.</description>
+  <description>What the distributions of a project are made of: build.xml — the modules the program needs (jdeps), a runtime per platform trimmed to them (jlink), the Linux and macOS tar.gz and the Windows zip, and the launchers and .ini they carry, written for any program by the jtools.app.* properties. The parent's dist profile unpacks it; nothing here runs.</description>
   <!-- the files keep their ${jtools.app.*}: the project's build fills them in, not this one's -->
   <properties>
     <!-- no Java: Maven Central's javadoc jar is a README (jtools-parent, profile publish) -->

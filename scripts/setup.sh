@@ -4,7 +4,8 @@
 # Deploys the project's externals into external/ (not under source control), from externals.conf — each tool only
 # when externals.conf names it:
 #   external/jdk, maven, gradle, node                    JDK_*, MAVEN_*, GRADLE, NODE_*: extracted, their top directory stripped
-#   external/jre-linux.tar.gz, external/jre-windows.zip  JRE_*: the JRE archives the distributions bundle
+#   external/jdk-linux.tar.gz, jdk-windows.zip, jdk-macos.tar.gz  JDK_*: the JDKs the distributions' runtimes are linked
+#                                                                 from, kept as archives (hard links to the downloads)
 #   external/downloads/                                  the archives as downloaded (kept: a second run downloads nothing)
 # then the project's own extras: scripts/setup.local.sh, when it has one, is sourced with fetch and deploy at hand,
 # $force set, and the options this script does not know in $local_args.
@@ -106,14 +107,16 @@ for spec in "jdk JDK_LINUX bin/java" "maven MAVEN_LINUX bin/mvn" "gradle GRADLE 
   echo "== $dir deployed"
 done
 
-# the JRE archives the distributions bundle, kept as archives under generic names
-for spec in "jre-linux.tar.gz JRE_LINUX" "jre-windows.zip JRE_WINDOWS"; do
+# the JDKs the distributions' runtimes are linked from, kept as archives under generic names: a hard link to the
+# download when both are on one file system (they weigh 200 MB each), a copy otherwise
+for spec in "jdk-linux.tar.gz JDK_LINUX" "jdk-windows.zip JDK_WINDOWS" "jdk-macos.tar.gz JDK_MACOS"; do
   set -- $spec
   [ -n "${!2:-}" ] || continue
   target=$ext/$1
   if [ -s "$target" ] && ! $force; then echo "== $target present"; continue; fi
   file=$(fetch "${!2}") || exit 1
-  cp "$file" "$target"
+  rm -f "$target"
+  ln "$file" "$target" 2>/dev/null || cp "$file" "$target"
   echo "== $target deployed"
 done
 

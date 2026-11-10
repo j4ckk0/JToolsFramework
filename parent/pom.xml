@@ -13,12 +13,12 @@
          - in a module holding an angular.json: the page built by npm (install, build, test), its build under
            static/ in the module's jar, and @jtools/web unpacked into target/jtools-web (profile jtools-frontend);
          - in the module setting jtools.program.skip to false: the program's one jar, embedding every module
-           (jtools-embed), and with -Pdist the Linux and Windows distributions, each with a bundled JRE, the
+           (jtools-embed), and with -Pdist the Linux, macOS and Windows distributions, each with a runtime jlink trims, the
            launchers and the .ini (profile dist; the descriptors come from jtools-dist).
        doc/BUILD.md in JToolsFramework says it in full. -->
   <groupId>org.jtools.framework</groupId>
   <artifactId>jtools-parent</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
   <packaging>pom</packaging>
 
   <name>JToolsFramework parent</name>
@@ -64,7 +64,7 @@
 
   <properties>
     <!-- the framework's version, for the projects' dependencies on its modules: always this pom's own <version> -->
-    <jtools.version>1.0.0</jtools.version>
+    <jtools.version>1.1.0</jtools.version>
     <maven.compiler.release>21</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <junit.version>5.12.2</junit.version>
@@ -109,6 +109,11 @@
       <dependency>
         <groupId>org.jtools.framework</groupId>
         <artifactId>jtools-launcher</artifactId>
+        <version>${jtools.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jtools.framework</groupId>
+        <artifactId>jtools-desktop</artifactId>
         <version>${jtools.version}</version>
       </dependency>
       <dependency>
@@ -188,11 +193,6 @@
           <version>3.1.0</version>
         </plugin>
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-assembly-plugin</artifactId>
-          <version>3.7.1</version>
-        </plugin>
-        <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
           <version>3.5.0</version>
@@ -245,8 +245,8 @@
     <plugins>
       <!-- The program's jar, in the module that sets jtools.program.skip to false: one jar, java -jar <id>.jar,
            embedding every module and library it depends on, the page included, with the program's main class and
-           version. Declared here rather than in that module so that it runs before the dist profile's assembly in the
-           same phase: a parent's plugins run before its children's, and the distributions carry this jar. -->
+           version. Declared here rather than in that module so that it runs before the dist profile's distributions in the
+           same phase: the build's own plugins run before its profiles', and the distributions carry this jar. -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -432,20 +432,22 @@
       mvn package -Pdist
       The self-contained distributions, built by the module that sets jtools.program.skip to false (every other module
       skips them), into releases/ at the root of the repository (not tracked, kept by mvn clean):
-        releases/<id>-<version>-linux.tar.gz   <id>.sh, <id>.jar, <id>.ini, README.md, jre/
+        releases/<id>-<version>-linux.tar.gz   <id>.sh, <id>.jar, <id>.ini, README.md, LICENSE, NOTICE, jre/
+        releases/<id>-<version>-macos.tar.gz   the same, Apple silicon
         releases/<id>-<version>-windows.zip    <name>.exe (no console), <id>.bat (console), the same, jre\
-      plus whatever the module keeps in src/dist/files/. The JREs come from external/jre-linux.tar.gz and
-      external/jre-windows.zip (scripts/setup.sh); the descriptors and the launchers from jtools-dist.
+      plus whatever the module keeps in src/dist/files/. Each jre/ is a runtime jlink trims to the modules the program
+      needs (jdeps on its jar, and jtools.dist.modules.extra), linked from that platform's JDK in external/
+      (jdk-linux.tar.gz, jdk-windows.zip, jdk-macos.tar.gz: scripts/setup.sh); a platform whose JDK is not there is not
+      built. jtools-dist's build.xml does it, once the program's jar is made.
     -->
     <profile>
       <id>dist</id>
       <properties>
-        <jre.archives>${maven.multiModuleProjectDirectory}/external</jre.archives>
-        <jre.windows>jre-windows.zip</jre.windows>
-        <jre.linux>jre-linux.tar.gz</jre.linux>
-        <jre.unpacked>${project.build.directory}/jre</jre.unpacked>
+        <jtools.jdk.archives>${maven.multiModuleProjectDirectory}/external</jtools.jdk.archives>
         <jtools.dist.files>${project.build.directory}/jtools-dist</jtools.dist.files>
         <release.dir>${maven.multiModuleProjectDirectory}/releases</release.dir>
+        <!-- what jdeps cannot see in the jar: the charsets of files in any encoding, the elliptic curves TLS needs -->
+        <jtools.dist.modules.extra>jdk.charsets,jdk.crypto.ec</jtools.dist.modules.extra>
       </properties>
       <build>
         <plugins>
@@ -476,43 +478,6 @@
             </executions>
           </plugin>
           <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>jtools-unpack-jre</id>
-                <phase>prepare-package</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <skip>${jtools.program.skip}</skip>
-                  <target>
-                    <fail message="no ${jre.archives}/${jre.windows}: run scripts/setup.sh (see README: Externals)">
-                      <condition>
-                        <not><available file="${jre.archives}/${jre.windows}"/></not>
-                      </condition>
-                    </fail>
-                    <fail message="no ${jre.archives}/${jre.linux}: run scripts/setup.sh (see README: Externals)">
-                      <condition>
-                        <not><available file="${jre.archives}/${jre.linux}"/></not>
-                      </condition>
-                    </fail>
-                    <!-- cutdirsmapper strips the archives' top-level "jdk-xx-jre/" directory -->
-                    <unzip dest="${jre.unpacked}/windows">
-                      <fileset dir="${jre.archives}" includes="${jre.windows}"/>
-                      <cutdirsmapper dirs="1"/>
-                    </unzip>
-                    <untar dest="${jre.unpacked}/linux" compression="gzip">
-                      <fileset dir="${jre.archives}" includes="${jre.linux}"/>
-                      <cutdirsmapper dirs="1"/>
-                    </untar>
-                  </target>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
             <!-- <name>.exe: a Windows launcher without a console (GUI subsystem) that runs the bundled jre\ with
                  <id>.jar; built from any OS. <id>.bat keeps the console. -->
             <groupId>com.akathist.maven.plugins.launch4j</groupId>
@@ -520,7 +485,7 @@
             <executions>
               <execution>
                 <id>jtools-windows-launcher</id>
-                <phase>package</phase>
+                <phase>prepare-package</phase>
                 <goals>
                   <goal>launch4j</goal>
                 </goals>
@@ -554,24 +519,36 @@
             </executions>
           </plugin>
           <plugin>
+            <!-- in the package phase after the program's jar (jtools-embed, declared before this profile's plugins) -->
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-assembly-plugin</artifactId>
+            <artifactId>maven-antrun-plugin</artifactId>
             <executions>
               <execution>
-                <id>jtools-dist</id>
+                <id>jtools-distributions</id>
                 <phase>package</phase>
                 <goals>
-                  <goal>single</goal>
+                  <goal>run</goal>
                 </goals>
                 <configuration>
-                  <skipAssembly>${jtools.program.skip}</skipAssembly>
-                  <finalName>${jtools.app.id}-${project.version}</finalName>
-                  <appendAssemblyId>true</appendAssemblyId>
-                  <outputDirectory>${release.dir}</outputDirectory>
-                  <descriptors>
-                    <descriptor>${jtools.dist.files}/assembly/windows.xml</descriptor>
-                    <descriptor>${jtools.dist.files}/assembly/linux.xml</descriptor>
-                  </descriptors>
+                  <skip>${jtools.program.skip}</skip>
+                  <target>
+                    <ant antfile="${jtools.dist.files}/build.xml" target="distributions" inheritAll="false">
+                      <property name="jdk.archives" value="${jtools.jdk.archives}"/>
+                      <property name="target" value="${project.build.directory}"/>
+                      <property name="launchers" value="${jtools.dist.files}/launcher"/>
+                      <property name="files" value="${project.basedir}/src/dist/files"/>
+                      <property name="root" value="${maven.multiModuleProjectDirectory}"/>
+                      <property name="release.dir" value="${release.dir}"/>
+                      <property name="jar" value="${project.build.directory}/${project.build.finalName}.jar"/>
+                      <property name="exe" value="${project.build.directory}/${jtools.app.name}.exe"/>
+                      <property name="version" value="${project.version}"/>
+                      <property name="java.release" value="${maven.compiler.release}"/>
+                      <property name="modules.extra" value="${jtools.dist.modules.extra}"/>
+                      <property name="jtools.app.id" value="${jtools.app.id}"/>
+                      <property name="jtools.app.name" value="${jtools.app.name}"/>
+                      <property name="jtools.app.port" value="${jtools.app.port}"/>
+                    </ant>
+                  </target>
                 </configuration>
               </execution>
             </executions>

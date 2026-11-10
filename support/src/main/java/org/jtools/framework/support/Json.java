@@ -25,8 +25,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Minimal JSON: writes and parses Map / List / String / Number / Boolean / null trees. No dependency. */
+/**
+ * Minimal JSON: writes and parses Map / List / String / Number / Boolean / null trees. No dependency. A {@link Raw} in a
+ * tree is JSON another writer already wrote: it is written as it is.
+ */
 public final class Json {
+
+    /** JSON already written — by a library's own writer — sent as it is, alone or inside a tree. Not checked. */
+    public record Raw(String json) {}
+
+    /** JSON already written, to be sent as it is: {@code Json.raw(graph.toJson())}. */
+    public static Raw raw(String json) { return new Raw(json); }
 
     /** What a malformed text is told: where it stopped, and what was expected there. */
     private static final String JSON_ERROR = "JSON: ", AT = " at ", TRAILING = "trailing characters", UNEXPECTED_END = "unexpected end",
@@ -47,6 +56,7 @@ public final class Json {
     @SuppressWarnings("unchecked")
     public static void write(StringBuilder sb, Object v) {
         if (v == null) sb.append("null");
+        else if (v instanceof Raw raw) sb.append(raw.json());
         else if (v instanceof String s) string(sb, s);
         else if (v instanceof Boolean || v instanceof Integer || v instanceof Long) sb.append(v);
         else if (v instanceof Number n) {

@@ -7,7 +7,8 @@ after each. The steps, in the order that pays first:
    managed scripts replace the project's copies (read the diff: what the project's own did beyond them goes into
    `scripts/*.local.sh`). The cheapest step, and the one that ends the drift between copies.
 2. **The parent pom** — `jtools-parent` as the root pom's parent, the `jtools.app.*` properties; the program's module
-   sets `jtools.program.skip` to `false` and loses its shade, launch4j, antrun and assembly configuration; the
+   sets `jtools.program.skip` to `false` and loses its shade, launch4j, antrun and assembly configuration (the
+   parent's dist profile links the runtimes with jlink and builds the Linux, macOS and Windows archives); the
    frontend's pom loses its npm executions. Then `src/assembly/` and `src/dist/` go, but for what the distributions
    carry of the project's own (`src/dist/files/`).
 3. **The libraries** — `PageWatch`, the HTTP plumbing, the browser, `Json`, the installation, the launcher: replaced
@@ -33,7 +34,7 @@ What its server and launcher need of the framework first, and what then goes: [D
 - Takes: the scripts (its `--model` setup goes into `scripts/setup.local.sh`, the model's checks into
   `externals.local.sh`), the parent (its eight modules keep their order), `PageWatch`, `Http`, `DesktopOpener`,
   `Json`, `Installation`, the launcher's command line (`--keep-alive` is the framework's name already).
-- Keeps: its "with model" distributions (a second assembly beside the parent's, in its own profile), its MCP server,
+- Keeps: its "with model" distributions (llm/ beside the parent's archives, in a profile of its own), its MCP server,
   its `--data` and `--lang` options (`WebApp.option`), its vanilla-JS page (the presence protocol is the same).
 - Candidates for the framework's next version, found here first: `I18n` (texts in English and French, the page's
   language from `Accept-Language`), `UserSettings` (the user's choices in `java.util.prefs`, as XsdViewer has too),

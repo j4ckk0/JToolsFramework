@@ -32,11 +32,16 @@ On Windows, the same scripts end in `.bat`. The CI runs before every push once t
 ### Running
 
 ```
-scripts/run.sh [--rebuild] [--port N] [--host H] [--no-browser] [--keep-alive] [--log-level LEVEL]
+scripts/run.sh [--rebuild] [--port N] [--host H] [--no-browser] [--keep-alive] [--log-level LEVEL | --verbose]
+               [--log-file FILE] [--lang LANG]
 ```
 
-`scripts/run.sh --help` says what each does. A distribution reads `__APP_ID__.ini` next to its jar
-(`port=__APP_PORT__`); the command line comes first.
+`scripts/run.sh --help` says what each does. The port is the command line's, else the one chosen from the page's
+Settings menu (`/api/settings`), else `__APP_ID__.ini`'s next to the jar (`port=__APP_PORT__`). The log goes to
+`~/.__APP_ID__/logs/__APP_ID__.0.log` (`--log-file`, or `log.folder` in the `.ini`), its lines in English.
+
+The framework answers four routes of its own beside the application's: `/api/settings` (the automatic stop, the
+port), `/api/about` (name, version, log file), `/api/quit` and `/api/log/open`.
 
 **The page alone, live-reloaded**: start the server (`scripts/run.sh --no-browser`), then `cd frontend && npm start`
 serves the page on `http://localhost:4200/`, sending `/api` to the server (`frontend/proxy.conf.json`).
@@ -51,13 +56,14 @@ Nothing the build needs is under source control nor taken from the machine: `scr
 | `jdk/` | Temurin JDK 21 (every script's `JAVA_HOME`) |
 | `maven/` | Maven, the build |
 | `node/` | Node.js and npm, the page's build (run by Maven) |
-| `jre-linux.tar.gz`, `jre-windows.zip` | Temurin JRE 21, bundled in the distributions |
+| `jdk-linux.tar.gz`, `jdk-windows.zip`, `jdk-macos.tar.gz` | the Temurin JDKs the distributions' runtimes are linked from (jlink) |
 
 ## Packaging
 
-`scripts/package.sh` builds two self-contained distributions — nothing to install, a JRE inside:
-`releases/__APP_ID__-<version>-linux.tar.gz` (`__APP_ID__.sh`) and `releases/__APP_ID__-<version>-windows.zip`
-(`__APP_NAME__.exe` without a console, `__APP_ID__.bat` with one). The version is said once, as `<revision>` in
+`scripts/package.sh` builds three self-contained distributions — nothing to install, a Java runtime inside, which
+jlink trims to the modules the program needs: `releases/__APP_ID__-<version>-linux.tar.gz` and `-macos.tar.gz` (Apple
+silicon; `__APP_ID__.sh`), and `releases/__APP_ID__-<version>-windows.zip` (`__APP_NAME__.exe` without a console,
+`__APP_ID__.bat` with one). The version is said once, as `<revision>` in
 `pom.xml`, with its four-part form `jtools.app.windowsVersion` for the `.exe`. Files the distributions carry besides
 go in `app/src/dist/files/`.
 

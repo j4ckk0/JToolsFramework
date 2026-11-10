@@ -1,7 +1,9 @@
 # JToolsFramework 1.1 — design
 
 What the framework must gain so that **XsdViewer** and **DCSBuilder** can move their infrastructure onto it. Written
-from a survey of both programs' code (November 2026); nothing here is implemented yet.
+from a survey of both programs' code (November 2026), then **implemented in 1.1.0** with the jlink distributions pulled
+in from §8 — §10 says where the implementation departed from this design, and why. Neither program has moved yet:
+their own test suites, on a branch each, remain the acceptance tests (§9).
 
 ## 0. Two decisions first
 
@@ -126,7 +128,7 @@ a 405 or 404 in text makes their `resp.json()` throw instead of saying why:
 | a method the route does not take | 405, `Allow:` header | "{0} expected" |
 | no such route | 404 | "not found" |
 
-A route registered with `get` answers GET (and HEAD), with `post` POST; `route(path, Route)` takes any method — what
+A route registered with `get` answers GET, with `post` POST; `route(path, Route)` takes any method — what
 DCSBuilder's `logged` routes and XsdViewer's `/api/capabilities` do today. `refuse(Class, status)` is how DCSBuilder
 keeps its "a domain exception is the user's problem: 400" (`server.refuse(Exception.class, 400)`, the most specific
 mapping winning) while an `IOException` becomes the 500 it is.
@@ -269,9 +271,9 @@ caller's. A module of its own, so that a program without dialogs does not carry 
 
 ```java
 public static boolean available();
-public static List<Path> chooseFilesToOpen(String title, boolean multiple, Filter filter);
-public static Optional<Path> chooseFileToSave(String title, Path folder, String name, Filter filter);
-public static Optional<Path> chooseFolder(String title);
+public static List<Path> chooseFilesToOpen(String title, boolean multiple, Filter filter);   // empty: cancelled
+public static Path chooseFileToSave(String title, Path folder, String name, Filter filter);   // null: cancelled
+public static Path chooseFolder(String title);                                                // null: cancelled
 public record Filter(String description, List<String> globs) {}
 ```
 
@@ -282,12 +284,13 @@ three that shrink, estimated): `PageWatch` 93, `AliveHandler` 55,
 `ByeHandler` 24, `QuitHandler` 28, `SettingsHandler` 83, `CapabilitiesHandler` 26, `StaticResourceHandler` 39,
 `HttpResponses` 59, `HttpStatus` 13, `HttpMethod` 8, `ContentType` 36, `QueryString` 35, `JsonRequest` 29,
 `BrowserLauncher` 28, `CommandLineOptions` 79, `ConfigFile` 129, `UserSettings` 45, `BuildInfo` 21, `FileDialogs` 345;
-`Log` shrinks to its facade; `XsdViewerServer` (121) and `XsdViewerApplication` (98) to the sketch below.
+`Log` shrinks to its facade; `XsdViewerServer` (121) and `XsdViewerApplication` (98) to the sketch below. With the jlink
+distributions in 1.1 (§10), its `dist` profile and `src/build/runtimes.xml` go too: the parent's builds the same three
+archives, its samples from `app/src/dist/files/`, its modules found by jdeps.
 
 **What stays**: core whole; the 15 schema handlers (their bodies change little: `requirePost` and `readBody` become
 `post` and `ex.text()`); `ApiPath`'s schema routes; `ServedSchemaFiles`, `SchemaText`, `SchemaFolder`, `Workspace`;
-its `dist` profile (jlink, three platforms — the parent's stays dormant: 1.2 candidate); its page, but for one
-constant.
+its page, but for one constant.
 
 ```java
 public static void main(String[] args) {
@@ -347,9 +350,7 @@ Gradle plugin yet).
 
 ## 8. 1.2 candidates — one-sided, or neither yet
 
-- **jlink runtimes and macOS** in jtools-dist: XsdViewer's `runtimes.xml` (trimmed runtimes from the three JDKs'
-  jmods), so that every program's distributions shrink and gain a macOS archive — XsdViewer could then drop its own
-  `dist` profile.
+- ~~**jlink runtimes and macOS**~~ — pulled into 1.1 (§10).
 - **A second launch opens the running one**: today both say "port in use" and exit. Probe `/api/about` on the port; if
   it is the same program, open the browser on it and hand it the file operand.
 - **A vanilla-JS page module** (`jtools-page.js`): presence, `request()` with the page's language, quit, settings,
@@ -378,3 +379,27 @@ The work, each step with its tests, the framework's CI (the generated project) g
 5. **The acceptance tests are the two programs' own**: XsdViewer moved on a branch passes its JUnit and its page's
    JS tests; DCSBuilder moved on a branch passes `DcsBuilderServerTest` (its protocol answers, ETags, the language of
    a 400), `I18nTest` and `FrontendTest`. A test of theirs that fails is a design fault here before it is a fault there.
+
+## 10. What the implementation changed
+
+Implemented in 1.1.0, tested by 53 framework tests (48 JUnit, 5 vitest) and a generated project built, run and packaged.
+Where it departs from the sections above:
+
+- **The jlink distributions are in 1.1** (the user's choice, from §8): jtools-dist's `build.xml` replaces the assembly
+  descriptors — jdeps on the program's jar, plus `jtools.dist.modules.extra` (`jdk.charsets,jdk.crypto.ec`); one
+  runtime per platform whose JDK is in `external/` (`JDK_LINUX`, `JDK_WINDOWS`, `JDK_MACOS` in `externals.conf`,
+  hard-linked archives); Linux, macOS (Apple silicon) and Windows archives of about 35 MB, against 50 MB with a whole
+  JRE. The `JRE_*` keys are gone. XsdViewer's own `dist` profile has its replacement.
+- **`get` answers GET only**, not HEAD: the JDK's server wants a HEAD answered without a body, which no route writes
+  for; no page asks HEAD.
+- **`FileDialogs` keeps XsdViewer's signatures** — null or an empty list when cancelled, not `Optional` — so that its
+  handlers move without a change; its two texts (the overwrite question, the failure) are in the machine's language,
+  the desktop it opens on, where XsdViewer used the page's.
+- **The log has its own formatter** (`LogFormatter`): the JDK's `SimpleFormatter` writes the level in the machine's
+  language (`INFOS`, `AVERTISSEMENT`) and `MessageFormat` groups digits (`8,093`, `8 093`) — found running a
+  distribution on a French machine; the log's levels are English and its numbers plain.
+- **`Exchange.i18n()`** answers the framework's own texts when the program named no catalogue (`WebApp.texts`),
+  rather than failing: a program without texts of its own still has a language for its refusals.
+- **The server's refusals and the launcher's messages** are each a catalogue of the framework in en and fr
+  (`org/jtools/framework/server/texts`, `…/launcher/texts`, `…/desktop/texts`).
+

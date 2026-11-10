@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.jtools.framework</groupId>
     <artifactId>jtools-parent</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <relativePath>parent/pom.xml</relativePath>
   </parent>
 
@@ -22,7 +22,8 @@
          support    JSON, the installation: the JDK and nothing else
          server     WebServer, PageWatch: a local web application's server
          launcher   WebApp: the program around the server
-         dist       the assembly descriptors and launchers of the distributions
+         desktop    FileDialogs: the native file dialogs (a program without them does not carry them)
+         dist       the distributions' build (jlink runtimes, the archives) and launchers
          web        @jtools/web: the page's side, as TypeScript sources
        One version for all, said in every pom and as jtools.version in parent/pom.xml: scripts/install.sh checks they
        agree. The project template (templates/webapp) and the scripts are not modules: scripts/new-project.sh copies them. -->
@@ -31,6 +32,7 @@
     <module>support</module>
     <module>server</module>
     <module>launcher</module>
+    <module>desktop</module>
     <module>dist</module>
     <module>web</module>
   </modules>

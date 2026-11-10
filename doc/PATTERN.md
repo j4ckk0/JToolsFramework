@@ -69,9 +69,10 @@ externals' versions are `externals.conf`'s. Nothing else repeats them; a test ch
 
 ## 7. The distributions
 
-`scripts/package.sh` builds two self-contained archives into `releases/` (not tracked): a Linux `tar.gz` with
-`<id>.sh`, and a Windows `zip` with `<Name>.exe` (launch4j, no console) and `<id>.bat` (a console). Each holds the
-program's one jar, its `<id>.ini` (the installation's settings: `port`, `host`), the README and a bundled JRE — nothing
+`scripts/package.sh` builds three self-contained archives into `releases/` (not tracked): a Linux and a macOS `tar.gz`
+with `<id>.sh`, and a Windows `zip` with `<Name>.exe` (launch4j, no console) and `<id>.bat` (a console). Each holds the
+program's one jar, its `<id>.ini` (the installation's settings: `port`, `host`, `log.level`, `log.folder`), the README and
+a runtime jlink trims to the modules the program needs (about 35 MB an archive) — nothing
 to install. The script checks what each carries and removes the previous versions' releases.
 
 ## 8. Ports

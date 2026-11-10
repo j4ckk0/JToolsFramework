@@ -4,7 +4,7 @@ rem
 rem Deploys the project's externals into external\ (not under source control), from externals.conf — each tool only
 rem when externals.conf names it:
 rem   external\jdk, maven, gradle, node                    JDK_*, MAVEN_*, GRADLE, NODE_*: extracted, their top directory stripped
-rem   external\jre-linux.tar.gz, external\jre-windows.zip  JRE_*: the JRE archives the distributions bundle
+rem   external\jdk-linux.tar.gz, jdk-windows.zip, jdk-macos.tar.gz  JDK_*: the JDKs the distributions' runtimes are linked from
 rem   external\downloads\                                  the archives as downloaded (kept)
 rem then the project's own extras: scripts\setup.local.bat, when it has one, is called with this script's arguments.
 rem
@@ -56,8 +56,9 @@ if defined JDK_WINDOWS call :tool jdk JDK_WINDOWS bin\java.exe || exit /b 1
 if defined MAVEN_WINDOWS call :tool maven MAVEN_WINDOWS bin\mvn.cmd || exit /b 1
 if defined GRADLE call :tool gradle GRADLE bin\gradle.bat || exit /b 1
 if defined NODE_WINDOWS call :tool node NODE_WINDOWS node.exe || exit /b 1
-if defined JRE_LINUX call :archive jre-linux.tar.gz JRE_LINUX || exit /b 1
-if defined JRE_WINDOWS call :archive jre-windows.zip JRE_WINDOWS || exit /b 1
+if defined JDK_LINUX call :archive jdk-linux.tar.gz JDK_LINUX || exit /b 1
+if defined JDK_WINDOWS call :archive jdk-windows.zip JDK_WINDOWS || exit /b 1
+if defined JDK_MACOS call :archive jdk-macos.tar.gz JDK_MACOS || exit /b 1
 if exist scripts\setup.local.bat call scripts\setup.local.bat %* || exit /b 1
 
 echo == external\ ready:
@@ -83,7 +84,7 @@ tar -xf "!FILE!" -C "%DIR%" --strip-components 1 || exit /b 1
 echo == %DIR% deployed
 exit /b 0
 
-rem ---- a JRE archive: copied as it is under its generic name
+rem ---- a JDK archive the distributions are linked from: copied as it is under its generic name
 :archive
 set "TARGET=%EXT%\%~1"
 if exist "%TARGET%" if "%FORCE%"=="0" (
