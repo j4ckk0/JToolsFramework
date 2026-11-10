@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The Windows distribution: zip with the bundled JRE, <name>.exe (no console) and <id>.bat (console). What goes in:
+     the program's jar, its launchers and .ini (from jtools-dist/launcher, filled in with the jtools.app.* properties),
+     the README, the JRE, and whatever the module keeps in src/dist/files/. -->
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.2.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.2.0 http://maven.apache.org/xsd/assembly-2.2.0.xsd">
+  <id>windows</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <baseDirectory>${jtools.app.id}-${project.version}</baseDirectory>
+
+  <files>
+    <file>
+      <source>${project.build.directory}/${project.build.finalName}.jar</source>
+      <destName>${jtools.app.id}.jar</destName>
+    </file>
+    <file>
+      <source>${project.build.directory}/${jtools.app.name}.exe</source>
+    </file>
+    <file>
+      <source>${jtools.dist.files}/launcher/app.bat</source>
+      <destName>${jtools.app.id}.bat</destName>
+      <filtered>true</filtered>
+      <lineEnding>crlf</lineEnding>
+    </file>
+    <file>
+      <source>${jtools.dist.files}/launcher/app.ini</source>
+      <destName>${jtools.app.id}.ini</destName>
+      <filtered>true</filtered>
+      <lineEnding>crlf</lineEnding>
+    </file>
+    <file>
+      <source>${maven.multiModuleProjectDirectory}/README.md</source>
+      <lineEnding>crlf</lineEnding>
+    </file>
+  </files>
+
+  <fileSets>
+    <fileSet>
+      <directory>${project.build.directory}/jre/windows</directory>
+      <outputDirectory>jre</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>${project.basedir}/src/dist/files</directory>
+      <outputDirectory>.</outputDirectory>
+    </fileSet>
+  </fileSets>
+</assembly>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jtools</groupId>
+    <artifactId>__APP_ID__-parent</artifactId>
+    <version>${revision}</version>
+  </parent>
+  <artifactId>__APP_ID__</artifactId>
+  <name>__APP_NAME__</name>
+  <description>The program: its launcher, its one jar embedding every module and the page, and with -Pdist the distributions (jtools-parent).</description>
+
+  <properties>
+    <!-- this module builds the program: its one jar, and with -Pdist the distributions (jtools-parent) -->
+    <jtools.program.skip>false</jtools.program.skip>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.jtools</groupId>
+      <artifactId>__APP_ID__-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jtools</groupId>
+      <artifactId>__APP_ID__-frontend</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jtools.framework</groupId>
+      <artifactId>jtools-launcher</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>${jtools.app.id}</finalName>
+  </build>
+</project>

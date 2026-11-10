@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jtools.framework</groupId>
+    <artifactId>jtools-parent</artifactId>
+    <version>1.0.0</version>
+    <relativePath>../parent/pom.xml</relativePath>
+  </parent>
+  <artifactId>jtools-launcher</artifactId>
+  <packaging>jar</packaging>
+  <name>JToolsFramework launcher</name>
+  <description>A local web application's program: the command line every org.jtools program shares (--port, --host, --no-browser, --keep-alive, --log-level, --help) and its own options, the installation's .ini, the logging, the server with the application's routes, the browser, the stop once the last page is closed, the startup failure said in a dialog.</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.jtools.framework</groupId>
+      <artifactId>jtools-server</artifactId>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Automatic-Module-Name>org.jtools.framework.launcher</Automatic-Module-Name>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

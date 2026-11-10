@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jtools.framework</groupId>
+    <artifactId>jtools-parent</artifactId>
+    <version>1.0.0</version>
+    <relativePath>../parent/pom.xml</relativePath>
+  </parent>
+  <artifactId>jtools-dist</artifactId>
+  <packaging>jar</packaging>
+  <name>JToolsFramework dist</name>
+  <description>What the distributions of a project are made of: the assembly descriptors of the Linux tar.gz and the Windows zip, and the launchers and .ini they carry, written for any program by the jtools.app.* properties. The parent's dist profile unpacks it; nothing here runs.</description>
+  <!-- the files keep their ${jtools.app.*}: the project's build fills them in, not this one's -->
+</project>

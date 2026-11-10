@@ -1,0 +1,16 @@
+<header>
+  <h1>{{ info()?.name ?? '__APP_NAME__' }}</h1>
+</header>
+
+<main>
+  @if (error(); as error) {
+    <p class="error">{{ error }} Start the program again (scripts/run.sh), then reload this page.</p>
+  }
+  <router-outlet />
+</main>
+
+<footer>
+  @if (info(); as info) {
+    <span>{{ info.name }} {{ info.version }}</span>
+  }
+</footer>

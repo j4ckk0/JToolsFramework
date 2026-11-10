@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jtools.framework</groupId>
+    <artifactId>jtools-parent</artifactId>
+    <version>1.0.0</version>
+    <relativePath>../parent/pom.xml</relativePath>
+  </parent>
+  <artifactId>jtools-web</artifactId>
+  <packaging>jar</packaging>
+  <name>JToolsFramework web</name>
+  <description>@jtools/web, the page's side of the framework, as TypeScript sources: the presence that keeps the server running (PagePresenceService), provideJTools(), the reading of the server's errors. A project's frontend gets them unpacked into target/jtools-web and compiles them with its page.</description>
+  <properties>
+    <!-- the parent's jtools-frontend profile builds and tests this workspace with npm (its angular.json), but there is
+         nothing to unpack here — this is what gets unpacked — and the test page it builds is not shipped -->
+    <jtools.web.skip>true</jtools.web.skip>
+    <jtools.page.skip>true</jtools.page.skip>
+  </properties>
+  <build>
+    <resources>
+      <resource>
+        <directory>src/lib</directory>
+        <excludes>
+          <exclude>**/*.spec.ts</exclude>
+        </excludes>
+        <targetPath>jtools-web</targetPath>
+      </resource>
+    </resources>
+  </build>
+</project>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.jtools.framework</groupId>
+    <artifactId>jtools-parent</artifactId>
+    <version>1.0.0</version>
+    <relativePath>parent/pom.xml</relativePath>
+  </parent>
+
+  <artifactId>jtools-framework</artifactId>
+  <packaging>pom</packaging>
+
+  <name>JToolsFramework</name>
+  <description>What the org.jtools projects share — a Java server holding the business, an Angular page as its view, the program stopping once its last page is closed, self-contained distributions — as a parent pom, libraries, the page's TypeScript, the scripts and a project template.</description>
+
+  <!-- The modules, each depending only on those above it:
+         parent     jtools-parent, the build conventions every project inherits
+         support    JSON, the installation: the JDK and nothing else
+         server     WebServer, PageWatch: a local web application's server
+         launcher   WebApp: the program around the server
+         dist       the assembly descriptors and launchers of the distributions
+         web        @jtools/web: the page's side, as TypeScript sources
+       One version for all, said in every pom and as jtools.version in parent/pom.xml: scripts/install.sh checks they
+       agree. The project template (templates/webapp) and the scripts are not modules: scripts/new-project.sh copies them. -->
+  <modules>
+    <module>parent</module>
+    <module>support</module>
+    <module>server</module>
+    <module>launcher</module>
+    <module>dist</module>
+    <module>web</module>
+  </modules>
+</project>

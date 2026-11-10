@@ -1,0 +1,19 @@
+# The files JToolsFramework owns in every project: scripts/new-project.sh copies them into a new one, and
+# scripts/jtools-sync.sh refreshes them in an existing one. A project changes them here, in the framework, never in
+# its own copy (each says so in its header). One path per line, relative to the framework's root and the project's.
+scripts/externals.sh
+scripts/setup.sh
+scripts/build.sh
+scripts/ci.sh
+scripts/run.sh
+scripts/stop.sh
+scripts/package.sh
+scripts/externals.bat
+scripts/setup.bat
+scripts/build.bat
+scripts/ci.bat
+scripts/run.bat
+scripts/stop.bat
+scripts/package.bat
+.githooks/pre-push
+.gitattributes

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- The build conventions — Java 21, the page built by npm, the program's jar, the distributions — come from
+       JToolsFramework's jtools-parent (scripts/install.sh there puts it in ~/.m2); this pom says what is this
+       project's own: its modules and the jtools.app.* properties of its program. -->
+  <parent>
+    <groupId>org.jtools.framework</groupId>
+    <artifactId>jtools-parent</artifactId>
+    <version>__JTOOLS_VERSION__</version>
+    <relativePath/>
+  </parent>
+
+  <groupId>org.jtools</groupId>
+  <artifactId>__APP_ID__-parent</artifactId>
+  <version>${revision}</version>
+  <packaging>pom</packaging>
+
+  <name>__APP_NAME__</name>
+  <description>__APP_NAME__: a Java server holding the whole business, an Angular page in the browser as its view only. The server stops once its last page is closed.</description>
+
+  <!-- The modules, each depending only on those above it (doc/ARCHITECTURE.md):
+         core       the business: pure Java, no HTTP — usable from any Java program
+         api        the HTTP API over core: what the page may ask, as JSON
+         frontend   the Angular page, a view only, as a jar of static/ resources
+         app        the program: the launcher, its jar embedding everything, the distributions
+       The version is said once, here (a CI-friendly ${revision}): the modules' <parent> refer to it. -->
+  <modules>
+    <module>core</module>
+    <module>api</module>
+    <module>frontend</module>
+    <module>app</module>
+  </modules>
+
+  <properties>
+    <revision>0.1.0</revision>
+    <!-- the program (jtools-parent says what each is for) -->
+    <jtools.app.id>__APP_ID__</jtools.app.id>
+    <jtools.app.name>__APP_NAME__</jtools.app.name>
+    <jtools.app.mainClass>org.jtools.__APP_ID__.app.Launcher</jtools.app.mainClass>
+    <jtools.app.port>__APP_PORT__</jtools.app.port>
+    <jtools.app.windowsVersion>0.1.0.0</jtools.app.windowsVersion>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jtools</groupId>
+        <artifactId>__APP_ID__-core</artifactId>
+        <version>${revision}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jtools</groupId>
+        <artifactId>__APP_ID__-api</artifactId>
+        <version>${revision}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jtools</groupId>
+        <artifactId>__APP_ID__-frontend</artifactId>
+        <version>${revision}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+</project>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jtools</groupId>
+    <artifactId>__APP_ID__-parent</artifactId>
+    <version>${revision}</version>
+  </parent>
+  <artifactId>__APP_ID__-frontend</artifactId>
+  <name>__APP_NAME__ frontend</name>
+  <!-- the build is jtools-parent's jtools-frontend profile, on because of angular.json: @jtools/web unpacked into
+       target/jtools-web, npm install, build and test, the page as static/ in this module's jar -->
+  <description>The Angular page, as a jar of static/ resources the server serves: a view only, every decision is the server's.</description>
+</project>

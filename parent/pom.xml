@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- The parent of every org.jtools project, and of the framework's own modules: the conventions of the build,
+       said once. A project's root pom names it as <parent>, sets the jtools.app.* properties below, and gets:
+         - Java 21, UTF-8, JUnit 5, the plugins' versions, the tests run from the root of the repository;
+         - in a module holding an angular.json: the page built by npm (install, build, test), its build under
+           static/ in the module's jar, and @jtools/web unpacked into target/jtools-web (profile jtools-frontend);
+         - in the module setting jtools.program.skip to false: the program's one jar, embedding every module
+           (jtools-embed), and with -Pdist the Linux and Windows distributions, each with a bundled JRE, the
+           launchers and the .ini (profile dist; the descriptors come from jtools-dist).
+       doc/BUILD.md in JToolsFramework says it in full. -->
+  <groupId>org.jtools.framework</groupId>
+  <artifactId>jtools-parent</artifactId>
+  <version>1.0.0</version>
+  <packaging>pom</packaging>
+
+  <name>JToolsFramework parent</name>
+  <description>The build conventions of the org.jtools projects: a Java server, an Angular page as its view, and self-contained distributions.</description>
+
+  <properties>
+    <!-- the framework's version, for the projects' dependencies on its modules: always this pom's own <version> -->
+    <jtools.version>1.0.0</jtools.version>
+    <maven.compiler.release>21</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <junit.version>5.12.2</junit.version>
+
+    <!-- The program a project builds, set in its root pom:
+           jtools.app.id               its jar, .ini, launchers and releases: <id>.jar, <id>.ini, <id>-<version>-linux.tar.gz
+           jtools.app.name             its name, as people read it, and its Windows launcher: <name>.exe
+           jtools.app.mainClass        the class starting it (most often a call to org.jtools.framework.launcher.WebApp)
+           jtools.app.port             the port its .ini says (doc/PORTS.md in JToolsFramework keeps them apart)
+           jtools.app.windowsVersion   the version in the four parts an .exe wants: 1.2 is 1.2.0.0 -->
+    <jtools.app.id>app</jtools.app.id>
+    <jtools.app.name>App</jtools.app.name>
+    <jtools.app.mainClass></jtools.app.mainClass>
+    <jtools.app.port>0</jtools.app.port>
+    <jtools.app.windowsVersion>0.0.0.0</jtools.app.windowsVersion>
+    <jtools.app.copyright>j4ckk0</jtools.app.copyright>
+
+    <!-- what a module opts out of — or, for the program, into: the module that sets jtools.program.skip to false
+         builds the program's one jar and, with -Pdist, the distributions -->
+    <jtools.program.skip>true</jtools.program.skip>
+    <jtools.page.skip>false</jtools.page.skip>
+    <jtools.web.skip>false</jtools.web.skip>
+    <!-- the way npm installs the page's dependencies: "install", or "ci" for exactly package-lock.json (scripts/ci.sh) -->
+    <npm.install>install</npm.install>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jtools.framework</groupId>
+        <artifactId>jtools-support</artifactId>
+        <version>${jtools.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jtools.framework</groupId>
+        <artifactId>jtools-server</artifactId>
+        <version>${jtools.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jtools.framework</groupId>
+        <artifactId>jtools-launcher</artifactId>
+        <version>${jtools.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.13.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>3.2.5</version>
+          <configuration>
+            <!-- the tests read files relative to the root of the repository, whichever module they belong to -->
+            <workingDirectory>${maven.multiModuleProjectDirectory}</workingDirectory>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.3.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.4.1</version>
+          <configuration>
+            <archive>
+              <manifest>
+                <!-- Implementation-Title and -Version: what a program says of itself (Installation.version) -->
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              </manifest>
+            </archive>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>3.1.2</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>3.1.2</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>3.4.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>3.8.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>3.1.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>3.7.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>3.5.0</version>
+        </plugin>
+        <plugin>
+          <groupId>com.akathist.maven.plugins.launch4j</groupId>
+          <artifactId>launch4j-maven-plugin</artifactId>
+          <version>2.7.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>3.6.0</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <!-- The program's jar, in the module that sets jtools.program.skip to false: one jar, java -jar <id>.jar,
+           embedding every module and library it depends on, the page included, with the program's main class and
+           version. Declared here rather than in that module so that it runs before the dist profile's assembly in the
+           same phase: a parent's plugins run before its children's, and the distributions carry this jar. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>jtools-embed</id>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <skip>${jtools.program.skip}</skip>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>${jtools.app.mainClass}</mainClass>
+                  <manifestEntries>
+                    <Implementation-Title>${jtools.app.name}</Implementation-Title>
+                    <Implementation-Version>${project.version}</Implementation-Version>
+                  </manifestEntries>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <!--
+      The page: in a module holding an angular.json, npm builds it — the npm of PATH, external/node's when the
+      scripts run Maven — into target/angular (angular.json: outputPath), which joins the module's jar as static/,
+      the folder WebServer serves. @jtools/web, the framework's TypeScript, is unpacked into target/jtools-web
+      first, where tsconfig.json's "paths" finds it.
+    -->
+    <profile>
+      <id>jtools-frontend</id>
+      <activation>
+        <file>
+          <exists>${basedir}/angular.json</exists>
+        </file>
+      </activation>
+      <properties>
+        <skipTests>false</skipTests>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>jtools-web</id>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <skip>${jtools.web.skip}</skip>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.jtools.framework</groupId>
+                      <artifactId>jtools-web</artifactId>
+                      <version>${jtools.version}</version>
+                      <includes>jtools-web/**</includes>
+                    </artifactItem>
+                  </artifactItems>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
+                  <overWriteReleases>true</overWriteReleases>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <configuration>
+              <executable>npm</executable>
+            </configuration>
+            <executions>
+              <execution>
+                <id>npm-install</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <arguments>
+                    <argument>${npm.install}</argument>
+                    <argument>--no-audit</argument>
+                    <argument>--no-fund</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>ng-build</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <arguments>
+                    <argument>run</argument>
+                    <argument>build</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>ng-test</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <skip>${skipTests}</skip>
+                  <arguments>
+                    <argument>test</argument>
+                    <argument>--</argument>
+                    <argument>--watch=false</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>jtools-page</id>
+                <phase>process-resources</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <skip>${jtools.page.skip}</skip>
+                  <outputDirectory>${project.build.outputDirectory}/static</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>${project.build.directory}/angular/browser</directory>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+              <execution>
+                <!-- the licences of the libraries the page bundles, which the Angular build writes -->
+                <id>jtools-page-licences</id>
+                <phase>process-resources</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <skip>${jtools.page.skip}</skip>
+                  <outputDirectory>${project.build.outputDirectory}/static/licences</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>${project.build.directory}/angular</directory>
+                      <includes>
+                        <include>3rdpartylicenses.txt</include>
+                      </includes>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!--
+      mvn package -Pdist
+      The self-contained distributions, built by the module that sets jtools.program.skip to false (every other module
+      skips them), into releases/ at the root of the repository (not tracked, kept by mvn clean):
+        releases/<id>-<version>-linux.tar.gz   <id>.sh, <id>.jar, <id>.ini, README.md, jre/
+        releases/<id>-<version>-windows.zip    <name>.exe (no console), <id>.bat (console), the same, jre\
+      plus whatever the module keeps in src/dist/files/. The JREs come from external/jre-linux.tar.gz and
+      external/jre-windows.zip (scripts/setup.sh); the descriptors and the launchers from jtools-dist.
+    -->
+    <profile>
+      <id>dist</id>
+      <properties>
+        <jre.archives>${maven.multiModuleProjectDirectory}/external</jre.archives>
+        <jre.windows>jre-windows.zip</jre.windows>
+        <jre.linux>jre-linux.tar.gz</jre.linux>
+        <jre.unpacked>${project.build.directory}/jre</jre.unpacked>
+        <jtools.dist.files>${project.build.directory}/jtools-dist</jtools.dist.files>
+        <release.dir>${maven.multiModuleProjectDirectory}/releases</release.dir>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>jtools-dist</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <skip>${jtools.program.skip}</skip>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.jtools.framework</groupId>
+                      <artifactId>jtools-dist</artifactId>
+                      <version>${jtools.version}</version>
+                      <includes>jtools-dist/**</includes>
+                    </artifactItem>
+                  </artifactItems>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
+                  <overWriteReleases>true</overWriteReleases>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>jtools-unpack-jre</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <skip>${jtools.program.skip}</skip>
+                  <target>
+                    <fail message="no ${jre.archives}/${jre.windows}: run scripts/setup.sh (see README: Externals)">
+                      <condition>
+                        <not><available file="${jre.archives}/${jre.windows}"/></not>
+                      </condition>
+                    </fail>
+                    <fail message="no ${jre.archives}/${jre.linux}: run scripts/setup.sh (see README: Externals)">
+                      <condition>
+                        <not><available file="${jre.archives}/${jre.linux}"/></not>
+                      </condition>
+                    </fail>
+                    <!-- cutdirsmapper strips the archives' top-level "jdk-xx-jre/" directory -->
+                    <unzip dest="${jre.unpacked}/windows">
+                      <fileset dir="${jre.archives}" includes="${jre.windows}"/>
+                      <cutdirsmapper dirs="1"/>
+                    </unzip>
+                    <untar dest="${jre.unpacked}/linux" compression="gzip">
+                      <fileset dir="${jre.archives}" includes="${jre.linux}"/>
+                      <cutdirsmapper dirs="1"/>
+                    </untar>
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <!-- <name>.exe: a Windows launcher without a console (GUI subsystem) that runs the bundled jre\ with
+                 <id>.jar; built from any OS. <id>.bat keeps the console. -->
+            <groupId>com.akathist.maven.plugins.launch4j</groupId>
+            <artifactId>launch4j-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>jtools-windows-launcher</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>launch4j</goal>
+                </goals>
+                <configuration>
+                  <skip>${jtools.program.skip}</skip>
+                  <headerType>gui</headerType>
+                  <outfile>${project.build.directory}/${jtools.app.name}.exe</outfile>
+                  <dontWrapJar>true</dontWrapJar>
+                  <jar>${jtools.app.id}.jar</jar>
+                  <chdir>.</chdir>
+                  <errTitle>${jtools.app.name}</errTitle>
+                  <jre>
+                    <path>jre</path>
+                    <requiresJdk>false</requiresJdk>
+                    <requires64Bit>true</requires64Bit>
+                    <minVersion>${maven.compiler.release}</minVersion>
+                  </jre>
+                  <versionInfo>
+                    <fileVersion>${jtools.app.windowsVersion}</fileVersion>
+                    <txtFileVersion>${project.version}</txtFileVersion>
+                    <fileDescription>${jtools.app.name}</fileDescription>
+                    <copyright>${jtools.app.copyright}</copyright>
+                    <productVersion>${jtools.app.windowsVersion}</productVersion>
+                    <txtProductVersion>${project.version}</txtProductVersion>
+                    <productName>${jtools.app.name}</productName>
+                    <internalName>${jtools.app.id}</internalName>
+                    <originalFilename>${jtools.app.name}.exe</originalFilename>
+                  </versionInfo>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>jtools-dist</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <configuration>
+                  <skipAssembly>${jtools.program.skip}</skipAssembly>
+                  <finalName>${jtools.app.id}-${project.version}</finalName>
+                  <appendAssemblyId>true</appendAssemblyId>
+                  <outputDirectory>${release.dir}</outputDirectory>
+                  <descriptors>
+                    <descriptor>${jtools.dist.files}/assembly/windows.xml</descriptor>
+                    <descriptor>${jtools.dist.files}/assembly/linux.xml</descriptor>
+                  </descriptors>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
