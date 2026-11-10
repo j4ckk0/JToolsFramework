@@ -7,7 +7,8 @@
     runtimes       for each platform whose JDK archive is in jdk.archives — jdk-linux.tar.gz, jdk-windows.zip,
                    jdk-macos.tar.gz (what scripts/setup.sh deploys), or Temurin's own names (*jdk*linux*.tar.gz,
                    *jdk*windows*.zip, *jdk*mac*.tar.gz: a JRE's do not match) —, its jmods unpacked and a trimmed
-                   runtime linked from them by this machine's own jlink, of the same version
+                   runtime linked from them by the jlink of this machine's platform's archive — of the archives'
+                   version by construction, whatever JDK runs the build —, else of the JDK running it
     distributions  <id>-<version>-linux.tar.gz and -macos.tar.gz (<id>.sh), -windows.zip (<name>.exe without a
                    console, <id>.bat with one): the jar, the launchers, <id>.ini, the README, LICENSE and NOTICE when
                    the project has them, what jtools.dist.include names of the repository (samples/**) under the
@@ -28,6 +29,9 @@
   <patternset id="jdk.windows"><include name="jdk-windows.zip"/><include name="*jdk*windows*.zip"/></patternset>
   <patternset id="jdk.macos"><include name="jdk-macos.tar.gz"/><include name="*jdk*mac*.tar.gz"/></patternset>
   <condition property="exec.suffix" value=".exe"><os family="windows"/></condition>
+  <condition property="host" value="windows"><os family="windows"/></condition>
+  <condition property="host" value="macos"><os family="mac"/></condition>
+  <property name="host" value="linux"/>
 
   <target name="detect">
     <condition property="jdk.linux"><resourcecount when="greater" count="0"><fileset dir="${jdk.archives}" erroronmissingdir="false"><patternset refid="jdk.linux"/></fileset></resourcecount></condition>
@@ -37,8 +41,34 @@
     <fail if="jdk.none" message="no JDK archive in ${jdk.archives} (jdk-linux.tar.gz, jdk-windows.zip, jdk-macos.tar.gz, or Temurin's *jdk*linux*.tar.gz…): run scripts/setup.sh (see README: Externals)"/>
   </target>
 
-  <target name="modules" depends="detect">
-    <exec executable="${java.home}/bin/jdeps${exec.suffix}" outputproperty="modules.found" failonerror="true">
+  <!-- jdeps and jlink: those of this machine's platform's archive, unpacked whole — jlink links only jmods of its own
+       version, and the JDK running the build may be another (a system Java 25 building for 21) —, else the running JDK's -->
+  <target name="tools" depends="detect">
+    <condition property="host.linux"><and><equals arg1="${host}" arg2="linux"/><isset property="jdk.linux"/></and></condition>
+    <condition property="host.windows"><and><equals arg1="${host}" arg2="windows"/><isset property="jdk.windows"/></and></condition>
+    <condition property="host.macos"><and><equals arg1="${host}" arg2="macos"/><isset property="jdk.macos"/></and></condition>
+    <condition property="jdk.tools" value="${target}/jdk-host" else="${java.home}">
+      <or><isset property="host.linux"/><isset property="host.windows"/><isset property="host.macos"/></or>
+    </condition>
+  </target>
+  <target name="tools-linux" depends="tools" if="host.linux">
+    <delete dir="${target}/jdk-host"/>
+    <untar dest="${target}/jdk-host" compression="gzip"><fileset dir="${jdk.archives}"><patternset refid="jdk.linux"/></fileset><cutdirsmapper dirs="1"/></untar>
+    <chmod perm="755"><fileset dir="${target}/jdk-host" includes="bin/**, lib/jspawnhelper, lib/jexec"/></chmod>
+  </target>
+  <target name="tools-macos" depends="tools" if="host.macos">
+    <delete dir="${target}/jdk-host"/>
+    <untar dest="${target}/jdk-host" compression="gzip"><fileset dir="${jdk.archives}"><patternset refid="jdk.macos"/></fileset><patternset includes="*/Contents/Home/**"/><cutdirsmapper dirs="3"/></untar>
+    <chmod perm="755"><fileset dir="${target}/jdk-host" includes="bin/**, lib/jspawnhelper, lib/jexec"/></chmod>
+  </target>
+  <target name="tools-windows" depends="tools" if="host.windows">
+    <delete dir="${target}/jdk-host"/>
+    <unzip dest="${target}/jdk-host"><fileset dir="${jdk.archives}"><patternset refid="jdk.windows"/></fileset><cutdirsmapper dirs="1"/></unzip>
+  </target>
+
+  <target name="modules" depends="tools, tools-linux, tools-macos, tools-windows">
+    <echo message="jdeps and jlink: ${jdk.tools}"/>
+    <exec executable="${jdk.tools}/bin/jdeps${exec.suffix}" outputproperty="modules.found" failonerror="true">
       <arg value="--ignore-missing-deps"/>
       <arg value="--print-module-deps"/>
       <arg value="--multi-release"/><arg value="${java.release}"/>
@@ -79,7 +109,7 @@
     <sequential>
       <delete dir="${runtime}/@{os}"/>
       <echo message="jlink: the @{os} runtime"/>
-      <exec executable="${java.home}/bin/jlink${exec.suffix}" failonerror="true">
+      <exec executable="${jdk.tools}/bin/jlink${exec.suffix}" failonerror="true">
         <arg value="--module-path"/><arg value="${jmods}/@{os}"/>
         <arg value="--add-modules"/><arg value="${modules}"/>
         <arg value="--output"/><arg value="${runtime}/@{os}"/>

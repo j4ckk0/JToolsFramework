@@ -419,4 +419,7 @@ Where it departs from the sections above:
 - `build.xml` finds a platform's JDK by Temurin's own names too (`*jdk*linux*.tar.gz`, case-sensitive: a JRE's do
   not match) in the folder `jtools.jdk.archives` names, and `jtools.dist.include` adds folders of the repository to
   the archives (`samples/**`) — XsdViewer's release workflow downloads its JDKs into `jre/` under those names.
+- `jdeps` and `jlink` are those of the build machine's platform's JDK archive, unpacked whole, else the running JDK's:
+  jlink links only jmods of its own version, and XsdViewer's scripts build with whatever Java is on the PATH (the
+  system's 25 here) — the framework's first version failed there, where XsdViewer's own build did not.
 

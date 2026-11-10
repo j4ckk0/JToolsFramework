@@ -55,7 +55,8 @@ no package to publish nor any `package-lock.json` integrity to keep — the Mave
      by default: what no class names — files in any encoding, the elliptic curves TLS needs);
   2. a runtime per platform whose JDK is in `external/` (`jdk-linux.tar.gz`, `jdk-windows.zip`, `jdk-macos.tar.gz`,
      which `scripts/setup.sh` deploys — or Temurin's own names, `*jdk*linux*.tar.gz`…, in the folder
-     `jtools.jdk.archives` names: XsdViewer's `jre/`): its `jmods` unpacked, linked by this machine's own `jlink` (`--strip-debug
+     `jtools.jdk.archives` names: XsdViewer's `jre/`): its `jmods` unpacked, linked by the `jlink` of this machine's platform's
+     archive — of the archives' version by construction, whatever JDK runs Maven —, else of the JDK running it (`--strip-debug
      --no-man-pages --no-header-files --compress zip-6`) — all of one version, which `externals.conf` says once;
   3. the archives into `releases/`: `<id>-<version>-linux.tar.gz` and `-macos.tar.gz` (`<id>.sh`, the executable bits
      set), `-windows.zip` (`<Name>.exe`, `<id>.bat`), each with the jar, `<id>.ini`, the README, `LICENSE` and
