@@ -83,6 +83,10 @@ precedence: the command line, then the `.ini`, then the program's default. Tests
 
 The working clone in `~/Developpement/git/<Project>`, its bare repository in `~/Developpement/git-bare/<Project>.git`
 (its `origin`, by absolute path), branch `master`; `git-bare/push-to-nas.sh` copies every bare repository to the NAS.
+A published project — on GitHub and Maven Central, under the Apache License 2.0: XsdViewer, DocComparator, this
+framework — lives in `~/Developpement/github/<Project>` instead, its `origin` on GitHub
+(`git@github.com:j4ckk0/<Project>.git`), no bare repository, and commits as `j4ckk057@gmail.com` (the repository's
+own `user.email`), the address its poms name.
 Commit messages are a feature title in plain English ("Settings: choose the voice that reads the stories").
 
 ## 10. Code and comments
