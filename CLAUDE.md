@@ -22,7 +22,8 @@ map, `doc/PATTERN.md` the conventions, `doc/BUILD.md` the parent pom, `doc/SCRIP
 scripts/install.sh                  # versions agree, build, test, install into ~/.m2
 scripts/ci.sh                       # quiet install with npm ci, then ci.local.sh: a project from the template and its CI
 scripts/new-project.sh Name [--port N] [--id id] [--dir D] [--no-git] [--no-build]
-scripts/jtools-sync.sh ../Project [--check]
+scripts/jtools-sync.sh ../../git/Project [--check]
+. scripts/externals.sh && mvn -Ppublish clean verify -Dgpg.skip   # what Maven Central would get (PUBLISHING.md); never deploy unasked
 ```
 
 ## Conventions

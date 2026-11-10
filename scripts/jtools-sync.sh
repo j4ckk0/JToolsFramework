@@ -5,12 +5,12 @@
 # the externals' versions — without changing those, which are the project's to decide. Commits nothing: read the
 # diff in the project, run its CI, commit there.
 #
-#   scripts/jtools-sync.sh ../SensorSimulator           # refresh the managed files, report the rest
-#   scripts/jtools-sync.sh ../SensorSimulator --check   # report only; exit 1 when anything differs (a project's CI)
+#   scripts/jtools-sync.sh ../../git/SensorSimulator           # refresh the managed files, report the rest
+#   scripts/jtools-sync.sh ../../git/SensorSimulator --check   # report only; exit 1 when anything differs (a project's CI)
 #
 set -euo pipefail
 framework="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
-project=${1:?"the folder of the project: scripts/jtools-sync.sh ../SomeProject [--check]"}
+project=${1:?"the folder of the project: scripts/jtools-sync.sh ../../git/SomeProject [--check]"}
 check=false
 [ "${2:-}" = "--check" ] && check=true
 project="$(cd "$project" && pwd)"

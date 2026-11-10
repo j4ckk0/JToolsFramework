@@ -14,4 +14,9 @@
   <name>JToolsFramework dist</name>
   <description>What the distributions of a project are made of: the assembly descriptors of the Linux tar.gz and the Windows zip, and the launchers and .ini they carry, written for any program by the jtools.app.* properties. The parent's dist profile unpacks it; nothing here runs.</description>
   <!-- the files keep their ${jtools.app.*}: the project's build fills them in, not this one's -->
+  <properties>
+    <!-- no Java: Maven Central's javadoc jar is a README (jtools-parent, profile publish) -->
+    <maven.javadoc.skip>true</maven.javadoc.skip>
+    <jtools.javadoc.placeholder.skip>false</jtools.javadoc.placeholder.skip>
+  </properties>
 </project>

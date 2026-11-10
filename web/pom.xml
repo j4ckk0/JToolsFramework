@@ -18,6 +18,9 @@
          nothing to unpack here — this is what gets unpacked — and the test page it builds is not shipped -->
     <jtools.web.skip>true</jtools.web.skip>
     <jtools.page.skip>true</jtools.page.skip>
+    <!-- no Java: Maven Central's javadoc jar is a README (jtools-parent, profile publish) -->
+    <maven.javadoc.skip>true</maven.javadoc.skip>
+    <jtools.javadoc.placeholder.skip>false</jtools.javadoc.placeholder.skip>
   </properties>
   <build>
     <resources>

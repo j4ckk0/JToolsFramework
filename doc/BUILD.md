@@ -77,8 +77,10 @@ it to the Artifactory the externals already use, then name that repository in th
 mvn deploy -DaltDeploymentRepository=jtools::https://<artifactory>/artifactory/libs-release-local
 ```
 
-A project published on GitHub (XsdViewer) can only depend on the framework once the framework is published where its
-CI resolves: Maven Central, where the framework is to go (the `org.jtools` namespace is verified there) — doc/ADOPTING.md.
+**Maven Central**, for everyone: the profile `publish` (sources, javadoc, GPG, the Central Portal — the same as
+DocComparator's and XsdViewer's) is jtools-parent's, so the framework's modules publish with it and a published
+project can too. [PUBLISHING.md](../PUBLISHING.md) says what it takes. A project published on GitHub (XsdViewer) can
+depend on the framework once it is there: its CI resolves from Central — doc/ADOPTING.md.
 
 ## The licence
 

@@ -89,6 +89,9 @@
     <jtools.web.skip>false</jtools.web.skip>
     <!-- the way npm installs the page's dependencies: "install", or "ci" for exactly package-lock.json (scripts/ci.sh) -->
     <npm.install>install</npm.install>
+    <!-- profile publish: a jar module holding no Java sets it to false (and maven.javadoc.skip to true) to publish a
+         javadoc jar of one README instead, the javadoc Maven Central requires of every jar -->
+    <jtools.javadoc.placeholder.skip>true</jtools.javadoc.placeholder.skip>
   </properties>
 
   <dependencyManagement>
@@ -572,6 +575,132 @@
                 </configuration>
               </execution>
             </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!--
+      mvn -Ppublish clean deploy
+      What Maven Central gets — each jar with its sources and its javadoc, every file signed — in one bundle uploaded to
+      the Central Portal, published by hand once its checks pass (autoPublish off: a mistake costs nothing). The same
+      profile as DocComparator's and XsdViewer's, here for every project inheriting jtools-parent: the framework's own
+      modules use it, and a published project (XsdViewer) can. PUBLISHING.md says what it takes, once and per version;
+      mvn -Ppublish verify -Dgpg.skip builds the same without signing nor uploading.
+      No flatten-maven-plugin: the framework's poms write their versions out; a project with a ${revision} adds it.
+    -->
+    <profile>
+      <id>publish</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>3.3.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.6.3</version>
+            <configuration>
+              <!-- the comments say what each part is for; not every parameter has its @param -->
+              <doclint>all,-missing</doclint>
+            </configuration>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- A jar holding no Java (jtools-dist, jtools-web) has no javadoc to make, and Maven Central refuses a jar
+               without one: its javadoc jar is a README saying where its documentation is. -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>jtools-javadoc-placeholder</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <skip>${jtools.javadoc.placeholder.skip}</skip>
+                  <target>
+                    <echo file="${project.build.directory}/jtools-javadoc/README.txt">${project.name} ${project.version}
+
+${project.description}
+
+This module holds no Java, so no javadoc: this jar is the one Maven Central requires
+beside every jar. The documentation is in the module's own files (its -sources jar) and
+in the framework's doc/BUILD.md: ${project.url}
+</echo>
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>jtools-javadoc-placeholder</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+                <configuration>
+                  <classifier>javadoc</classifier>
+                  <classesDirectory>${project.build.directory}/jtools-javadoc</classesDirectory>
+                  <!-- nothing written there, nothing made: the modules with Java have their real javadoc -->
+                  <skipIfEmpty>true</skipIfEmpty>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <!-- signs each file with the GPG key of the one publishing (-Dgpg.keyname= if several) -->
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>3.2.4</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <!-- uploads to the Central Portal, its token in ~/.m2/settings.xml under the server "central"; published
+                 by hand from https://central.sonatype.com once its checks pass -->
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <!-- at least this one: older versions fail on a field of the portal's status answer (PUBLISHING.md) -->
+            <version>0.11.0</version>
+            <extensions>true</extensions>
+            <configuration>
+              <publishingServerId>central</publishingServerId>
+              <autoPublish>false</autoPublish>
+              <!-- the framework's aggregator: nothing depends on it, it only lists the modules to build -->
+              <excludeArtifacts>
+                <excludeArtifact>jtools-framework</excludeArtifact>
+              </excludeArtifacts>
+            </configuration>
           </plugin>
         </plugins>
       </build>
