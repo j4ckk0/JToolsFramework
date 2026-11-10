@@ -237,7 +237,7 @@ public final class WebApp {
 
         WebServer server;
         try {
-            server = start(options, program);
+            server = startServer(options, program);
         } catch (BindException e) {
             fail(console.t("error.portInUse", options.port(), name, "http://" + options.host() + ":" + options.port() + "/"), EXIT_CANNOT_START);
             return;
@@ -257,10 +257,30 @@ public final class WebApp {
     }
 
     /**
-     * Starts the server: the application's routes and the framework's, the automatic stop armed unless the run or the
-     * user said otherwise. What {@link #launch} does once the command line is read; the tests call it directly.
+     * The program's server for its tests, started as {@link #launch} would start it: the arguments read (a usage error
+     * is an {@link IllegalArgumentException}), the operands handed over, the Settings menu's port, the routes, the
+     * automatic stop. And nothing of a process: <b>no {@code .ini} is read</b> — a stray one in the repository must not
+     * change a test run —, no log is set up, no browser opened, nothing ever exits (the stop and {@code /api/quit} close
+     * the server only). {@code start("--port", "0", "--keep-alive", "samples/a.xsd")}; close the server after.
      */
-    WebServer start(LaunchOptions options, Class<?> program) throws IOException {
+    public WebServer start(String... args) throws IOException {
+        Class<?> program = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass();
+        LaunchOptions options;
+        try {
+            options = options(args, new Properties(), UserSettings.of(id).port());
+        } catch (UsageException e) {
+            throw new IllegalArgumentException(e.getMessage(), e);
+        }
+        if (operands != null) operands.accept(options.operands());
+        exit = code -> {};
+        return startServer(options, program);
+    }
+
+    /**
+     * Starts the server: the application's routes and the framework's, the automatic stop armed unless the run or the
+     * user said otherwise. What {@link #launch} and {@link #start(String...)} do once the command line is read.
+     */
+    WebServer startServer(LaunchOptions options, Class<?> program) throws IOException {
         UserSettings settings = UserSettings.of(id);
         WebServer server = new WebServer(pageRoot, new PageWatch(grace));
         if (texts != null) server.texts(texts);

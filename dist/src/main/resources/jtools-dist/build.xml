@@ -4,12 +4,14 @@
 
     modules        the modules the program needs: what jdeps finds in its jar, and jtools.dist.modules.extra
                    besides (what no class names: the charsets, the elliptic curves of TLS)
-    runtimes       for each platform whose JDK archive is in jdk.archives (jdk-linux.tar.gz, jdk-windows.zip,
-                   jdk-macos.tar.gz: what scripts/setup.sh deploys), its jmods unpacked and a trimmed runtime linked
-                   from them — by this machine's own jlink, of the same version (externals.conf names one version)
+    runtimes       for each platform whose JDK archive is in jdk.archives — jdk-linux.tar.gz, jdk-windows.zip,
+                   jdk-macos.tar.gz (what scripts/setup.sh deploys), or Temurin's own names (*jdk*linux*.tar.gz,
+                   *jdk*windows*.zip, *jdk*mac*.tar.gz: a JRE's do not match) —, its jmods unpacked and a trimmed
+                   runtime linked from them by this machine's own jlink, of the same version
     distributions  <id>-<version>-linux.tar.gz and -macos.tar.gz (<id>.sh), -windows.zip (<name>.exe without a
                    console, <id>.bat with one): the jar, the launchers, <id>.ini, the README, LICENSE and NOTICE when
-                   the project has them, the module's src/dist/files/, and the runtime as jre/
+                   the project has them, what jtools.dist.include names of the repository (samples/**) under the
+                   same path, the module's src/dist/files/, and the runtime as jre/
 
   A platform without its archive is not built; jtools-dist's launchers carry ${jtools.app.*} that the copy fills in.
 -->
@@ -20,14 +22,19 @@
   <property name="jmods" location="${target}/jmods"/>
   <property name="dist.name" value="${jtools.app.id}-${version}"/>
   <property name="exec.suffix" value=""/>
+  <!-- what else of the repository the archives carry, as Ant patterns from its root; by default, nothing -->
+  <property name="include" value="jtools-dist-includes-nothing"/>
+  <patternset id="jdk.linux"><include name="jdk-linux.tar.gz"/><include name="*jdk*linux*.tar.gz"/></patternset>
+  <patternset id="jdk.windows"><include name="jdk-windows.zip"/><include name="*jdk*windows*.zip"/></patternset>
+  <patternset id="jdk.macos"><include name="jdk-macos.tar.gz"/><include name="*jdk*mac*.tar.gz"/></patternset>
   <condition property="exec.suffix" value=".exe"><os family="windows"/></condition>
 
   <target name="detect">
-    <available property="jdk.linux" file="${jdk.archives}/jdk-linux.tar.gz"/>
-    <available property="jdk.windows" file="${jdk.archives}/jdk-windows.zip"/>
-    <available property="jdk.macos" file="${jdk.archives}/jdk-macos.tar.gz"/>
+    <condition property="jdk.linux"><resourcecount when="greater" count="0"><fileset dir="${jdk.archives}" erroronmissingdir="false"><patternset refid="jdk.linux"/></fileset></resourcecount></condition>
+    <condition property="jdk.windows"><resourcecount when="greater" count="0"><fileset dir="${jdk.archives}" erroronmissingdir="false"><patternset refid="jdk.windows"/></fileset></resourcecount></condition>
+    <condition property="jdk.macos"><resourcecount when="greater" count="0"><fileset dir="${jdk.archives}" erroronmissingdir="false"><patternset refid="jdk.macos"/></fileset></resourcecount></condition>
     <condition property="jdk.none"><not><or><isset property="jdk.linux"/><isset property="jdk.windows"/><isset property="jdk.macos"/></or></not></condition>
-    <fail if="jdk.none" message="no JDK archive in ${jdk.archives} (jdk-linux.tar.gz, jdk-windows.zip, jdk-macos.tar.gz): run scripts/setup.sh (see README: Externals)"/>
+    <fail if="jdk.none" message="no JDK archive in ${jdk.archives} (jdk-linux.tar.gz, jdk-windows.zip, jdk-macos.tar.gz, or Temurin's *jdk*linux*.tar.gz…): run scripts/setup.sh (see README: Externals)"/>
   </target>
 
   <target name="modules" depends="detect">
@@ -44,21 +51,24 @@
   <!-- only the jmods of each archive: the rest of a JDK is of no use to jlink -->
   <target name="unpack-linux" if="jdk.linux">
     <delete dir="${jmods}/linux"/>
-    <untar src="${jdk.archives}/jdk-linux.tar.gz" dest="${jmods}/linux" compression="gzip">
+    <untar dest="${jmods}/linux" compression="gzip">
+      <fileset dir="${jdk.archives}"><patternset refid="jdk.linux"/></fileset>
       <patternset includes="*/jmods/**"/>
       <cutdirsmapper dirs="2"/>
     </untar>
   </target>
   <target name="unpack-windows" if="jdk.windows">
     <delete dir="${jmods}/windows"/>
-    <unzip src="${jdk.archives}/jdk-windows.zip" dest="${jmods}/windows">
+    <unzip dest="${jmods}/windows">
+      <fileset dir="${jdk.archives}"><patternset refid="jdk.windows"/></fileset>
       <patternset includes="*/jmods/**"/>
       <cutdirsmapper dirs="2"/>
     </unzip>
   </target>
   <target name="unpack-macos" if="jdk.macos">
     <delete dir="${jmods}/macos"/>
-    <untar src="${jdk.archives}/jdk-macos.tar.gz" dest="${jmods}/macos" compression="gzip">
+    <untar dest="${jmods}/macos" compression="gzip">
+      <fileset dir="${jdk.archives}"><patternset refid="jdk.macos"/></fileset>
       <patternset includes="*/Contents/Home/jmods/**"/>
       <cutdirsmapper dirs="4"/>
     </untar>
@@ -115,6 +125,7 @@
         <tarfileset file="${work}/unix/app.sh" fullpath="${dist.name}/${jtools.app.id}.sh" filemode="755"/>
         <tarfileset file="${work}/unix/app.ini" fullpath="${dist.name}/${jtools.app.id}.ini" filemode="644"/>
         <tarfileset dir="${work}/unix" includes="README.md, LICENSE, NOTICE" prefix="${dist.name}" filemode="644"/>
+        <tarfileset dir="${root}" includes="${include}" prefix="${dist.name}" filemode="644" dirmode="755"/>
         <tarfileset dir="${files}" prefix="${dist.name}" filemode="644" dirmode="755" erroronmissingdir="false"/>
         <tarfileset dir="${runtime}/@{os}" prefix="${dist.name}/jre" filemode="755" dirmode="755" includes="bin/**, lib/jspawnhelper, lib/jexec"/>
         <tarfileset dir="${runtime}/@{os}" prefix="${dist.name}/jre" filemode="644" dirmode="755" excludes="bin/**, lib/jspawnhelper, lib/jexec"/>
@@ -130,6 +141,7 @@
       <zipfileset file="${work}/windows/app.bat" fullpath="${dist.name}/${jtools.app.id}.bat"/>
       <zipfileset file="${work}/windows/app.ini" fullpath="${dist.name}/${jtools.app.id}.ini"/>
       <zipfileset dir="${work}/windows" includes="README.md, LICENSE, NOTICE" prefix="${dist.name}"/>
+      <zipfileset dir="${root}" includes="${include}" prefix="${dist.name}"/>
       <zipfileset dir="${files}" prefix="${dist.name}" erroronmissingdir="false"/>
       <zipfileset dir="${runtime}/windows" prefix="${dist.name}/jre"/>
     </zip>

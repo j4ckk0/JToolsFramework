@@ -76,7 +76,7 @@ class BuiltInRoutesTest {
                 .aboutFields(about -> about.put("dialogs", false))
                 .exitWith(code -> { exitCode.set(code); exited.countDown(); });
         LaunchOptions options = app.options(new String[] {"--port", "0"}, new Properties(), OptionalInt.empty());
-        server = app.start(options, BuiltInRoutesTest.class);
+        server = app.startServer(options, BuiltInRoutesTest.class);
     }
 
     @AfterEach
@@ -158,7 +158,7 @@ class BuiltInRoutesTest {
     @Test
     void letsTheProgramReplaceOneOfThem() throws Exception {
         WebApp own = WebApp.named("JToolsTest").id(ID).routes(s -> s.get(WebApp.ABOUT, ex -> Map.of("capabilities", "its own")));
-        try (WebServer other = own.start(own.options(new String[] {"--port", "0"}, new Properties(), OptionalInt.empty()), BuiltInRoutesTest.class)) {
+        try (WebServer other = own.start("--port", "0")) {
             HttpResponse<String> about = client.send(HttpRequest.newBuilder(URI.create(other.url() + "api/about")).build(), HttpResponse.BodyHandlers.ofString());
             assertEquals("{\"capabilities\":\"its own\"}", about.body());
         }

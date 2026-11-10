@@ -408,3 +408,15 @@ Where it departs from the sections above:
 - **`jdk.localedata` is not in the runtimes by default**: jdeps cannot see it; a program formatting dates or numbers
   in French adds it to `jtools.dist.modules.extra` (BUILD.md). XsdViewer's runtimes lived without it.
 
+**Forced by the first migration, XsdViewer's** — the acceptance test doing its job:
+
+- `/api/alive` and `/api/bye` answer 405 to another method, with `Allow`, as every route does (they answered 404).
+- `WebApp.start(args…)`: a program's tests start its server as `launch` would, but read no `.ini`, set up no log,
+  open no browser and never exit — XsdViewer's `XsdViewerServerTest` started its own server directly.
+- The publish plugins' versions are in jtools-parent's `pluginManagement`, so that a module keeping itself off Maven
+  Central names the portal's plugin with `skipPublishing` and no version (XsdViewer publishes `core` only).
+- The program's jar leaves out a modular library's `module-info.class` (XsdViewer's `core` is a named module).
+- `build.xml` finds a platform's JDK by Temurin's own names too (`*jdk*linux*.tar.gz`, case-sensitive: a JRE's do
+  not match) in the folder `jtools.jdk.archives` names, and `jtools.dist.include` adds folders of the repository to
+  the archives (`samples/**`) — XsdViewer's release workflow downloads its JDKs into `jre/` under those names.
+

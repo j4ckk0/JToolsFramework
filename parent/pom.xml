@@ -207,6 +207,29 @@
           <artifactId>maven-shade-plugin</artifactId>
           <version>3.6.0</version>
         </plugin>
+        <!-- the publish profile's plugins: here so that a module keeping itself off Maven Central names the portal's
+             plugin with no version of its own (<skipPublishing>true</skipPublishing>: XsdViewer's app and examples) -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>3.3.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>3.6.3</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>3.2.4</version>
+        </plugin>
+        <plugin>
+          <groupId>org.sonatype.central</groupId>
+          <artifactId>central-publishing-maven-plugin</artifactId>
+          <!-- at least this one: older versions fail on a field of the portal's status answer (PUBLISHING.md) -->
+          <version>0.11.0</version>
+        </plugin>
         <!-- The Apache 2.0 header at the top of every Java source, main and test (the convention of the published
              jtools projects): a module gets it by naming this plugin — the framework's libraries do, a project
              inheriting this parent does not unless it is published under that licence too. -->
@@ -263,7 +286,10 @@
               <filters>
                 <filter>
                   <artifact>*:*</artifact>
+                  <!-- a modular library's descriptor stays out: the program's jar is a plain classpath one -->
                   <excludes>
+                    <exclude>module-info.class</exclude>
+                    <exclude>META-INF/versions/*/module-info.class</exclude>
                     <exclude>META-INF/*.SF</exclude>
                     <exclude>META-INF/*.DSA</exclude>
                     <exclude>META-INF/*.RSA</exclude>
@@ -448,6 +474,8 @@
         <release.dir>${maven.multiModuleProjectDirectory}/releases</release.dir>
         <!-- what jdeps cannot see in the jar: the charsets of files in any encoding, the elliptic curves TLS needs -->
         <jtools.dist.modules.extra>jdk.charsets,jdk.crypto.ec</jtools.dist.modules.extra>
+        <!-- what else of the repository the archives carry under the same path, as Ant patterns: samples/** -->
+        <jtools.dist.include>jtools-dist-includes-nothing</jtools.dist.include>
       </properties>
       <build>
         <plugins>
@@ -544,6 +572,7 @@
                       <property name="version" value="${project.version}"/>
                       <property name="java.release" value="${maven.compiler.release}"/>
                       <property name="modules.extra" value="${jtools.dist.modules.extra}"/>
+                      <property name="include" value="${jtools.dist.include}"/>
                       <property name="jtools.app.id" value="${jtools.app.id}"/>
                       <property name="jtools.app.name" value="${jtools.app.name}"/>
                       <property name="jtools.app.port" value="${jtools.app.port}"/>
@@ -573,7 +602,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>3.3.1</version>
             <executions>
               <execution>
                 <id>attach-sources</id>
@@ -586,7 +614,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.6.3</version>
             <configuration>
               <!-- the comments say what each part is for; not every parameter has its @param -->
               <doclint>all,-missing</doclint>
@@ -651,7 +678,6 @@ in the framework's doc/BUILD.md: ${project.url}
             <!-- signs each file with the GPG key of the one publishing (-Dgpg.keyname= if several) -->
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>3.2.4</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
@@ -667,8 +693,6 @@ in the framework's doc/BUILD.md: ${project.url}
                  by hand from https://central.sonatype.com once its checks pass -->
             <groupId>org.sonatype.central</groupId>
             <artifactId>central-publishing-maven-plugin</artifactId>
-            <!-- at least this one: older versions fail on a field of the portal's status answer (PUBLISHING.md) -->
-            <version>0.11.0</version>
             <extensions>true</extensions>
             <configuration>
               <publishingServerId>central</publishingServerId>

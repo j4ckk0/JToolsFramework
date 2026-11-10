@@ -264,5 +264,7 @@ class WebServerTest {
         assertTrue(stopped.await(5, TimeUnit.SECONDS), "the stop once the grace has elapsed");
         stream.body().close();
         assertEquals(400, get("/api/alive").statusCode(), "a stream without a page id");
+        assertEquals(405, get("/api/bye?id=page-1").statusCode(), "the presence routes say which method they take");
+        assertEquals(405, post("/api/alive?id=page-1", "", null).statusCode());
     }
 }

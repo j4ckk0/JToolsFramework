@@ -46,18 +46,21 @@ no package to publish nor any `package-lock.json` integrity to keep — the Mave
 ## The program's module (`jtools.program.skip` = false)
 
 - **`jtools-embed`** (shade, `package`): the module's jar becomes the program's one jar — `java -jar <id>.jar` —
-  embedding every module and library, the page included, with `Main-Class: ${jtools.app.mainClass}`. The module's
+  embedding every module and library, the page included, with `Main-Class: ${jtools.app.mainClass}`; a modular
+  library's `module-info.class` stays out, the program's jar being a plain classpath one. The module's
   `<finalName>` is `${jtools.app.id}`.
 - **with `-Pdist`** (profile `dist`, what `scripts/package.sh` runs): `jtools-dist` unpacked into
   `target/jtools-dist`, `<Name>.exe` (launch4j), then — once the program's jar is made — `jtools-dist`'s `build.xml`:
   1. the modules: what `jdeps` finds in the jar, and `jtools.dist.modules.extra` besides (`jdk.charsets,jdk.crypto.ec`
      by default: what no class names — files in any encoding, the elliptic curves TLS needs);
   2. a runtime per platform whose JDK is in `external/` (`jdk-linux.tar.gz`, `jdk-windows.zip`, `jdk-macos.tar.gz`,
-     which `scripts/setup.sh` deploys): its `jmods` unpacked, linked by this machine's own `jlink` (`--strip-debug
+     which `scripts/setup.sh` deploys — or Temurin's own names, `*jdk*linux*.tar.gz`…, in the folder
+     `jtools.jdk.archives` names: XsdViewer's `jre/`): its `jmods` unpacked, linked by this machine's own `jlink` (`--strip-debug
      --no-man-pages --no-header-files --compress zip-6`) — all of one version, which `externals.conf` says once;
   3. the archives into `releases/`: `<id>-<version>-linux.tar.gz` and `-macos.tar.gz` (`<id>.sh`, the executable bits
      set), `-windows.zip` (`<Name>.exe`, `<id>.bat`), each with the jar, `<id>.ini`, the README, `LICENSE` and
-     `NOTICE` when the project has them, the module's `src/dist/files/` as it is, and the runtime as `jre/`.
+     `NOTICE` when the project has them, what `jtools.dist.include` names of the repository under the same path
+     (Ant patterns from its root: `samples/**`), the module's `src/dist/files/` as it is, and the runtime as `jre/`.
   A platform whose JDK is not in `external/` gets no archive. About 35 MB each, against 50 MB with a whole JRE.
   **What jdeps cannot see stays out**: a program that formats dates or numbers in a language other than English
   (`DateTimeFormatter`, `NumberFormat`, `String.format("%,d")`, `MessageFormat`) adds `jdk.localedata` to
@@ -65,6 +68,9 @@ no package to publish nor any `package-lock.json` integrity to keep — the Mave
 
 The shade execution lives in the parent's build rather than in the module, on purpose: in one phase the build's own
 plugins run before its profiles', and the distributions must find the embedded jar, not the module's own.
+
+A program's tests start its server as `launch` would with `WebApp.start(args…)` — the arguments, the operands, the
+Settings menu's port, the routes —, and nothing of a process: no `.ini` read, no log, no browser, no exit.
 
 ## The framework's libraries
 

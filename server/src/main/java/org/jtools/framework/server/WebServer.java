@@ -292,9 +292,11 @@ public final class WebServer implements AutoCloseable {
     private void dispatch(HttpExchange ex) throws IOException {
         String method = ex.getRequestMethod(), path = ex.getRequestURI().getPath();
         try (ex) {
-            if (path.equals(ALIVE) && method.equals(Http.METHOD_GET)) alive(ex);
-            else if (path.equals(BYE) && method.equals(Http.METHOD_POST)) bye(ex);
-            else {
+            if (path.equals(ALIVE)) {
+                if (method.equals(Http.METHOD_GET)) alive(ex); else wrongMethod(ex, Http.METHOD_GET);
+            } else if (path.equals(BYE)) {
+                if (method.equals(Http.METHOD_POST)) bye(ex); else wrongMethod(ex, Http.METHOD_POST);
+            } else {
                 Map<String, Mount> byMethod = mounted(path);
                 if (byMethod != null) mounted(ex, path, method, byMethod);
                 else if (path.startsWith(API + ROOT) || path.equals(API)) refuse(ex, 404, "http.notFound");
@@ -320,9 +322,7 @@ public final class WebServer implements AutoCloseable {
     private void mounted(HttpExchange ex, String path, String method, Map<String, Mount> byMethod) throws Exception {
         Mount mount = byMethod.getOrDefault(method, byMethod.get(ANY_METHOD));
         if (mount == null) {
-            String allowed = String.join(", ", byMethod.keySet());
-            ex.getResponseHeaders().set(Http.HEADER_ALLOW, allowed);
-            refuse(ex, 405, "http.methodExpected", allowed);
+            wrongMethod(ex, String.join(", ", byMethod.keySet()));
             return;
         }
         if (mount.handler() != null) {
@@ -364,6 +364,12 @@ public final class WebServer implements AutoCloseable {
         LOG.info(() -> ex.getRequestMethod() + " " + ex.getRequestURI().getPath() + " refused: " + I18n.message(e));
         LOG.log(Level.FINE, "the refusal's trace", e);
         Http.error(ex, status, I18n.message(e));
+    }
+
+    /** 405, with the methods the path takes in {@code Allow} and in the refusal. */
+    private static void wrongMethod(HttpExchange ex, String allowed) throws IOException {
+        ex.getResponseHeaders().set(Http.HEADER_ALLOW, allowed);
+        refuse(ex, 405, "http.methodExpected", allowed);
     }
 
     private static void refuse(HttpExchange ex, int status, String key, Object... args) throws IOException {
