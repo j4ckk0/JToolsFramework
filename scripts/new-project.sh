@@ -86,10 +86,12 @@ sed -i "s/\"name\": \"jtools-web\"/\"name\": \"$id\"/" "$dir/frontend/package.js
 
 # The port, entered in the registry (kept sorted by port) — by a real project, with its repository; a try is not one.
 if $git; then
-  where=$(realpath --relative-to="$(dirname "$(dirname "$framework")")" "$dir" 2>/dev/null || echo "$dir")
+  # where it is: git/<Name> under the folder holding git/ and git-bare/, its full path elsewhere
+  root=$(dirname "$(dirname "$framework")")
+  case "$dir" in "$root"/*) where=${dir#"$root"/} ;; *) where=$dir ;; esac
   {
     sed -n '1,/^|---/p' doc/PORTS.md
-    { sed -n '/^|---/,$p' doc/PORTS.md | sed 1d | grep '^|'; echo "| $port | $name | $where |"; } | sort -t'|' -k2 -n
+    { sed -n '/^|---/,$p' doc/PORTS.md | sed 1d | grep '^|'; echo "| $port | $name | $where |"; } | sort -s -t'|' -k2,2n
     sed -n '/^|---/,$p' doc/PORTS.md | sed 1d | grep -v '^|' || true
   } > doc/PORTS.md.new && mv doc/PORTS.md.new doc/PORTS.md
   echo "== port $port entered in doc/PORTS.md (commit it in JToolsFramework)"
