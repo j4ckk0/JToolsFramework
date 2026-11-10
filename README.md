@@ -9,9 +9,9 @@ as its view, the program stopping once its last page is closed, self-contained d
 ```bash
 scripts/setup.sh                          # the externals: JDK 21, Maven, Node.js, the JREs (once)
 scripts/install.sh                        # build, test and install the framework into ~/.m2
-scripts/new-project.sh SensorMonitor      # a new project in ../SensorMonitor, on the next free port, its bare
-                                          # repository in ../../git-bare/SensorMonitor.git, built, committed, pushed
-cd ../SensorMonitor && scripts/run.sh     # the page in the browser; close it and the program stops
+scripts/new-project.sh SensorMonitor      # a new project in ../../git/SensorMonitor, on the next free port, its
+                                          # bare repository in ../../git-bare/SensorMonitor.git, built, committed, pushed
+cd ../../git/SensorMonitor && scripts/run.sh   # the page in the browser; close it and the program stops
 ```
 
 The generated project is four modules — `core` (the business), `api` (its HTTP face), `frontend` (the Angular view),

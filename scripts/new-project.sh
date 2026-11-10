@@ -5,7 +5,7 @@
 # and a port of its own; then, unless told otherwise, its externals, a first build, a git repository with its first
 # commit, its bare repository, and the first push (which runs the new project's CI).
 #
-#   scripts/new-project.sh SensorSimulator                # ../SensorSimulator, ../../git-bare/SensorSimulator.git
+#   scripts/new-project.sh SensorSimulator                # ~/Developpement/git/SensorSimulator, git-bare/SensorSimulator.git
 #   scripts/new-project.sh SensorSimulator --port 8094    # the port of its .ini (default: the next free one, doc/PORTS.md)
 #   scripts/new-project.sh SensorSimulator --id sensors   # the program's id (default: the name in lower case)
 #   scripts/new-project.sh Demo --dir /tmp/Demo --no-git  # elsewhere, files only (a try, the framework's CI)
@@ -13,6 +13,8 @@
 #
 # The name is the Java class of the business (core) and the program's name: CamelCase, a letter first. The port is
 # entered in doc/PORTS.md, the registry that keeps the programs apart — commit it in the framework afterwards.
+# A new project is a private one: git/ and git-bare/ beside the folder holding the framework (github/, where the
+# published projects are), whence git-bare/push-to-nas.sh takes it to the NAS.
 #
 set -euo pipefail
 framework="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
@@ -38,8 +40,9 @@ done
 [[ $name =~ ^[A-Z][A-Za-z0-9]*$ ]] || { echo "$name: a CamelCase name, a letter first (it is a Java class)" >&2; exit 2; }
 id=${id:-$(tr '[:upper:]' '[:lower:]' <<< "$name")}
 [[ $id =~ ^[a-z][a-z0-9]*$ ]] || { echo "$id: an id of lower-case letters and digits (it is a Java package)" >&2; exit 2; }
-dir=${dir:-$(dirname "$framework")/$name}
-bare=${bare:-$(dirname "$(dirname "$framework")")/git-bare/$name.git}
+developpement=$(dirname "$(dirname "$framework")")   # the folder holding github/, git/ and git-bare/
+dir=${dir:-$developpement/git/$name}
+bare=${bare:-$developpement/git-bare/$name.git}
 [ ! -e "$dir" ] || { echo "$dir exists: choose another name or --dir" >&2; exit 1; }
 if $git; then [ ! -e "$bare" ] || { echo "$bare exists: choose another name or --bare" >&2; exit 1; }; fi
 
