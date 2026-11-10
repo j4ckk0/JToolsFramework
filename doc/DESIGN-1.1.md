@@ -382,7 +382,7 @@ The work, each step with its tests, the framework's CI (the generated project) g
 
 ## 10. What the implementation changed
 
-Implemented in 1.1.0, tested by 53 framework tests (48 JUnit, 5 vitest) and a generated project built, run and packaged.
+Implemented in 1.1.0, tested by 54 framework tests (49 JUnit, 5 vitest) and a generated project built, run and packaged.
 Where it departs from the sections above:
 
 - **The jlink distributions are in 1.1** (the user's choice, from §8): jtools-dist's `build.xml` replaces the assembly
@@ -402,4 +402,9 @@ Where it departs from the sections above:
   rather than failing: a program without texts of its own still has a language for its refusals.
 - **The server's refusals and the launcher's messages** are each a catalogue of the framework in en and fr
   (`org/jtools/framework/server/texts`, `…/launcher/texts`, `…/desktop/texts`).
+- **A program's route replaces a built-in one** of the same path and method — the program's are mounted after the
+  framework's, and the replacement is logged: XsdViewer and DCSBuilder each have their own `/api/settings`,
+  `/api/about` and `/api/quit` until they move to the framework's, and a route kept on purpose must win, not vanish.
+- **`jdk.localedata` is not in the runtimes by default**: jdeps cannot see it; a program formatting dates or numbers
+  in French adds it to `jtools.dist.modules.extra` (BUILD.md). XsdViewer's runtimes lived without it.
 

@@ -180,8 +180,10 @@ public final class WebServer implements AutoCloseable {
         return this;
     }
 
+    /** A later mount of the same path and method replaces the earlier: said in the log, since it is easily unmeant. */
     private WebServer mount(Mount mount) {
-        mounts.computeIfAbsent(mount.path(), p -> new ConcurrentHashMap<>()).put(mount.method(), mount);
+        Mount replaced = mounts.computeIfAbsent(mount.path(), p -> new ConcurrentHashMap<>()).put(mount.method(), mount);
+        if (replaced != null) LOG.info(() -> "a new " + mount.method() + " " + mount.path() + " replaces the one mounted before");
         return this;
     }
 

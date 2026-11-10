@@ -63,7 +63,8 @@ Nothing the build needs is under source control nor taken from the machine: `scr
 `scripts/package.sh` builds three self-contained distributions — nothing to install, a Java runtime inside, which
 jlink trims to the modules the program needs: `releases/__APP_ID__-<version>-linux.tar.gz` and `-macos.tar.gz` (Apple
 silicon; `__APP_ID__.sh`), and `releases/__APP_ID__-<version>-windows.zip` (`__APP_NAME__.exe` without a console,
-`__APP_ID__.bat` with one). The version is said once, as `<revision>` in
+`__APP_ID__.bat` with one). A program formatting dates or numbers in French adds `jdk.localedata` to
+`jtools.dist.modules.extra` in `pom.xml`: jdeps cannot see it, and without it the runtime formats them as in English. The version is said once, as `<revision>` in
 `pom.xml`, with its four-part form `jtools.app.windowsVersion` for the `.exe`. Files the distributions carry besides
 go in `app/src/dist/files/`.
 

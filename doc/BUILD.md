@@ -59,6 +59,9 @@ no package to publish nor any `package-lock.json` integrity to keep — the Mave
      set), `-windows.zip` (`<Name>.exe`, `<id>.bat`), each with the jar, `<id>.ini`, the README, `LICENSE` and
      `NOTICE` when the project has them, the module's `src/dist/files/` as it is, and the runtime as `jre/`.
   A platform whose JDK is not in `external/` gets no archive. About 35 MB each, against 50 MB with a whole JRE.
+  **What jdeps cannot see stays out**: a program that formats dates or numbers in a language other than English
+  (`DateTimeFormatter`, `NumberFormat`, `String.format("%,d")`, `MessageFormat`) adds `jdk.localedata` to
+  `jtools.dist.modules.extra` in its root pom — without it, the trimmed runtime formats them as in English.
 
 The shade execution lives in the parent's build rather than in the module, on purpose: in one phase the build's own
 plugins run before its profiles', and the distributions must find the embedded jar, not the module's own.

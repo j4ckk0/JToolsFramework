@@ -112,7 +112,7 @@ public final class WebApp {
         this.id = name.toLowerCase(Locale.ROOT);
     }
 
-    /** The program, by the name people read; its id — the jar's, the .ini's, its folder ~/.<id> — is that name in lower case unless {@link #id} says another. */
+    /** The program, by the name people read; its id — the jar's, the .ini's, its folder {@code ~/.<id>} — is that name in lower case unless {@link #id} says another. */
     public static WebApp named(String name) {
         return new WebApp(name);
     }
@@ -264,8 +264,8 @@ public final class WebApp {
         UserSettings settings = UserSettings.of(id);
         WebServer server = new WebServer(pageRoot, new PageWatch(grace));
         if (texts != null) server.texts(texts);
-        routes.accept(server);
         builtInRoutes(server, settings, program);
+        routes.accept(server);   // after the framework's: a route of the program's own replaces one of them (logged)
         server.start(options.host(), options.port());
         server.pages().setEnabled(!options.keepAlive() && settings.autoStop());
         server.pages().watch(() -> {

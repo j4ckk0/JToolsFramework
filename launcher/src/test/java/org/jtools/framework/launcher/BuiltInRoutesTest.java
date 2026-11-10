@@ -156,6 +156,15 @@ class BuiltInRoutesTest {
     }
 
     @Test
+    void letsTheProgramReplaceOneOfThem() throws Exception {
+        WebApp own = WebApp.named("JToolsTest").id(ID).routes(s -> s.get(WebApp.ABOUT, ex -> Map.of("capabilities", "its own")));
+        try (WebServer other = own.start(own.options(new String[] {"--port", "0"}, new Properties(), OptionalInt.empty()), BuiltInRoutesTest.class)) {
+            HttpResponse<String> about = client.send(HttpRequest.newBuilder(URI.create(other.url() + "api/about")).build(), HttpResponse.BodyHandlers.ofString());
+            assertEquals("{\"capabilities\":\"its own\"}", about.body());
+        }
+    }
+
+    @Test
     void quitsWhenThePageSaysSo() throws Exception {
         HttpResponse<String> answer = post(WebApp.QUIT, "");
         assertEquals("{\"ok\":true}", answer.body(), "the answer leaves before the program does");
