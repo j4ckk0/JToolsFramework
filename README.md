@@ -29,7 +29,7 @@ The generated project is four modules — `core` (the business), `api` (its HTTP
 | `web/` | **@jtools/web**: `provideJTools()`, `PagePresenceService`, `apiErrorMessage()` — TypeScript, compiled with the project's page | SensorSimulator, MythoStory |
 | `scripts/` | the managed scripts every project gets — `setup build ci run stop package` (`.sh`, `.bat`) — and the framework's tools: `install`, `new-project`, `jtools-sync` ([doc/SCRIPTS.md](doc/SCRIPTS.md)) | the five `scripts/` folders, which had drifted apart |
 | `templates/webapp/` | the project `new-project.sh` writes | SensorSimulator |
-| `doc/` | [PATTERN.md](doc/PATTERN.md) (the conventions, and why), [BUILD.md](doc/BUILD.md), [SCRIPTS.md](doc/SCRIPTS.md), [ADOPTING.md](doc/ADOPTING.md) (what each existing project can take), [PORTS.md](doc/PORTS.md) (the registry); [PUBLISHING.md](PUBLISHING.md) (Maven Central) | |
+| `doc/` | [PATTERN.md](doc/PATTERN.md) (the conventions, and why), [BUILD.md](doc/BUILD.md), [SCRIPTS.md](doc/SCRIPTS.md), [ADOPTING.md](doc/ADOPTING.md) (what each existing project can take), [PORTS.md](doc/PORTS.md) (the registry); [PUBLISHING.md](PUBLISHING.md) (Maven Central); [DESIGN-1.1.md](doc/DESIGN-1.1.md) (what 1.1 takes from XsdViewer and DCSBuilder) | |
 
 ## Decisions of this version
 

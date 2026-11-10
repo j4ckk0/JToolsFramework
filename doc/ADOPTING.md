@@ -28,6 +28,8 @@ it has no business yet.
 
 ## DCSBuilder — the scripts, the parent, most of the server; the model distributions stay its own
 
+What its server and launcher need of the framework first, and what then goes: [DESIGN-1.1.md](DESIGN-1.1.md) §7.
+
 - Takes: the scripts (its `--model` setup goes into `scripts/setup.local.sh`, the model's checks into
   `externals.local.sh`), the parent (its eight modules keep their order), `PageWatch`, `Http`, `DesktopOpener`,
   `Json`, `Installation`, the launcher's command line (`--keep-alive` is the framework's name already).
@@ -55,6 +57,8 @@ and its dist profile once its desktop module sets `jtools.program.skip`. `@jtool
 property it overrides.
 
 ## XsdViewer — the patterns only, until the framework is on Maven Central
+
+What its server and launcher need of the framework first, and what then goes: [DESIGN-1.1.md](DESIGN-1.1.md) §6.
 
 Public on GitHub, Apache-2.0, organisation jtools.org, built by GitHub Actions with the runner's Maven (no
 `externals.conf`), JPMS (`core/module-info.java`). The licences agree — the framework is Apache-2.0 too, under the
