@@ -78,7 +78,19 @@ mvn deploy -DaltDeploymentRepository=jtools::https://<artifactory>/artifactory/l
 ```
 
 A project published on GitHub (XsdViewer) can only depend on the framework once the framework is published where its
-CI resolves (Maven Central, GitHub Packages) under a licence compatible with the project's — doc/ADOPTING.md.
+CI resolves: Maven Central, where the framework is to go (the `org.jtools` namespace is verified there) — doc/ADOPTING.md.
+
+## The licence
+
+The framework is under the Apache License 2.0 (`LICENSE`, `NOTICE`). jtools-parent carries what Maven Central
+requires of every pom it publishes — `<url>`, `<licenses>`, `<organization>`, `<developers>`, `<scm>` — and, as with
+any parent, **a project inheriting it inherits those too**: one that publishes its own artifacts declares its own
+`<url>`, `<licenses>` and `<scm>`. The modules' url and scm are the repository's, not the repository's with the
+artifactId appended (`child.*.inherit.append.path="false"`).
+
+`license-maven-plugin` puts the Apache header at the top of every Java source, main and test, at `process-sources`:
+it is configured in jtools-parent's `pluginManagement` and a module gets it by naming the plugin — the framework's
+libraries do; a project does not, unless it is published under the same licence (XsdViewer's configuration is the same).
 
 ## Not in this version
 

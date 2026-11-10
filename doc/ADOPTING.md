@@ -54,11 +54,12 @@ and its dist profile once its desktop module sets `jtools.program.skip`. `@jtool
 `/api/alive` and `/api/bye` first. It is also the one on Java 17 bytecode (Android): `maven.compiler.release` is a
 property it overrides.
 
-## XsdViewer — the patterns only, until the framework is published
+## XsdViewer — the patterns only, until the framework is on Maven Central
 
 Public on GitHub, Apache-2.0, organisation jtools.org, built by GitHub Actions with the runner's Maven (no
-`externals.conf`), JPMS (`core/module-info.java`). Its build can only depend on what its CI resolves: the framework
-would have to be published (Maven Central or GitHub Packages) **under a licence compatible with Apache-2.0** — the
-owner's decision; the framework carries no licence yet. The jars name an `Automatic-Module-Name` for the day it is.
+`externals.conf`), JPMS (`core/module-info.java`). The licences agree — the framework is Apache-2.0 too, under the
+same organisation — but its build can only depend on what its CI resolves: the framework must reach Maven Central
+first. The jars name an `Automatic-Module-Name` for its `module-info.java`; jtools-parent's `license-maven-plugin`
+configuration is the one XsdViewer already uses.
 Its `PageWatch`, `AliveHandler`, `ByeHandler`, `BrowserLauncher`, `CommandLineOptions`, `ConfigFile` are the
 framework's libraries, in a finer split (a handler per route); its review rules are the framework's (CLAUDE.md).

@@ -1,0 +1,25 @@
+JToolsFramework
+Copyright 2026 jtools.org
+
+This product is licensed under the Apache License, Version 2.0. The full text is in
+the LICENSE file beside this one.
+
+
+What the artifacts hold
+=======================
+
+The artifacts published on Maven Central — jtools-parent, jtools-support, jtools-server,
+jtools-launcher, jtools-dist and jtools-web — hold the framework's own code and files
+only: the Java libraries depend on nothing but the JDK, and jtools-web holds TypeScript
+sources, no library of anyone else's.
+
+
+The projects built with the framework
+=====================================
+
+A project's distributions, which jtools-parent builds from jtools-dist, bundle an Eclipse
+Temurin (OpenJDK) runtime, licensed under the GNU General Public License, version 2, with
+the Classpath Exception, and its own licence and notices in their jre/legal/ directory;
+and its page bundles the Angular libraries it depends on, whose licences its build writes
+into static/licences/3rdpartylicenses.txt. Those are the project's to state in its own
+NOTICE: the framework distributes neither.

@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- child.*.inherit.append.path: every module of the framework lives in the one repository, so its url and scm are
+     the repository's, not the repository's with the module's artifactId appended (Maven's default) -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         child.project.url.inherit.append.path="false">
   <modelVersion>4.0.0</modelVersion>
 
   <!-- The parent of every org.jtools project, and of the framework's own modules: the conventions of the build,
@@ -20,6 +23,44 @@
 
   <name>JToolsFramework parent</name>
   <description>The build conventions of the org.jtools projects: a Java server, an Angular page as its view, and self-contained distributions.</description>
+
+  <!-- What Maven Central requires of every pom it publishes, and shows: the same as XsdViewer's and DocComparator's.
+       A project inheriting jtools-parent inherits these too, as with any parent; one publishing its own artifacts
+       declares its own (doc/BUILD.md, "The licence"). -->
+  <url>https://github.com/j4ckk0/JToolsFramework</url>
+  <inceptionYear>2026</inceptionYear>
+  <organization>
+    <name>jtools.org</name>
+    <url>https://github.com/j4ckk0</url>
+  </organization>
+  <licenses>
+    <license>
+      <name>Apache License Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>j4ckk0</id>
+      <name>Jacques HENRY</name>
+      <email>j4ckk057@gmail.com</email>
+      <organization>jtools.org</organization>
+      <organizationUrl>https://github.com/j4ckk0</organizationUrl>
+    </developer>
+  </developers>
+  <scm child.scm.connection.inherit.append.path="false"
+       child.scm.developerConnection.inherit.append.path="false"
+       child.scm.url.inherit.append.path="false">
+    <connection>scm:git:https://github.com/j4ckk0/JToolsFramework.git</connection>
+    <developerConnection>scm:git:git@github.com:j4ckk0/JToolsFramework.git</developerConnection>
+    <url>https://github.com/j4ckk0/JToolsFramework</url>
+    <tag>HEAD</tag>
+  </scm>
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/j4ckk0/JToolsFramework/issues</url>
+  </issueManagement>
 
   <properties>
     <!-- the framework's version, for the projects' dependencies on its modules: always this pom's own <version> -->
@@ -162,6 +203,39 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-shade-plugin</artifactId>
           <version>3.6.0</version>
+        </plugin>
+        <!-- The Apache 2.0 header at the top of every Java source, main and test (the convention of the published
+             jtools projects): a module gets it by naming this plugin — the framework's libraries do, a project
+             inheriting this parent does not unless it is published under that licence too. -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <version>2.4.0</version>
+          <configuration>
+            <verbose>false</verbose>
+            <licenseName>apache_v2</licenseName>
+            <organizationName>jtools.org</organizationName>
+            <inceptionYear>2026</inceptionYear>
+            <canUpdateCopyright>true</canUpdateCopyright>
+          </configuration>
+          <executions>
+            <execution>
+              <id>add-license-headers</id>
+              <phase>process-sources</phase>
+              <goals>
+                <goal>update-file-header</goal>
+              </goals>
+              <configuration>
+                <includes>
+                  <include>**/*.java</include>
+                </includes>
+                <roots>
+                  <root>src/main/java</root>
+                  <root>src/test</root>
+                </roots>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>

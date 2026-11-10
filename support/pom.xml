@@ -15,6 +15,11 @@
   <description>What every program leans on and none of them is about: JSON (Map / List trees, no dependency), where the program is installed, its version and its .ini. The JDK and nothing else.</description>
   <build>
     <plugins>
+      <!-- the Apache 2.0 header on every Java source (jtools-parent configures it) -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>

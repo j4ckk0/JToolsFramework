@@ -32,6 +32,9 @@ scripts/jtools-sync.sh ../Project [--check]
   project's CI), then synced into the projects with `jtools-sync.sh`.
 - **The libraries stay generic**: nothing of any application in `support`, `server`, `launcher`, `web`.
 - **One version** for every module (`scripts/check-versions.sh`); a project names it as its parent's version.
+- **Apache License 2.0** (`LICENSE`, `NOTICE`): the build writes the header on every Java source of the libraries
+  (`license-maven-plugin`) — a new class gets it at its first build. Never on `templates/webapp`: the projects
+  generated from it are their owners', under their owners' terms.
 - **Template trials** go under `tmp/` or `--dir /tmp/...` with `--no-git` (no port registered, no repository).
   A trial run of a program: `--port 18000+`, and nothing that opens the desktop's browser — `--no-browser`, or
   `BROWSER=true` with no `DISPLAY` to test the stop.

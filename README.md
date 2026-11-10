@@ -42,8 +42,10 @@ The generated project is four modules — `core` (the business), `api` (its HTTP
 - **One name for each thing that had several**: `--keep-alive` (`--keep-running` still understood), a 15 s grace,
   a 5 s ping, `--no-browser` keeping the program running — what three of the five projects did.
 - **Maven-first**: no Gradle convention plugin yet; a project wanting Gradle keeps its own build beside.
-- **No licence yet**: the framework is private, like four of the five projects. XsdViewer, public under Apache-2.0,
-  can only depend on it once it is published under a compatible licence ([doc/ADOPTING.md](doc/ADOPTING.md)).
+- **Apache License 2.0**, like XsdViewer and DocComparator: [LICENSE](LICENSE), [NOTICE](NOTICE), the licence and
+  the project's metadata in jtools-parent (what Maven Central requires), the Apache header on every Java source
+  (`license-maven-plugin`, as in the published jtools projects). It is to be published on GitHub
+  (<https://github.com/j4ckk0/JToolsFramework>) and Maven Central; until then the projects find it in `~/.m2`.
 
 ## Build and run
 
