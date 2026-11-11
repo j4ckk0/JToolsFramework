@@ -170,7 +170,7 @@ public final class WebServer implements AutoCloseable {
 
     /**
      * Answers a route's exception of that class (or of a subclass) with that status and its message —
-     * {@code refuse(SchemaException.class, 400)}. The most specific mapping wins; {@link IllegalArgumentException} is
+     * {@code refuse(UnknownSensorException.class, 404)}. The most specific mapping wins; {@link IllegalArgumentException} is
      * 400 already. An exception mapped to nothing is a 500.
      */
     public WebServer refuse(Class<? extends Throwable> exception, int status) {
@@ -255,7 +255,7 @@ public final class WebServer implements AutoCloseable {
         public void doFilter(HttpExchange ex, Chain chain) throws IOException {
             long start = System.nanoTime();
             try {
-                if (refused(ex)) return;
+                if (rejectForeign(ex)) return;
                 chain.doFilter(ex);
             } finally {
                 LOG.fine(() -> String.format("%s %s -> %d in %d ms", ex.getRequestMethod(), ex.getRequestURI().getPath(),
@@ -269,7 +269,8 @@ public final class WebServer implements AutoCloseable {
         }
     }
 
-    private boolean refused(HttpExchange ex) throws IOException {
+    /** Answers 403 to a request naming another host, or changing state from another site's page: true when it did. */
+    private boolean rejectForeign(HttpExchange ex) throws IOException {
         I18n say = SERVER_TEXTS.of(ex.getRequestHeaders().getFirst("Accept-Language"));
         String hostHeader = ex.getRequestHeaders().getFirst(Http.HEADER_HOST);
         if (hostHeader != null && !allowedHost(hostHeader)) {
@@ -306,11 +307,11 @@ public final class WebServer implements AutoCloseable {
             } else if (path.equals(BYE)) {
                 if (method.equals(Http.METHOD_POST)) bye(ex); else wrongMethod(ex, Http.METHOD_POST);
             } else {
-                Map<String, Mount> byMethod = mounted(path);
-                if (byMethod != null) mounted(ex, path, method, byMethod);
-                else if (path.startsWith(API + ROOT) || path.equals(API)) refuse(ex, 404, "http.notFound");
-                else if (!method.equals(Http.METHOD_GET)) refuse(ex, 405, "http.methodExpected", Http.METHOD_GET);
-                else if (!files.serve(ex, path)) refuse(ex, 404, "http.notFound");
+                Map<String, Mount> byMethod = mountsFor(path);
+                if (byMethod != null) callMount(ex, path, method, byMethod);
+                else if (path.startsWith(API + ROOT) || path.equals(API)) sendError(ex, 404, "http.notFound");
+                else if (!method.equals(Http.METHOD_GET)) sendError(ex, 405, "http.methodExpected", Http.METHOD_GET);
+                else if (!files.serve(ex, path)) sendError(ex, 404, "http.notFound");
             }
         } catch (Exception e) {
             LOG.log(Level.SEVERE, method + " " + path + " failed", e);
@@ -318,7 +319,7 @@ public final class WebServer implements AutoCloseable {
     }
 
     /** The mounts of a path: its own, else the longest prefix above it. */
-    private Map<String, Mount> mounted(String path) {
+    private Map<String, Mount> mountsFor(String path) {
         Map<String, Mount> exact = mounts.get(path);
         if (exact != null) return exact;
         String best = null;
@@ -328,7 +329,7 @@ public final class WebServer implements AutoCloseable {
         return best == null ? null : mounts.get(best);
     }
 
-    private void mounted(HttpExchange ex, String path, String method, Map<String, Mount> byMethod) throws Exception {
+    private void callMount(HttpExchange ex, String path, String method, Map<String, Mount> byMethod) throws Exception {
         Mount mount = byMethod.getOrDefault(method, byMethod.get(ANY_METHOD));
         if (mount == null) {
             wrongMethod(ex, String.join(", ", byMethod.keySet()));
@@ -343,12 +344,12 @@ public final class WebServer implements AutoCloseable {
         try {
             answer = mount.route().answer(exchange);
         } catch (Refusal e) {
-            refused(exchange, e, e.status());
+            sendRefusal(exchange, e, e.status());
             return;
         } catch (Exception e) {
             Integer status = statusOf(e);
             if (status != null) {
-                refused(exchange, e, status);
+                sendRefusal(exchange, e, status);
             } else {
                 LOG.log(Level.SEVERE, method + " " + path + " failed", e);
                 Http.error(ex, 500, exchange.serverTexts().t("http.internalError", I18n.message(e)));
@@ -369,7 +370,7 @@ public final class WebServer implements AutoCloseable {
         return null;
     }
 
-    private static void refused(Exchange ex, Exception e, int status) throws IOException {
+    private static void sendRefusal(Exchange ex, Exception e, int status) throws IOException {
         LOG.info(() -> ex.getRequestMethod() + " " + ex.getRequestURI().getPath() + " refused: " + I18n.message(e));
         LOG.log(Level.FINE, "the refusal's trace", e);
         Http.error(ex, status, I18n.message(e));
@@ -378,10 +379,10 @@ public final class WebServer implements AutoCloseable {
     /** 405, with the methods the path takes in {@code Allow} and in the refusal. */
     private static void wrongMethod(HttpExchange ex, String allowed) throws IOException {
         ex.getResponseHeaders().set(Http.HEADER_ALLOW, allowed);
-        refuse(ex, 405, "http.methodExpected", allowed);
+        sendError(ex, 405, "http.methodExpected", allowed);
     }
 
-    private static void refuse(HttpExchange ex, int status, String key, Object... args) throws IOException {
+    private static void sendError(HttpExchange ex, int status, String key, Object... args) throws IOException {
         Http.error(ex, status, SERVER_TEXTS.of(ex.getRequestHeaders().getFirst("Accept-Language")).t(key, args));
     }
 
@@ -402,7 +403,7 @@ public final class WebServer implements AutoCloseable {
     private void alive(HttpExchange ex) throws IOException {
         String id = Http.query(ex, PARAM_PAGE);
         if (id == null || id.isEmpty()) {
-            refuse(ex, 400, "http.pageExpected");
+            sendError(ex, 400, "http.pageExpected");
             return;
         }
         ex.getResponseHeaders().set(Http.HEADER_CONTENT_TYPE, Http.TYPE_EVENT_STREAM);

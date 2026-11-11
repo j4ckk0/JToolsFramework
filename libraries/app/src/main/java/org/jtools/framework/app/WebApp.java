@@ -72,9 +72,9 @@ import org.jtools.framework.support.Json;
 public final class WebApp {
 
     private static final Logger LOG = Logger.getLogger(WebApp.class.getName());
-    private static final Catalogue LAUNCHER_TEXTS = I18n.catalogue(WebApp.class, "org.jtools.framework.app.texts", Locale.ENGLISH, Locale.FRENCH);
+    private static final Catalogue APP_CATALOGUE = I18n.catalogue(WebApp.class, "org.jtools.framework.app.texts", Locale.ENGLISH, Locale.FRENCH);
     /** What the log says of a failure: English, whoever runs the program (a log is read by whoever helps, and searched). */
-    private static final I18n ENGLISH = LAUNCHER_TEXTS.of(Locale.ENGLISH);
+    private static final I18n ENGLISH = APP_CATALOGUE.of(Locale.ENGLISH);
 
     /** The framework's own routes. */
     public static final String SETTINGS = WebServer.API + "/settings", ABOUT = WebServer.API + "/about", QUIT = WebServer.API + "/quit",
@@ -237,7 +237,7 @@ public final class WebApp {
         // the program's own class: its jar is the one whose folder holds the .ini and whose manifest says the version
         Class<?> program = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass();
         Logging.configure();
-        I18n console = LAUNCHER_TEXTS.of(Locale.getDefault());
+        I18n console = APP_CATALOGUE.of(Locale.getDefault());
         Properties ini;
         LaunchOptions options;
         try {
@@ -334,7 +334,7 @@ public final class WebApp {
         server.get(SETTINGS, ex -> settings(server, settings))
               .post(SETTINGS, ex -> {
                   Map<String, Object> asked = ex.jsonObject();
-                  I18n say = LAUNCHER_TEXTS.of(ex.language());
+                  I18n say = APP_CATALOGUE.of(ex.language());
                   if (asked.containsKey(J_AUTO_STOP) && !(asked.get(J_AUTO_STOP) instanceof Boolean)) throw new WebServer.Refusal(400, say.t("settings.autoStop"));
                   if (asked.containsKey(J_PORT) && !(asked.get(J_PORT) instanceof Number n && isPortOrUnset(n))) throw new WebServer.Refusal(400, say.t("settings.port"));
                   if (settingsFields != null) settingsFields.write(asked, ex);   // the program's own refusals before anything is kept
@@ -379,7 +379,7 @@ public final class WebApp {
     }
 
     private static Object openLog(Exchange ex) throws IOException {
-        I18n say = LAUNCHER_TEXTS.of(ex.language());
+        I18n say = APP_CATALOGUE.of(ex.language());
         if (!ex.fromThisComputer()) throw new WebServer.Refusal(403, say.t("log.notHere"));
         Path file = Logging.file();
         if (file == null || !Files.isRegularFile(file)) throw new WebServer.Refusal(409, say.t("log.none"));
@@ -435,7 +435,7 @@ public final class WebApp {
 
     /** The console's texts: in the language --lang named, else the machine's. */
     private I18n console(LaunchOptions options) {
-        return LAUNCHER_TEXTS.of(options.lang() != null ? options.lang() : Locale.getDefault());
+        return APP_CATALOGUE.of(options.lang() != null ? options.lang() : Locale.getDefault());
     }
 
     /** The help --help prints, in the console's language: the framework's options, then the program's own. */
@@ -466,7 +466,7 @@ public final class WebApp {
     }
 
     private static String languages() {
-        return LAUNCHER_TEXTS.languages().stream().map(Locale::getLanguage).collect(Collectors.joining(", "));
+        return APP_CATALOGUE.languages().stream().map(Locale::getLanguage).collect(Collectors.joining(", "));
     }
 
     private static void line(StringBuilder usage, String option, String help) {
@@ -497,7 +497,7 @@ public final class WebApp {
     }
 
     private static Locale language(String text, String what) throws UsageException {
-        for (Locale language : LAUNCHER_TEXTS.languages()) if (language.getLanguage().equalsIgnoreCase(text)) return language;
+        for (Locale language : APP_CATALOGUE.languages()) if (language.getLanguage().equalsIgnoreCase(text)) return language;
         throw new UsageException("error.badLanguage", what + " " + text, languages());
     }
 
