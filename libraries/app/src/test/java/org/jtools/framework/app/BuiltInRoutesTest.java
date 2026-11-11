@@ -111,10 +111,10 @@ class BuiltInRoutesTest {
 
     @Test
     void switchesTheAutomaticStopAtOnceAndKeepsIt() throws Exception {
-        assertTrue(server.pages().isEnabled());
+        assertTrue(server.pages().autoStops());
         Map<?, ?> answer = json(post(WebApp.SETTINGS, "{\"autoStop\":false}"));
         assertEquals(false, answer.get("autoStop"));
-        assertFalse(server.pages().isEnabled(), "at once");
+        assertFalse(server.pages().autoStops(), "at once");
         assertFalse(UserSettings.of(ID).autoStop(), "and for the next runs");
     }
 
@@ -132,11 +132,11 @@ class BuiltInRoutesTest {
         HttpResponse<String> badPort = post(WebApp.SETTINGS, "{\"port\":70000,\"autoStop\":false}");
         assertEquals(400, badPort.statusCode());
         assertEquals("port: 0, or 1 to 65535", json(badPort).get("error"));
-        assertTrue(server.pages().isEnabled(), "nothing of a refused request is applied");
+        assertTrue(server.pages().autoStops(), "nothing of a refused request is applied");
         assertEquals(400, post(WebApp.SETTINGS, "{\"autoStop\":\"no\"}").statusCode());
         HttpResponse<String> badTheme = post(WebApp.SETTINGS, "{\"theme\":\"pink\",\"autoStop\":false}");
         assertEquals("theme: light or dark", json(badTheme).get("error"));
-        assertTrue(server.pages().isEnabled());
+        assertTrue(server.pages().autoStops());
         assertEquals("dark", json(post(WebApp.SETTINGS, "{\"theme\":\"dark\"}")).get("theme"));
     }
 

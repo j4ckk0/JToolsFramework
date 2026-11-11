@@ -90,7 +90,7 @@ class WebServerTest {
                     @Override public String description() { return "records every path"; }
                 })
                 .start("127.0.0.1", 0);
-        server.pages().watch(stopped::countDown);
+        server.pages().onLastPageGone(stopped::countDown);
     }
 
     @AfterEach

@@ -38,7 +38,7 @@ class PageWatchTest {
     void waitsForAFirstPage() throws Exception {
         PageWatch watch = new PageWatch(GRACE);
         CountDownLatch stopped = new CountDownLatch(1);
-        watch.watch(stopped::countDown);
+        watch.onLastPageGone(stopped::countDown);
         assertFalse(stopped.await(GRACE.toMillis() * 3, TimeUnit.MILLISECONDS));
     }
 
@@ -46,7 +46,7 @@ class PageWatchTest {
     void stopsOnceTheLastPageHasGone() throws Exception {
         PageWatch watch = new PageWatch(GRACE);
         CountDownLatch stopped = new CountDownLatch(1);
-        watch.watch(stopped::countDown);
+        watch.onLastPageGone(stopped::countDown);
         watch.opened("a");
         watch.opened("b");
         watch.closed("a");
@@ -59,7 +59,7 @@ class PageWatchTest {
     void aPageBackWithinTheGraceKeepsItRunning() throws Exception {
         PageWatch watch = new PageWatch(GRACE);
         CountDownLatch stopped = new CountDownLatch(1);
-        watch.watch(stopped::countDown);
+        watch.onLastPageGone(stopped::countDown);
         watch.opened("a");
         watch.closed("a");
         watch.opened("a");   // a reload
@@ -70,9 +70,9 @@ class PageWatchTest {
     @Test
     void neverStopsWhenDisabled() throws Exception {
         PageWatch watch = new PageWatch(GRACE);
-        watch.setEnabled(false);
+        watch.setAutoStop(false);
         CountDownLatch stopped = new CountDownLatch(1);
-        watch.watch(stopped::countDown);
+        watch.onLastPageGone(stopped::countDown);
         watch.opened("a");
         watch.closed("a");
         assertFalse(stopped.await(GRACE.toMillis() * 3, TimeUnit.MILLISECONDS));

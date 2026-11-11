@@ -277,7 +277,7 @@ public final class WebApp {
         }));
         String url = server.url();
         LOG.info(name + " " + Installation.version(program) + " is ready on " + url + "; "
-                + (server.pages().isEnabled() ? "it stops when its last page is closed (or Ctrl+C)" : "Ctrl+C to stop")
+                + (server.pages().autoStops() ? "it stops when its last page is closed (or Ctrl+C)" : "Ctrl+C to stop")
                 + (Logging.file() == null ? "" : "; log: " + Logging.file()));
         if (options.browser() && !DesktopOpener.browse(url)) LOG.info("Open " + url + " in your browser.");
     }
@@ -314,8 +314,8 @@ public final class WebApp {
         builtInRoutes(server, settings, program);
         routes.accept(server);   // after the framework's: a route of the program's own replaces one of them (logged)
         server.start(options.host(), options.port());
-        server.pages().setEnabled(!options.keepAlive() && settings.autoStop());
-        server.pages().watch(() -> {
+        server.pages().setAutoStop(!options.keepAlive() && settings.autoStop());
+        server.pages().onLastPageGone(() -> {
             LOG.info("The last page has been closed for " + grace.toSeconds() + " s: " + name + " stops.");
             stopAndExit(server);
         });
@@ -338,7 +338,7 @@ public final class WebApp {
                   if (asked.containsKey(J_PORT) && !(asked.get(J_PORT) instanceof Number n && isPortOrUnset(n))) throw new WebServer.Refusal(400, say.t("settings.port"));
                   if (settingsFields != null) settingsFields.write(asked, ex);   // the program's own refusals before anything is kept
                   if (asked.get(J_AUTO_STOP) instanceof Boolean on) {
-                      server.pages().setEnabled(on);
+                      server.pages().setAutoStop(on);
                       settings.setAutoStop(on);
                   }
                   if (asked.get(J_PORT) instanceof Number port) settings.setPort(port.intValue());
@@ -364,7 +364,7 @@ public final class WebApp {
 
     private Map<String, Object> settings(WebServer server, UserSettings settings) {
         Map<String, Object> answer = Json.obj();
-        answer.put(J_AUTO_STOP, server.pages().isEnabled());
+        answer.put(J_AUTO_STOP, server.pages().autoStops());
         answer.put(J_PORT, settings.port().orElse(UserSettings.PORT_UNSET));
         answer.put(J_DEFAULT_PORT, defaultPort);
         answer.put(J_CURRENT_PORT, server.port());

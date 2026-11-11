@@ -45,6 +45,10 @@ A page that closes normally sends its beacon: the stop comes 15 s later. A crash
 breaks, which a ping notices — the first write after a close usually still succeeds, so up to two pings (10 s) — then
 the 15 s run. Nothing happens before a first page has opened.
 
+One idea, several names: the pages' **presence** (`/api/alive`, `/api/bye`, `PagePresenceService`) feeds the
+**automatic stop** (`PageWatch`: `setAutoStop`, `onLastPageGone`), which the Settings menu's `autoStop` switches off,
+and `--keep-alive` or `--no-browser` for one run.
+
 ## 4. Self-contained: a clone and `scripts/setup.sh`
 
 Nothing the build needs is under source control **nor taken from the machine**: `externals.conf` names the JDK,
