@@ -18,7 +18,8 @@ A project on JToolsFramework builds, runs and packages with the same scripts as 
 | `scripts/package.sh` | `mvn package -Pdist`: the Linux, macOS and Windows archives into `releases/`; the previous versions' removed |
 | `scripts/jtools` | the devkit itself: `sync`, `sync --check`, `version`, `new` (below) — the one script the devkit never refreshes |
 
-Each in `.bat` for Windows but `jtools`, which is bash: on Windows, Git Bash runs it.
+Each in `.bat` for Windows, `jtools` too: `scripts\jtools.bat` — `scripts\jtools sync`, `jtools new` in a command
+prompt. The shell scripts also run in Git Bash, where they take the Windows tools.
 
 ## scripts/jtools
 

@@ -6,14 +6,20 @@ don't.
 
 ## 0. What you need
 
-Linux, macOS, or Windows with Git Bash; `bash`, `curl`, `unzip`, `tar` and `git`. **Nothing else** — no Java, Maven
-nor Node.js to install: a project downloads its own into its `external/` folder, the first time, about 450 MB.
+Linux, with `bash`, `curl`, `unzip`, `tar` and `git`; or Windows 10 or later, with
+[Git for Windows](https://git-scm.com/download/win) for the project's repository — Windows has the rest (`curl`,
+`tar`). **Nothing else** — no Java, Maven nor Node.js to install: a project downloads its own into its `external/`
+folder, the first time, about 450 MB.
 
 ```bash
 for tool in bash curl unzip tar git; do command -v $tool >/dev/null || echo "missing: $tool"; done
 ```
 
-*You should see*: nothing. A `missing:` line names what to install first, with your system's package manager.
+*You should see*: nothing. A `missing:` line names what to install first, with your system's package manager. On
+Windows, `where git` in a command prompt says whether Git is there.
+
+**On Windows**, every command below has its `.bat` twin, typed in a command prompt: `install.bat` for `install.sh`,
+`jtools` (`jtools.bat`) for `jtools`, `scripts\run.bat` for `scripts/run.sh`, and so on.
 
 ## 1. Install JToolsFramework
 
@@ -30,6 +36,11 @@ jtools --help
 *You should see* `== JToolsFramework 1.3.0 in …/.m2/repository`, `== jtools in …/.local/bin`, then `jtools`'s commands:
 `sync`, `version`, `new`. *If `jtools` is not found*: `~/.local/bin` is not on your `PATH` — the installer says the
 line to add to `~/.bashrc`; until then, `~/.local/bin/jtools`.
+
+*On Windows*: download `jtools-1.3.0.zip` from the [release](https://github.com/j4ckk0/JToolsFramework/releases/tag/v1.3.0), extract it (right-click ▸ *Extract All*), then
+`jtools-1.3.0\install.bat --no-project` in a command prompt. It offers to add `%USERPROFILE%\.local\bin` to your
+`PATH`; `jtools --help` then works in the windows you open next. Double-clicked, `install.bat` asks the project's name
+and folder instead.
 
 `install.sh` without `--no-project` goes on with step 3 at once: it asks the project's name and the folder its files go
 in (`install.sh Bookshelf --dir ~/work/bookshelf` says them).

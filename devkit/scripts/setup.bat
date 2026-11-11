@@ -32,8 +32,13 @@ if defined JTOOLS_DOWNLOADS set "DL=%JTOOLS_DOWNLOADS%"
 set "FORCE=0"
 if /i "%~1"=="--force" set "FORCE=1"
 
-for %%t in (curl tar) do where %%t >nul 2>nul || (
-  echo %%t not found ^(Windows 10 1803 and later have it^): install it, then run setup again >&2
+rem Windows' own curl and tar: a Git or Cygwin tar earlier on the PATH cannot read a zip
+set "CURL=%SystemRoot%\System32\curl.exe"
+if not exist "%CURL%" set "CURL=curl"
+set "TAR=%SystemRoot%\System32\tar.exe"
+if not exist "%TAR%" set "TAR=tar"
+for %%t in ("%CURL%" "%TAR%") do if not exist %%t where %%~t >nul 2>nul || (
+  echo %%~t not found ^(Windows 10 1803 and later have it^): install it, then run setup again >&2
   exit /b 1
 )
 
@@ -88,7 +93,7 @@ if exist "%DIR%\%~3" if "%FORCE%"=="0" if "!STAMPED!"=="1" (
 call :fetch %~2 || exit /b 1
 if exist "%DIR%" rmdir /s /q "%DIR%"
 mkdir "%DIR%"
-tar -xf "!FILE!" -C "%DIR%" --strip-components 1 || exit /b 1
+"%TAR%" -xf "!FILE!" -C "%DIR%" --strip-components 1 || exit /b 1
 >"%EXT%\.%~1.url" echo !%~2!
 echo == %DIR% deployed
 exit /b 0
@@ -124,6 +129,6 @@ if defined MIRROR set "SRC=!MIRROR!/!NAME!"
 set "FILE=%DL%\!NAME!"
 if exist "!FILE!" if "%FORCE%"=="0" exit /b 0
 echo == downloading !NAME! from !SRC!
-curl -fL !AUTH! -o "!FILE!.part" "!SRC!" || exit /b 1
+"%CURL%" -fL !AUTH! -o "!FILE!.part" "!SRC!" || exit /b 1
 move /y "!FILE!.part" "!FILE!" >nul
 exit /b 0

@@ -49,7 +49,7 @@ set "ARCHIVE=%~1"
 :checkNext
 shift
 if "%~1"=="" exit /b 0
-tar -tf "%ARCHIVE%" | findstr /x /c:"%BASE%/%~1" >nul || ( echo %ARCHIVE%: no %~1 >&2 & exit /b 1 )
+"%SystemRoot%\System32\tar.exe" -tf "%ARCHIVE%" | findstr /x /c:"%BASE%/%~1" >nul || ( echo %ARCHIVE%: no %~1 >&2 & exit /b 1 )
 goto checkNext
 
 rem ---- an archive of another version: removed

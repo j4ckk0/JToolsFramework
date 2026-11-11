@@ -63,7 +63,7 @@ jobs:
     runs-on: windows-latest
     defaults:
       run:
-        shell: cmd
+        shell: pwsh
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -73,25 +73,35 @@ jobs:
           name: made-on-linux
           path: made-on-linux
       - name: git's identity, for the projects' first commits
-        run: git config --global user.name "JToolsFramework CI" && git config --global user.email "ci@example.invalid"
+        run: git config --global user.name "JToolsFramework CI"; git config --global user.email "ci@example.invalid"
+      # Each step runs the .bat scripts in cmd, as a developer would; when one fails, its output's end becomes the
+      # step's error annotation, which GitHub's API shows to anyone (a job's log needs the repository's admin).
       - name: Install, and make a project (install.bat)
         run: |
-          for %%z in (jtools-*.zip) do tar -xf %%z || exit /b 1
-          for /d %%d in (jtools-*) do call %%d\install.bat Demo --dir %RUNNER_TEMP%\demo --port 18096 || exit /b 1
+          $ErrorActionPreference = 'Continue'
+          Expand-Archive -Path (Get-Item jtools-*.zip).FullName -DestinationPath .
+          $delivery = (Get-Item jtools-* -Exclude *.zip, *.gz).FullName
+          cmd /c "`"$delivery\install.bat`" Demo --dir `"$env:RUNNER_TEMP\demo`" --port 18096" 2>&1 | Tee-Object -FilePath step.log
+          if ($LASTEXITCODE -ne 0) { $e = ((Get-Content step.log -Tail 60) -join "`n").Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A'); Write-Output "::error title=install.bat::$e"; exit 1 }
       - name: Its build, its distributions, its sync (the .bat scripts)
         working-directory: ${{ runner.temp }}\demo
         run: |
-          call scripts\build.bat || exit /b 1
-          call scripts\package.bat || exit /b 1
-          call scripts\jtools.bat sync --check || exit /b 1
-          call %USERPROFILE%\.local\bin\jtools.bat version || exit /b 1
-          dir releases
+          $ErrorActionPreference = 'Continue'
+          foreach ($command in 'scripts\build.bat', 'scripts\package.bat', 'scripts\jtools.bat sync --check', "`"$env:USERPROFILE\.local\bin\jtools.bat`" version") {
+            cmd /c $command 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\step.log"
+            if ($LASTEXITCODE -ne 0) { $e = ((Get-Content "$env:RUNNER_TEMP\step.log" -Tail 60) -join "`n").Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A'); Write-Output "::error title=$command::$e"; exit 1 }
+          }
+          Get-ChildItem releases
       - name: The same project as Linux's, but for its line endings
         run: |
-          call %USERPROFILE%\.local\bin\jtools.bat new Demo --dir %RUNNER_TEMP%\fresh --port 18096 --no-git --no-build || exit /b 1
-          "C:\Program Files\Git\usr\bin\diff.exe" -r --strip-trailing-cr made-on-linux %RUNNER_TEMP%\fresh
+          $ErrorActionPreference = 'Continue'
+          cmd /c "`"$env:USERPROFILE\.local\bin\jtools.bat`" new Demo --dir `"$env:RUNNER_TEMP\fresh`" --port 18096 --no-git --no-build" 2>&1 | Tee-Object -FilePath step.log
+          if ($LASTEXITCODE -ne 0) { $e = ((Get-Content step.log -Tail 60) -join "`n").Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A'); Write-Output "::error title=jtools new::$e"; exit 1 }
+          & 'C:\Program Files\Git\usr\bin\diff.exe' -r --strip-trailing-cr made-on-linux "$env:RUNNER_TEMP\fresh" 2>&1 | Tee-Object -FilePath step.log
+          if ($LASTEXITCODE -ne 0) { $e = ((Get-Content step.log -TotalCount 80) -join "`n").Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A'); Write-Output "::error title=differs from Linux's::$e"; exit 1 }
       - name: Git Bash's shell scripts, on Windows too
         continue-on-error: true
         shell: bash
         working-directory: ${{ runner.temp }}/demo
-        run: scripts/build.sh -q
+        run: |
+          scripts/build.sh -q > "$RUNNER_TEMP/bash.log" 2>&1 || { e=$(tail -60 "$RUNNER_TEMP/bash.log" | sed 's/%/%25/g' | tr -d '\r' | sed ':a;N;$!ba;s/\n/%0A/g'); echo "::warning title=scripts/build.sh in Git Bash::$e"; exit 1; }

@@ -34,10 +34,11 @@ program needs. Nothing to install to run it.
 
 ### The development environment
 
-The scripts every project carries — `setup`, `build`, `ci`, `run`, `stop`, `package`, in `.sh` and `.bat`. `setup`
-downloads the project's own JDK, Maven and Node.js into its `external/` folder, at the versions its `externals.conf`
-names: nothing is taken from your machine, so the project builds the same everywhere. `scripts/jtools sync` keeps the
-scripts up to date with the framework.
+The scripts every project carries — `setup`, `build`, `ci`, `run`, `stop`, `package` and `jtools` — in `.sh` for Linux
+and in `.bat` for Windows, which needs no Git Bash. `setup` downloads the project's own JDK, Maven and Node.js into its
+`external/` folder, the ones for the computer it runs on, at the versions its `externals.conf` names: nothing is taken
+from your machine, so the project builds the same everywhere. `scripts/jtools sync` keeps the scripts up to date with
+the framework.
 
 ### The project template
 
@@ -51,9 +52,9 @@ the idea behind it in one page.
 
 ## Quick start: a new project, step by step
 
-**0. What you need**: Linux, macOS, or Windows with Git Bash; `bash`, `curl`, `unzip`, `tar` and `git`. Nothing else —
-no Java, Maven nor Node.js to install: a project downloads its own into its `external/` folder the first time (about
-450 MB).
+**0. What you need**: Linux, with `bash`, `curl`, `unzip`, `tar` and `git`; or Windows 10 or later, with
+[Git for Windows](https://git-scm.com/download/win) for the project's repository. Nothing else — no Java, Maven nor
+Node.js to install: a project downloads its own into its `external/` folder the first time (about 450 MB).
 
 **1. Download the delivery** — one archive, the framework and its installer, from the
 [release](https://github.com/j4ckk0/JToolsFramework/releases/tag/v1.3.0):
@@ -69,6 +70,14 @@ tar xzf jtools-1.3.0.tar.gz
 jtools-1.3.0/install.sh                                   # asks; or says it all at once:
 jtools-1.3.0/install.sh Bookshelf --dir ~/work/bookshelf
 ```
+
+**On Windows**, the same with `.bat` scripts — no Git Bash, no PowerShell script: plain `.bat` files, with the `curl`
+and `tar` Windows 10 comes with. Download `jtools-1.3.0.zip` from the
+[release](https://github.com/j4ckk0/JToolsFramework/releases/tag/v1.3.0), extract it (right-click ▸ *Extract All*),
+and double-click `jtools-1.3.0\install.bat`: it asks the project's name and folder, and offers to put `jtools` on
+your `PATH`. From a command prompt, `jtools-1.3.0\install.bat Bookshelf --dir C:\work\bookshelf` says them at once.
+Each command below has its `.bat` twin: `scripts\run.bat`, `scripts\build.bat`, `scripts\package.bat`,
+`scripts\jtools sync`.
 
 It puts the framework into your local Maven repository (`~/.m2`) and `jtools` into `~/.local/bin`, then makes the
 project: its files in that folder, its development environment — a JDK, Maven and Node.js of its own, in its
@@ -202,7 +211,7 @@ curl 'http://127.0.0.1:8089/api/hello?name=script'   # {"message":"Hello, script
 | [`conventions/`](conventions) | `parent`: the build; `bom`: the versions alone; `dist`: the distributions' build (jdeps, jlink, the archives) and launchers | `jtools-parent`, `jtools-bom`, `jtools-dist` |
 | [`devkit/`](devkit) | what a project carries: its scripts, its pre-push hook, `.gitattributes`, the default `externals.conf`; `scripts/jtools` | `jtools-devkit`, with the starter |
 | [`starter/`](starter) | the template and `new-project.sh`, which `jtools new` runs | in `jtools-devkit` |
-| [`delivery/`](delivery) | the delivery's installer and README; `scripts/delivery.sh` builds the archive a release carries | `jtools-<version>.tar.gz`, on GitHub's releases |
+| [`delivery/`](delivery) | the delivery's installers — `install.sh` for Linux, `install.bat` for Windows — and README; `scripts/delivery.sh` builds the archives a release carries | `jtools-<version>.tar.gz` and `.zip`, on GitHub's releases |
 | [`examples/`](examples) | `hello`, `todo`, `greeter`: three very small programs, each a step further | never: built and tested with the rest |
 | [`doc/`](doc) | [GETTING-STARTED](doc/GETTING-STARTED.md), [CONCEPTS](doc/CONCEPTS.md), [LIBRARIES](doc/LIBRARIES.md), [CONVENTIONS](doc/CONVENTIONS.md), [DEVKIT](doc/DEVKIT.md), [ADOPTING](doc/ADOPTING.md) (moving an existing program onto it), [design/](doc/design) (why it is as it is) | — |
 | `scripts/` | the framework's own — `install`, `check-versions`, `ci.local`, `delivery` — and the devkit's, which the framework carries like any project | — |
