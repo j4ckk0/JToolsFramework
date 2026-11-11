@@ -2,16 +2,16 @@
 
 **JToolsFramework helps Java developers build a local web application**: a program that runs on the user's
 computer, with a Java server holding all the business logic and a web page in the browser as its user interface. The
-server's routes form an HTTP API — JSON in, JSON out — so scripts and other programs can use the application just as
+server's endpoints form an HTTP API — JSON in, JSON out — so scripts and other programs can use the application just as
 its page does ([A page and an API](#a-page-and-an-api)).
 
-You write the business logic, the API's routes and the page; JToolsFramework provides the rest.
+You write the business logic, the API's endpoints and the page; JToolsFramework provides the rest.
 
 ## What it is
 
 JToolsFramework is four things:
 
-- **a small framework** — the libraries a program's code calls: the server, the routes, the command line, the
+- **a small framework** — the libraries a program's code calls: the server, the endpoints, the command line, the
   settings, the log, the stop (`jtools-app`; the JDK and nothing else);
 - **its build conventions** — the parent pom a project inherits: Java 25, the tests, the program's one jar, the
   distributions with a runtime jlink trims (`jtools-parent`);
@@ -21,7 +21,7 @@ JToolsFramework is four things:
 
 ### The framework
 
-A few Java libraries your program calls. You write the business and its routes; the libraries do the rest: the web
+A few Java libraries your program calls. You write the business and its endpoints; the libraries do the rest: the web
 server, the command line (`--port`, `--help`…), the settings, the log, opening the browser, and stopping the program
 once its page is closed. They need nothing but the JDK. [The libraries](#the-libraries) below says what each gives.
 
@@ -42,7 +42,7 @@ scripts up to date with the framework.
 ### The project template
 
 `jtools new Bookshelf` makes a complete project that runs at once: the business (`core`), its API (`api`), the page
-(`frontend`) and the program (`app`), with a first route, its tests, a git repository and a first build. You start
+(`frontend`) and the program (`app`), with a first endpoint, its tests, a git repository and a first build. You start
 from working code, not from a blank folder.
 
 Apache License 2.0. Version 1.2.0; on Maven Central once published (until then, the delivery's `install.sh` — the
@@ -78,7 +78,7 @@ project: its files in that folder, its development environment — a JDK, Maven 
 ```
 bookshelf/
 ├── core/       the business: Bookshelf.java, pure Java — every rule, every computation, every state
-├── api/        its HTTP face: BookshelfApi.java — each route asks core and turns its answer into JSON
+├── api/        its HTTP face: BookshelfApi.java — each endpoint asks core and turns its answer into JSON
 ├── frontend/   the Angular page: a view, it decides nothing — api.service.ts is its one door to the server
 ├── app/        the program: Launcher.java, a WebApp serving the API; its one jar and its distributions
 └── scripts/    setup, build, ci, run, stop, package — and jtools
@@ -87,7 +87,7 @@ bookshelf/
 **3. Run it**: `cd ~/work/bookshelf && scripts/run.sh` — the page opens in your browser; close it, and 15 seconds later the
 program stops (`--keep-alive` keeps it serving).
 
-**4. Add a feature**, one layer at a time: a method in `core` decides, a route in `api` translates it to JSON, a method
+**4. Add a feature**, one layer at a time: a method in `core` decides, an endpoint in `api` translates it to JSON, a method
 in `api.service.ts` and a view in `frontend` show it. `scripts/run.sh` rebuilds when a source is newer.
 
 **5. Test it**: `scripts/build.sh` — every Java test and the page's.
@@ -109,8 +109,8 @@ step 4, what to do when something goes wrong — in fifteen minutes.
 
 | Library | What a program gets | Start from |
 |---|---|---|
-| `jtools-app` | the program around the server: the command line (`--port`, `--no-browser`, `--lang`, `--help`…), the `.ini`, the Settings menu, the log, the browser opened, the stop once the last page is closed; the routes `/api/settings`, `/api/about`, `/api/quit` | `WebApp` |
-| `jtools-server` | the HTTP server: the program's routes (a `Map` or a `List` answered as JSON, a refusal as `{"error"}`), the page's files, the pages' presence, the Host and Origin checks | `WebServer`, `Exchange` |
+| `jtools-app` | the program around the server: the command line (`--port`, `--no-browser`, `--lang`, `--help`…), the `.ini`, the Settings menu, the log, the browser opened, the stop once the last page is closed; the endpoints `/api/settings`, `/api/about`, `/api/quit` | `WebApp` |
+| `jtools-server` | the HTTP server: the program's endpoints (a `Map` or a `List` answered as JSON, a refusal as `{"error"}`), the page's files, the pages' presence, the Host and Origin checks | `WebServer`, `Exchange` |
 | `jtools-support` | JSON, the texts in each language (`Accept-Language` honoured), the installation's folder and version | `Json`, `Catalogue` |
 | `jtools-desktop` | native open, save and folder dialogs, for a program that wants them | `FileDialogs` |
 | `@jtools/web` | the Angular page's side: its presence, the API's refusals as sentences | `provideJTools()` |
@@ -142,21 +142,21 @@ flowchart TB
 
     subgraph program["Bookshelf — a program on JToolsFramework"]
         app["app/ · Launcher<br/>main: WebApp.named(Bookshelf)…launch(args)<br/>one jar, the distributions"]
-        api["api/ · BookshelfApi<br/>its routes: GET /api/status, /api/books…<br/>a translation, no rule"]
+        api["api/ · BookshelfApi<br/>its endpoints: GET /api/status, /api/books…<br/>a translation, no rule"]
         core["core/ · Bookshelf<br/>the business: every rule, every state<br/>pure Java, no HTTP"]
         frontend["frontend/ · the Angular page<br/>a view only; in the jar as static/"]
     end
 
     subgraph libraries["JToolsFramework's libraries"]
         japp["jtools-app · WebApp<br/>command line, .ini, settings, log,<br/>the browser, the stop; /api/settings, /api/about"]
-        jserver["jtools-server · WebServer<br/>routes, the page's files, the pages' presence,<br/>the Host and Origin checks"]
+        jserver["jtools-server · WebServer<br/>endpoints, the page's files, the pages' presence,<br/>the Host and Origin checks"]
         jsupport["jtools-support<br/>Json, Catalogue and Texts, Installation"]
         jdesktop["jtools-desktop · FileDialogs<br/>native file dialogs, when a program wants them"]
         jweb["@jtools/web<br/>the page's presence, the API's refusals"]
     end
 
     browser -- "HTTP: the page, its JSON, /api/alive" --> app
-    other -- "HTTP: the same JSON routes" --> app
+    other -- "HTTP: the same JSON endpoints" --> app
 
     app --> api
     app --> frontend
@@ -171,22 +171,22 @@ flowchart TB
 ```
 
 - **The business is `core`'s alone**: pure Java, testable and usable without a server or a page.
-- **`api` translates**: each route asks `core` and turns its answer into JSON; a refusal is `{"error": reason}`.
+- **`api` translates**: each endpoint asks `core` and turns its answer into JSON; a refusal is `{"error": reason}`.
 - **The page decides nothing**: it shows what the API answers. Any other client sees exactly the same API.
-- **`app` is the program**: `WebApp` puts the server, the API, the page and the framework's own routes together, and
+- **`app` is the program**: `WebApp` puts the server, the API, the page and the framework's own endpoints together, and
   the build makes them one jar and its distributions.
 
 ### A page and an API
 
-Every route a program declares — `server.get("/api/books", …)`, `server.post(…)` — is plain HTTP and JSON. Its page is
-one client of it; anything that speaks HTTP is another:
+Every endpoint a program declares — `server.get("/api/books", …)`, `server.post(…)` — is plain HTTP and JSON; in the
+code, an endpoint is called a *route*. Its page is one client of it; anything that speaks HTTP is another:
 
 ```bash
 curl 'http://127.0.0.1:8089/api/hello?name=script'   # {"message":"Hello, script!"}, from examples/hello
 ```
 
 - **Without a page**: `--no-browser` starts the program without opening one, and it keeps serving until it is told to
-  stop (`scripts/stop.sh`, `POST /api/quit`, Ctrl+C). The framework's own routes come with it: `/api/about`,
+  stop (`scripts/stop.sh`, `POST /api/quit`, Ctrl+C). The framework's own endpoints come with it: `/api/about`,
   `/api/settings`, `/api/quit`.
 - **Another protocol beside the JSON**: `server.handle("/mcp", handler)` mounts a plain JDK handler — an assistant's
   tool endpoint, say — behind the same checks.
