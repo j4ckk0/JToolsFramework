@@ -115,14 +115,14 @@ for spec in "jdk JDK_LINUX bin/java" "maven MAVEN_LINUX bin/mvn" "gradle GRADLE 
   echo "== $dir deployed"
 done
 
-# the archives the distributions are made from, under generic names: the JDK's own (its jlink), and the jmods of each
-# platform — a hard link to the download when both are on one file system, a copy otherwise
-# — and, for a platform with no JMODS_* (a JDK up to 23, which carries its jmods), that platform's JDK archive instead
+# the archives the distributions are made from, under generic names: the host JDK's (its jlink) and each platform's
+# jmods, or that platform's JDK archive when it has no JMODS_* (a JDK up to 23 carries its jmods); hard links to the
+# downloads, copies across file systems
 for spec in "jdk-linux.tar.gz JDK_LINUX" "jmods-linux.tar.gz JMODS_LINUX" "jmods-windows.zip JMODS_WINDOWS" "jmods-macos.tar.gz JMODS_MACOS" \
             "jdk-windows.zip JDK_WINDOWS JMODS_WINDOWS" "jdk-macos.tar.gz JDK_MACOS JMODS_MACOS"; do
   set -- $spec
   [ -n "${!2:-}" ] || continue
-  [ -n "${3:-}" ] && [ -n "${!3:-}" ] && continue   # that platform's jmods come apart
+  [ -n "${3:-}" ] && [ -n "${!3:-}" ] && continue   # its jmods are named apart: its JDK archive is not needed
   target=$ext/$1
   if [ -s "$target" ] && deployed_from "$1" "${!2}" && ! $force; then echo "== $target present"; continue; fi
   file=$(fetch "${!2}") || exit 1

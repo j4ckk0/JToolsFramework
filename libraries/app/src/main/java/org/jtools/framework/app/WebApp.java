@@ -106,8 +106,8 @@ public final class WebApp {
     private record ExtraOption(String valueName, String help, Consumer<String> action) {}
 
     /**
-     * A command line that cannot be run: a text of the launcher's and its arguments, so that it is said twice — in English
-     * as its message, what the log keeps, and in the person's language ({@link #in}), what they read.
+     * A command line that cannot be run, kept as a text key and its arguments so that it is said twice: in English as its
+     * message, what the log keeps, and in the person's language ({@link #in}), what they read.
      */
     static final class UsageException extends Exception {
         private final String key;
@@ -208,7 +208,7 @@ public final class WebApp {
         return this;
     }
 
-    /** One optional file to open, refused when it is not a regular file — the policy, the schema the program starts on. */
+    /** One optional file to open, refused when it is not a regular file. */
     public WebApp fileOperand(String usage, String help, Consumer<Path> action) {
         operands(usage, help, files -> { if (!files.isEmpty()) action.accept(Path.of(files.get(0))); });
         this.oneFile = true;
@@ -501,7 +501,7 @@ public final class WebApp {
         throw new UsageException("error.badLanguage", what + " " + text, languages());
     }
 
-    /** A failure said with a text of the launcher's: English in the log, the console's language to the person. */
+    /** A failure said with one of jtools-app's texts: English in the log, the console's language to the person. */
     private void fail(I18n console, int code, String key, Object... args) {
         fail(ENGLISH.t(key, args), console.t(key, args), code);
     }

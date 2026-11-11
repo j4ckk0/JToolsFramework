@@ -10,7 +10,7 @@ import org.jtools.framework.app.WebApp;
  */
 public final class Launcher {
 
-    /** The port when neither the command line nor __APP_ID__.ini names one: the root pom's jtools.app.port (LauncherTest checks). */
+    /** The port when neither the command line, the Settings menu nor __APP_ID__.ini names one: the root pom's jtools.app.port (LauncherTest checks). */
     static final int DEFAULT_PORT = __APP_PORT__;
 
     private Launcher() {}

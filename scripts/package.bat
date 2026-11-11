@@ -8,7 +8,7 @@ rem
 rem   scripts\package.bat
 rem   scripts\package.bat -DskipTests      extra arguments are passed to mvn
 rem
-rem The runtimes are linked from the JDKs of external\ (scripts\setup.bat deploys them). The version is the root pom's <revision>.
+rem The runtimes are linked from the jmods of external\ (scripts\setup.bat deploys them). The version is the root pom's <revision>.
 rem The releases of the previous versions are removed once the new one is built.
 rem
 cd /d "%~dp0.."

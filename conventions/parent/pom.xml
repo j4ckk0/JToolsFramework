@@ -220,9 +220,9 @@
           <!-- at least this one: older versions fail on a field of the portal's status answer (PUBLISHING.md) -->
           <version>0.11.0</version>
         </plugin>
-        <!-- The Apache 2.0 header at the top of every Java source, main and test (the convention of the published
-             jtools projects): a module gets it by naming this plugin — the framework's libraries do, a project
-             inheriting this parent does not unless it is published under that licence too. -->
+        <!-- The Apache 2.0 header at the top of every Java source, main and test: a module gets it by naming this
+             plugin — the framework's libraries do, a project inheriting this parent does not unless it is published
+             under that licence too. -->
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>license-maven-plugin</artifactId>

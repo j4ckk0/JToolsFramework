@@ -12,11 +12,9 @@ function newPageId(): string {
 }
 
 /**
- * Tells the server this page is open, so that it stops once the last page has gone (PageWatch on the server): an event
- * stream (GET api/alive?id=) held while the page lives, which the browser drops when the page closes or crashes, and
- * which background tabs do not throttle — EventSource reconnects it, under the same id, after a sleep; a beacon on
- * pagehide (POST api/bye?id=) spares the server the wait for the stream to break. A page back from the browser's
- * history cache opens its stream again.
+ * Tells the server this page is open, so that it stops once the last page has gone (PageWatch on the server). An event
+ * stream is used because the browser drops it when the page closes or crashes, background tabs do not throttle it, and
+ * EventSource reconnects it under the same id after a sleep; the beacon on pagehide spares the server the wait.
  */
 @Injectable({ providedIn: 'root' })
 export class PagePresenceService {

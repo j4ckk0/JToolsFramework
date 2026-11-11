@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <!-- The build conventions — Java 25, the page built by npm, the program's jar, the distributions — come from
-       JToolsFramework's jtools-parent (scripts/install.sh there puts it in ~/.m2); this pom says what is this
+       JToolsFramework's jtools-parent (from Maven Central, or ~/.m2 after scripts/install.sh in a clone); this pom says what is this
        project's own: its modules and the jtools.app.* properties of its program. -->
   <parent>
     <groupId>org.jtools.framework</groupId>

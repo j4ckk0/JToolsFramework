@@ -109,11 +109,12 @@ public final class Json {
         sb.append('"');
     }
 
-    /** Convenience: an insertion-ordered map. */
+    /** An insertion-ordered map: the JSON keeps its fields in the order they were put. */
     public static Map<String, Object> obj() { return new LinkedHashMap<>(); }
 
     // ---- parsing ----------------------------------------------------------------------------
 
+    /** The tree of a JSON text; a malformed one is an {@link IllegalArgumentException} saying where it stopped. */
     public static Object parse(String text) {
         Parser p = new Parser(text);
         Object v = p.value();

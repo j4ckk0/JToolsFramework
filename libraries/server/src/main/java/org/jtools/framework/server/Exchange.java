@@ -104,7 +104,7 @@ public final class Exchange extends HttpExchange {
         return value == null ? fallback : value;
     }
 
-    /** For a prefix route ({@code /api/store/}), the path below it ({@code spifs/X/labels}); empty for an exact route. */
+    /** For a prefix route ({@code /api/store/}), the path below it ({@code reports/2026.json}); empty for an exact route. */
     public String rest() {
         return rest;
     }

@@ -23,8 +23,8 @@
  *
  * {@link org.jtools.framework.desktop.FileDialogs}: open, save and folder dialogs — kdialog or zenity on Linux, the system's
  * on Windows and macOS, Swing's otherwise —, {@code available()} false when the program runs without a display (a route
- * then answers 409 and the page offers the browser's own). A module of its own: a program without dialogs does not carry
- * Swing in its dependencies.
+ * then answers 409 and the page offers the browser's own). A module of its own: choosing files is a feature a program
+ * opts into.
  * <pre>{@code
  * List<Path> chosen = FileDialogs.chooseFilesToOpen("Open a schema", true, new FileDialogs.Filter("XML Schema", List.of("*.xsd")));
  * }</pre>

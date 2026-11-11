@@ -4,12 +4,10 @@
 
     modules        the modules the program needs: what jdeps finds in its jar, and jtools.dist.modules.extra
                    besides (what no class names: the charsets, the elliptic curves of TLS)
-    runtimes       for each platform whose jmods are in jdk.archives, a trimmed runtime linked from them: its jmods
-                   archive — jmods-linux.tar.gz, jmods-windows.zip, jmods-macos.tar.gz (what scripts/setup.sh deploys),
-                   or Temurin's own names, *jmods*linux*.tar.gz… —, a JDK from 24 on carrying none of its own; else
-                   its JDK archive's jmods/ (a JDK up to 23: jdk-linux.tar.gz…, *jdk*linux*.tar.gz…, a JRE's do not
-                   match). Linked by the jlink of this machine's platform's JDK archive — of the jmods' version by
-                   construction, whatever JDK runs the build —, else of the JDK running it
+    runtimes       for each platform whose jmods are in jdk.archives, a runtime trimmed to those modules, linked from
+                   its jmods archive (jmods-<os>.*, or Temurin's *jmods*<os>*: a JDK from 24 on carries none), else
+                   from its JDK archive's jmods/ (a JDK up to 23). jlink is the one of this machine's JDK archive, so
+                   that it matches the jmods' version whatever JDK runs the build; else the running JDK's
     distributions  <id>-<version>-linux.tar.gz and -macos.tar.gz (<id>.sh), -windows.zip (<name>.exe without a
                    console, <id>.bat with one): the jar, the launchers, <id>.ini, the README, LICENSE and NOTICE when
                    the project has them, what jtools.dist.include names of the repository (samples/**) under the

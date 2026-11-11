@@ -8,7 +8,7 @@
 #   scripts/package.sh
 #   scripts/package.sh -DskipTests      # extra arguments are passed to mvn
 #
-# The runtimes are linked from the JDKs of external/ (scripts/setup.sh deploys them). The version is the root pom's <revision>.
+# The runtimes are linked from the jmods of external/ (scripts/setup.sh deploys them). The version is the root pom's <revision>.
 # The releases of the previous versions are removed once the new one is built: releases/ holds the release of the
 # version pom.xml names, and whatever else you put there is left alone.
 #
