@@ -80,8 +80,7 @@ server.get("/api/sensors", ex -> sensors.list())                     // a List, 
 - **The presence**: `GET /api/alive?id=` (a stream the page holds), `POST /api/bye?id=` (its beacon); `PageWatch`
   counts the pages and runs the stop.
 
-Public for a technical reason: `Http` (the content types an `Answer` names: `Http.TYPE_JSON`, `TYPE_XML`, `TYPE_ZIP`…),
-`DesktopOpener` (jtools-app opens the page and the log with it).
+Public for a technical reason: `Http` (the content types an `Answer` names: `Http.TYPE_JSON`, `TYPE_XML`, `TYPE_ZIP`…).
 
 ## jtools-support — what every module leans on
 
@@ -104,8 +103,8 @@ texts.of(ex.language()).tn("sensors.count", n);   // sensors.count.one / sensors
 
 `org.jtools.framework.desktop`. **`FileDialogs`**: open, save and folder dialogs on the program's own desktop —
 kdialog or zenity on Linux, the system's on Windows and macOS, Swing's otherwise. `available()` is false without a
-display: a route then answers 409, and the page offers the browser's own. A library of its own, so that a program
-without dialogs does not carry Swing in its dependencies.
+display: a route then answers 409, and the page offers the browser's own. A library of its own: choosing files is a feature
+a program opts into.
 
 ```java
 List<Path> chosen = FileDialogs.chooseFilesToOpen("Open a schema", true, new FileDialogs.Filter("XML Schema", List.of("*.xsd")));

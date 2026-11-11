@@ -1,8 +1,8 @@
-package org.jtools.framework.server;
+package org.jtools.framework.app;
 
 /*-
  * #%L
- * JToolsFramework server
+ * JToolsFramework app
  * %%
  * Copyright (C) 2026 jtools.org
  * %%
@@ -29,10 +29,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * What the desktop opens for the program, as a double-click would: the page in the browser, a file in its viewer. Public
- * because jtools-app opens the page and the log with it; a program rarely needs it itself.
+ * What the desktop opens for the program, as a double-click would: the page in the browser, a file in its viewer: what
+ * {@link WebApp} opens the page and the log with.
  */
-public final class DesktopOpener {
+final class DesktopOpener {
 
     private static final Logger LOG = Logger.getLogger(DesktopOpener.class.getName());
     private static final String OPEN_LINUX = "xdg-open", OPEN_MAC = "open", OS_LINUX = "linux", OS_MAC = "mac", OS_NAME = "os.name";
@@ -40,7 +40,7 @@ public final class DesktopOpener {
     private DesktopOpener() {}
 
     /** The address in the browser: the desktop's own, else xdg-open on Linux; false when neither could. */
-    public static boolean browse(String url) {
+    static boolean browse(String url) {
         try {
             if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
                 Desktop.getDesktop().browse(URI.create(url));
@@ -57,7 +57,7 @@ public final class DesktopOpener {
     }
 
     /** A file in the application its type opens with: xdg-open on Linux, open on macOS, the desktop's association elsewhere. */
-    public static void open(Path file) throws IOException {
+    static void open(Path file) throws IOException {
         String os = os();
         if (os.contains(OS_LINUX)) new ProcessBuilder(OPEN_LINUX, file.toString()).start();
         else if (os.contains(OS_MAC)) new ProcessBuilder(OPEN_MAC, file.toString()).start();

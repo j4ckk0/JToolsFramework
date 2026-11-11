@@ -122,8 +122,8 @@ import line per file, its pom by one artifactId (§11).
 ### 4.2 One dependency, said once
 
 The README and each guide begin with the same sentence: **a program depends on `jtools-app`**; it brings `jtools-server`
-and `jtools-support`. `jtools-desktop` is added for native file dialogs (it carries Swing's weight in the dependency
-tree, which is why it is apart); `jtools-web` by an Angular page, nothing else.
+and `jtools-support`. `jtools-desktop` is added for native file dialogs (a feature a program opts into, with platform
+code of its own); `jtools-web` by an Angular page, nothing else.
 
 ### 4.3 What is API
 
@@ -133,7 +133,7 @@ line, so that a reader of the reference knows what to call:
 | Library | API | Public for a technical reason |
 |---|---|---|
 | `jtools-support` | `Json`, `I18n`, `Catalogue`, `Installation` | — |
-| `jtools-server` | `WebServer` (and `Route`, `Refusal`), `Exchange`, `Answer`, `PageWatch` (what `pages()` answers) | `Http` (the content types a route may name: keep, document the constants), `DesktopOpener` (`jtools-app` calls it) |
+| `jtools-server` | `WebServer` (and `Route`, `Refusal`), `Exchange`, `Answer`, `PageWatch` (what `pages()` answers) | `Http` (the content types a route may name: keep, document the constants); `DesktopOpener` moves into `jtools-app`, package-private, its only caller |
 | `jtools-app` | `WebApp`, `SettingsFields`, `UserSettings` | `LaunchOptions` (its option and `.ini` names: document them as the command line's vocabulary), `LogFormatter` (java.util.logging instantiates it by name) |
 | `jtools-desktop` | `FileDialogs` (and `Filter`) | — |
 

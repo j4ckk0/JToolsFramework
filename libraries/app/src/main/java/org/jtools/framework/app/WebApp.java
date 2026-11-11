@@ -43,7 +43,6 @@ import java.util.stream.Collectors;
 
 import javax.swing.JOptionPane;
 
-import org.jtools.framework.server.DesktopOpener;
 import org.jtools.framework.server.Exchange;
 import org.jtools.framework.server.PageWatch;
 import org.jtools.framework.server.WebServer;
