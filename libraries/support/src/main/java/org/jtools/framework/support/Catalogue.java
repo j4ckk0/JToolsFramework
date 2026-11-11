@@ -45,10 +45,18 @@ public final class Catalogue {
     private final ClassLoader loader;
     private final String path;
     private final List<Locale> languages;
-    private final Map<String, I18n> byLanguage = new ConcurrentHashMap<>();
+    private final Map<String, Texts> byLanguage = new ConcurrentHashMap<>();
     private volatile Properties defaults;
 
-    Catalogue(Class<?> anchor, String bundle, List<Locale> languages) {
+    /**
+     * A program's texts: {@code <bundle>.properties} beside the anchor's classes for the first language, the default,
+     * {@code <bundle>_<lang>.properties} for the others ({@code Catalogue.load(App.class, "i18n.messages", ENGLISH, FRENCH)}).
+     */
+    public static Catalogue load(Class<?> anchor, String bundle, Locale... languages) {
+        return new Catalogue(anchor, bundle, List.of(languages));
+    }
+
+    private Catalogue(Class<?> anchor, String bundle, List<Locale> languages) {
         if (languages.isEmpty()) throw new IllegalArgumentException("a catalogue needs at least one language");
         this.loader = anchor.getClassLoader();
         this.path = bundle.replace('.', '/');
@@ -65,16 +73,16 @@ public final class Catalogue {
     }
 
     /** The texts in that language, or in the default one when the catalogue does not have it. */
-    public I18n of(Locale locale) {
+    public Texts of(Locale locale) {
         Locale language = supported(locale == null ? null : locale.getLanguage());
-        return byLanguage.computeIfAbsent(language.getLanguage(), lang -> new I18n(language, texts(language)));
+        return byLanguage.computeIfAbsent(language.getLanguage(), lang -> new Texts(language, texts(language)));
     }
 
     /**
      * The texts in the language an {@code Accept-Language} header prefers among the catalogue's: its q-values
      * honoured, a region ignored ({@code fr-CA} is {@code fr}); the default when it names none of them, or is absent.
      */
-    public I18n of(String acceptLanguage) {
+    public Texts of(String acceptLanguage) {
         return of(preferred(acceptLanguage));
     }
 

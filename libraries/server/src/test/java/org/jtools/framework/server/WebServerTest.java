@@ -42,7 +42,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.jtools.framework.support.I18n;
+import org.jtools.framework.support.Catalogue;
 import org.jtools.framework.support.Json;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,10 +66,10 @@ class WebServerTest {
     @BeforeEach
     void start() throws Exception {
         server = new WebServer("test-page", new PageWatch(Duration.ofMillis(200)))
-                .texts(I18n.catalogue(WebServerTest.class, "org.jtools.framework.server.program-texts", Locale.ENGLISH, Locale.FRENCH))
+                .catalogue(Catalogue.load(WebServerTest.class, "org.jtools.framework.server.program-texts", Locale.ENGLISH, Locale.FRENCH))
                 .refuse(SchemaException.class, 422)
                 .get("/api/echo", ex -> Map.of("said", ex.query("say", "nothing")))
-                .get("/api/hello", ex -> Map.of("text", ex.i18n().t("hello"), "lang", ex.language().getLanguage()))
+                .get("/api/hello", ex -> Map.of("text", ex.texts().t("hello"), "lang", ex.language().getLanguage()))
                 .get("/api/refused", ex -> { throw new WebServer.Refusal(409, "no"); })
                 .get("/api/illegal", ex -> { throw new IllegalArgumentException("not like that"); })
                 .get("/api/schema", ex -> { throw new SchemaException("line 3: no such type"); })
@@ -267,5 +267,11 @@ class WebServerTest {
         assertEquals(400, get("/api/alive").statusCode(), "a stream without a page id");
         assertEquals(405, get("/api/bye?id=page-1").statusCode(), "the presence routes say which method they take");
         assertEquals(405, post("/api/alive?id=page-1", "", null).statusCode());
+    }
+
+    @Test
+    void aRefusalSaysWhatItsExceptionSays() {
+        assertEquals("bad", WebServer.reason(new IllegalStateException("bad")));
+        assertTrue(WebServer.reason(new NullPointerException()).contains("NullPointerException"), "no message: its class");
     }
 }

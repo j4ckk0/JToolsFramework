@@ -30,7 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.jtools.framework.support.Catalogue;
-import org.jtools.framework.support.I18n;
+import org.jtools.framework.support.Texts;
 import org.jtools.framework.support.Json;
 
 import com.sun.net.httpserver.Headers;
@@ -48,15 +48,15 @@ public final class Exchange extends HttpExchange {
     private static final String HEADER_ACCEPT_LANGUAGE = "Accept-Language";
 
     private final HttpExchange exchange;
-    private final Catalogue programTexts;
-    private final Catalogue serverTexts;
+    private final Catalogue programCatalogue;
+    private final Catalogue serverCatalogue;
     private final String rest;
     private byte[] body;
 
-    Exchange(HttpExchange exchange, Catalogue programTexts, Catalogue serverTexts, String rest) {
+    Exchange(HttpExchange exchange, Catalogue programCatalogue, Catalogue serverCatalogue, String rest) {
         this.exchange = exchange;
-        this.programTexts = programTexts;
-        this.serverTexts = serverTexts;
+        this.programCatalogue = programCatalogue;
+        this.serverCatalogue = serverCatalogue;
         this.rest = rest;
     }
 
@@ -111,12 +111,12 @@ public final class Exchange extends HttpExchange {
 
     /** The page's language among the program's (its {@code Accept-Language}), the program's default when none. */
     public Locale language() {
-        return programTexts.preferred(exchange.getRequestHeaders().getFirst(HEADER_ACCEPT_LANGUAGE));
+        return programCatalogue.preferred(exchange.getRequestHeaders().getFirst(HEADER_ACCEPT_LANGUAGE));
     }
 
-    /** The program's texts in the page's language ({@code WebApp.texts}); the framework's own when it named none. */
-    public I18n i18n() {
-        return programTexts.of(language());
+    /** The program's texts in the page's language ({@code WebApp.catalogue}); the framework's own when it named none. */
+    public Texts texts() {
+        return programCatalogue.of(language());
     }
 
     /** Whether the request comes from this computer: a route acting on its desktop (opening a file) answers only then. */
@@ -126,8 +126,8 @@ public final class Exchange extends HttpExchange {
     }
 
     /** The framework's own texts in the page's language: the server's refusals. */
-    I18n serverTexts() {
-        return serverTexts.of(language());
+    Texts serverTexts() {
+        return serverCatalogue.of(language());
     }
 
     // ---- the JDK's exchange, as it is -----------------------------------------------------------------------

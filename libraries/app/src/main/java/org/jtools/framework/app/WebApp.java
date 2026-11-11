@@ -47,7 +47,7 @@ import org.jtools.framework.server.Exchange;
 import org.jtools.framework.server.PageWatch;
 import org.jtools.framework.server.WebServer;
 import org.jtools.framework.support.Catalogue;
-import org.jtools.framework.support.I18n;
+import org.jtools.framework.support.Texts;
 import org.jtools.framework.support.Installation;
 import org.jtools.framework.support.Json;
 
@@ -71,9 +71,9 @@ import org.jtools.framework.support.Json;
 public final class WebApp {
 
     private static final Logger LOG = Logger.getLogger(WebApp.class.getName());
-    private static final Catalogue APP_CATALOGUE = I18n.catalogue(WebApp.class, "org.jtools.framework.app.texts", Locale.ENGLISH, Locale.FRENCH);
+    private static final Catalogue APP_CATALOGUE = Catalogue.load(WebApp.class, "org.jtools.framework.app.texts", Locale.ENGLISH, Locale.FRENCH);
     /** What the log says of a failure: English, whoever runs the program (a log is read by whoever helps, and searched). */
-    private static final I18n ENGLISH = APP_CATALOGUE.of(Locale.ENGLISH);
+    private static final Texts ENGLISH = APP_CATALOGUE.of(Locale.ENGLISH);
 
     /** The framework's own routes. */
     public static final String SETTINGS = WebServer.API + "/settings", ABOUT = WebServer.API + "/about", QUIT = WebServer.API + "/quit",
@@ -89,7 +89,7 @@ public final class WebApp {
     private int defaultPort;
     private String pageRoot = WebServer.DEFAULT_PAGE_ROOT;
     private Duration grace = PageWatch.GRACE;
-    private Catalogue texts;
+    private Catalogue catalogue;
     private Consumer<WebServer> routes = server -> {};
     private Runnable onStop = () -> {};
     private SettingsFields settingsFields;
@@ -118,7 +118,7 @@ public final class WebApp {
             this.args = args;
         }
 
-        String in(I18n say) {
+        String in(Texts say) {
             return say.t(key, args);
         }
     }
@@ -156,9 +156,9 @@ public final class WebApp {
         return this;
     }
 
-    /** The program's texts and languages: the pages' languages ({@code Exchange.i18n()}), and the help of its options when they are keys of it. */
-    public WebApp texts(Catalogue programTexts) {
-        this.texts = programTexts;
+    /** The program's texts and languages: the pages' languages ({@code Exchange.texts()}), and the help of its options when they are keys of it. */
+    public WebApp catalogue(Catalogue programCatalogue) {
+        this.catalogue = programCatalogue;
         return this;
     }
 
@@ -236,7 +236,7 @@ public final class WebApp {
         // the program's own class: its jar is the one whose folder holds the .ini and whose manifest says the version
         Class<?> program = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass();
         Logging.configure();
-        I18n console = APP_CATALOGUE.of(Locale.getDefault());
+        Texts console = APP_CATALOGUE.of(Locale.getDefault());
         Properties ini;
         LaunchOptions options;
         try {
@@ -310,7 +310,7 @@ public final class WebApp {
     WebServer startServer(LaunchOptions options, Class<?> program) throws IOException {
         UserSettings settings = UserSettings.of(id);
         WebServer server = new WebServer(pageRoot, new PageWatch(grace));
-        if (texts != null) server.texts(texts);
+        if (catalogue != null) server.catalogue(catalogue);
         builtInRoutes(server, settings, program);
         routes.accept(server);   // after the framework's: a route of the program's own replaces one of them (logged)
         server.start(options.host(), options.port());
@@ -333,7 +333,7 @@ public final class WebApp {
         server.get(SETTINGS, ex -> settings(server, settings))
               .post(SETTINGS, ex -> {
                   Map<String, Object> asked = ex.jsonObject();
-                  I18n say = APP_CATALOGUE.of(ex.language());
+                  Texts say = APP_CATALOGUE.of(ex.language());
                   if (asked.containsKey(J_AUTO_STOP) && !(asked.get(J_AUTO_STOP) instanceof Boolean)) throw new WebServer.Refusal(400, say.t("settings.autoStop"));
                   if (asked.containsKey(J_PORT) && !(asked.get(J_PORT) instanceof Number n && isPortOrUnset(n))) throw new WebServer.Refusal(400, say.t("settings.port"));
                   if (settingsFields != null) settingsFields.write(asked, ex);   // the program's own refusals before anything is kept
@@ -378,7 +378,7 @@ public final class WebApp {
     }
 
     private static Object openLog(Exchange ex) throws IOException {
-        I18n say = APP_CATALOGUE.of(ex.language());
+        Texts say = APP_CATALOGUE.of(ex.language());
         if (!ex.fromThisComputer()) throw new WebServer.Refusal(403, say.t("log.notHere"));
         Path file = Logging.file();
         if (file == null || !Files.isRegularFile(file)) throw new WebServer.Refusal(409, say.t("log.none"));
@@ -433,12 +433,12 @@ public final class WebApp {
     }
 
     /** The console's texts: in the language --lang named, else the machine's. */
-    private I18n console(LaunchOptions options) {
+    private Texts console(LaunchOptions options) {
         return APP_CATALOGUE.of(options.lang() != null ? options.lang() : Locale.getDefault());
     }
 
     /** The help --help prints, in the console's language: the framework's options, then the program's own. */
-    String usage(I18n say) {
+    String usage(Texts say) {
         StringBuilder line = new StringBuilder("[--port N] [--host H] [--no-browser] [--keep-alive] [--log-level LEVEL] [--log-file FILE] [--lang LANG]");
         extraOptions.forEach((option, extra) -> line.append(" [").append(option).append(extra.valueName() == null ? "" : " " + extra.valueName()).append(']'));
         if (operands != null) line.append(' ').append(operandsUsage);
@@ -458,9 +458,9 @@ public final class WebApp {
     }
 
     /** The help of a program's option: a key of its texts, in the console's language, or the text as it was given. */
-    private String programText(I18n say, String help) {
-        if (texts == null) return help;
-        I18n programSay = texts.of(say.locale());
+    private String programText(Texts say, String help) {
+        if (catalogue == null) return help;
+        Texts programSay = catalogue.of(say.locale());
         return programSay.has(help) ? programSay.t(help) : help;
     }
 
@@ -501,7 +501,7 @@ public final class WebApp {
     }
 
     /** A failure said with one of jtools-app's texts: English in the log, the console's language to the person. */
-    private void fail(I18n console, int code, String key, Object... args) {
+    private void fail(Texts console, int code, String key, Object... args) {
         fail(ENGLISH.t(key, args), console.t(key, args), code);
     }
 

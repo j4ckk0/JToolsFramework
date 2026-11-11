@@ -23,15 +23,14 @@ package org.jtools.framework.support;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
 
-class I18nTest {
+class TextsTest {
 
-    private final Catalogue texts = I18n.catalogue(I18nTest.class, "org.jtools.framework.support.test-texts", Locale.ENGLISH, Locale.FRENCH);
+    private final Catalogue texts = Catalogue.load(TextsTest.class, "org.jtools.framework.support.test-texts", Locale.ENGLISH, Locale.FRENCH);
 
     @Test
     void replacesTheArgumentsAsTheyAre() {
@@ -42,7 +41,7 @@ class I18nTest {
 
     @Test
     void fallsBackOnTheDefaultLanguageThenOnTheKey() {
-        I18n french = texts.of(Locale.FRENCH);
+        Texts french = texts.of(Locale.FRENCH);
         assertEquals("only in English", french.t("only.english"));
         assertEquals("no.such.key", french.t("no.such.key"));
         assertFalse(french.has("no.such.key"));
@@ -76,12 +75,6 @@ class I18nTest {
         assertEquals(Locale.ENGLISH, texts.preferred("de"), "none of its languages: the default");
         assertEquals(Locale.ENGLISH, texts.preferred(null));
         assertEquals(Locale.ENGLISH, texts.preferred("fr;q=0"), "q=0 means not this one");
-        assertSame(texts.of("fr"), texts.of(Locale.FRENCH), "one I18n per language");
-    }
-
-    @Test
-    void saysWhatAnExceptionSays() {
-        assertEquals("bad", I18n.message(new IllegalStateException("bad")));
-        assertTrue(I18n.message(new NullPointerException()).contains("NullPointerException"));
+        assertSame(texts.of("fr"), texts.of(Locale.FRENCH), "one Texts per language");
     }
 }

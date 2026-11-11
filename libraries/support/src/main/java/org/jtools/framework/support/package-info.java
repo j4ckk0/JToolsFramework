@@ -24,13 +24,13 @@
  * <ul>
  *   <li>{@link org.jtools.framework.support.Json}: a {@code Map} / {@code List} / {@code String} / {@code Number} / {@code Boolean}
  *       tree to text and back; {@link org.jtools.framework.support.Json#raw} for JSON another writer already wrote;</li>
- *   <li>{@link org.jtools.framework.support.I18n} and {@link org.jtools.framework.support.Catalogue}: a program's texts in
+ *   <li>{@link org.jtools.framework.support.Texts} and {@link org.jtools.framework.support.Catalogue}: a program's texts in
  *       each of its languages, {@code {0}} placeholders, plurals, an {@code Accept-Language} header honoured;</li>
  *   <li>{@link org.jtools.framework.support.Installation}: where the program's jar is, its version, its {@code .ini}.</li>
  * </ul>
  * <pre>{@code
- * Catalogue texts = I18n.catalogue(MyApp.class, "i18n.messages", Locale.ENGLISH, Locale.FRENCH);
- * String said = texts.of("fr-CA,fr;q=0.9").t("greeting", "Ada");   // i18n/messages_fr.properties: greeting=Bonjour {0}
+ * Catalogue catalogue = Catalogue.load(MyApp.class, "i18n.messages", Locale.ENGLISH, Locale.FRENCH);
+ * String said = catalogue.of("fr-CA,fr;q=0.9").t("greeting", "Ada");   // i18n/messages_fr.properties: greeting=Bonjour {0}
  * String json = Json.write(Map.of("said", said));
  * }</pre>
  */

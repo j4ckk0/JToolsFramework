@@ -12,7 +12,7 @@ Every artifact with its pom, the version written out in each (the framework's po
 |---|---|---|
 | `org.jtools.framework:jtools-parent` | the build conventions every project inherits, the coordinates, the licence | the pom |
 | `org.jtools.framework:jtools-bom` | the versions of the framework's artifacts, for a build not inheriting jtools-parent | the pom |
-| `org.jtools.framework:jtools-support` | `Json`, `I18n`, `Catalogue`, `Installation` | jar, sources, javadoc |
+| `org.jtools.framework:jtools-support` | `Json`, `Catalogue`, `Texts`, `Installation` | jar, sources, javadoc |
 | `org.jtools.framework:jtools-server` | `WebServer`, `Exchange`, `Answer`, `PageWatch`, `Http` | jar, sources, javadoc |
 | `org.jtools.framework:jtools-app` | `WebApp`, `UserSettings`, `SettingsFields`, `LaunchOptions`, `LogFormatter` | jar, sources, javadoc |
 | `org.jtools.framework:jtools-desktop` | `FileDialogs`: the native file dialogs | jar, sources, javadoc |

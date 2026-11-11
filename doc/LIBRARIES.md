@@ -72,7 +72,7 @@ server.get("/api/sensors", ex -> sensors.list())                     // a List, 
   `IllegalArgumentException` (400), an exception mapped with `refuse`, a wrong method (405, with `Allow`), no such
   route (404); anything else is a 500, its trace in the log.
 - **`Exchange`**, a route's request: `text()`, `bytes()`, `json()`, `jsonObject()`, `query(name[, fallback])`, `rest()`,
-  `language()` (the page's, from `Accept-Language`), `i18n()` (the program's texts in it), `fromThisComputer()`.
+  `language()` (the page's, from `Accept-Language`), `texts()` (the program's texts in it), `fromThisComputer()`.
 - **Every request is checked first**: a `Host` that is not this computer's (or the `--host` given) is refused — the
   defence against DNS rebinding —, and so is a request changing state from another site's `Origin`.
 - **The page**: the files of the page's classpath folder, with an ETag (304 when unchanged); `index.html` for a path
@@ -88,13 +88,14 @@ Public for a technical reason: `Http` (the content types an `Answer` names: `Htt
 
 - **`Json`**: a `Map` / `List` / `String` / `Number` / `Boolean` / `null` tree to text and back; `Json.obj()` for an
   ordered map, `Json.raw(text)` for JSON another writer already wrote.
-- **`I18n`** and **`Catalogue`**: a program's texts in each of its languages, `i18n/messages.properties` and
+- **`Catalogue`** and **`Texts`**: a program's texts in each of its languages — the catalogue loads them, `of`
+  gives one language's `Texts` —, `i18n/messages.properties` and
   `messages_fr.properties` in UTF-8; `{0}` placeholders without `MessageFormat`'s quoting, `tn` for plurals, an
   `Accept-Language` header honoured (q-values, `fr-CA` is `fr`), a missing key answered as itself.
 
 ```java
-Catalogue texts = I18n.catalogue(MyApp.class, "i18n.messages", Locale.ENGLISH, Locale.FRENCH);
-texts.of(ex.language()).tn("sensors.count", n);   // sensors.count.one / sensors.count.other
+Catalogue catalogue = Catalogue.load(MyApp.class, "i18n.messages", Locale.ENGLISH, Locale.FRENCH);
+catalogue.of(ex.language()).tn("sensors.count", n);   // sensors.count.one / sensors.count.other
 ```
 
 - **`Installation`**: the folder of the program's jar, its version (the manifest's), its `.ini`.

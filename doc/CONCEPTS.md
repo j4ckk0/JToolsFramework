@@ -101,7 +101,7 @@ The rules a project on the framework is reviewed by (the framework's CLAUDE.md h
   alone. **Method names are promises**: no `handle`/`process` without an object, no `get` that writes.
 - **Dependencies point one way** (server → core, page → API). A file past 500 lines names its responsibilities;
   past 1000, it is a finding.
-- Texts people read are constants or i18n keys, not literals scattered in the code (`I18n`, a catalogue per language).
+- Texts people read are constants or i18n keys, not literals scattered in the code (a `Catalogue`, its `Texts` in each language).
 
 ---
 

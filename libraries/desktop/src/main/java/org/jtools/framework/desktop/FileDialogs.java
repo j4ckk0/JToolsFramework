@@ -45,7 +45,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jtools.framework.support.Catalogue;
-import org.jtools.framework.support.I18n;
+import org.jtools.framework.support.Texts;
 
 /**
  * The file dialogs the server opens on behalf of the page (which cannot learn a file's path from
@@ -58,7 +58,7 @@ public final class FileDialogs {
 
     private static final Logger LOG = Logger.getLogger(FileDialogs.class.getName());
     /** What the dialogs say themselves, in the machine's language: they open on its desktop. */
-    private static final Catalogue TEXTS = I18n.catalogue(FileDialogs.class, "org.jtools.framework.desktop.texts", Locale.ENGLISH, Locale.FRENCH);
+    private static final Catalogue CATALOGUE = Catalogue.load(FileDialogs.class, "org.jtools.framework.desktop.texts", Locale.ENGLISH, Locale.FRENCH);
 
     /** What a dialog lets pick: a description and glob patterns ({@code *.xsd}). */
     public record Filter(String description, List<String> globs) {
@@ -81,8 +81,8 @@ public final class FileDialogs {
 
     private FileDialogs() {}
 
-    private static I18n say() {
-        return TEXTS.of(Locale.getDefault());
+    private static Texts say() {
+        return CATALOGUE.of(Locale.getDefault());
     }
 
     public static boolean available() {

@@ -20,7 +20,6 @@ package org.jtools.framework.support;
  * #L%
  */
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -29,24 +28,16 @@ import java.util.Properties;
  * they are — not {@code MessageFormat}, whose quoting would make every French apostrophe a trap ({@code l''arbre}).
  * A key the catalogue does not have is answered as itself, so that a missing text shows, rather than breaks.
  */
-public final class I18n {
+public final class Texts {
 
     private static final String ONE = ".one", OTHER = ".other";
 
     private final Locale locale;
     private final Properties texts;
 
-    I18n(Locale locale, Properties texts) {
+    Texts(Locale locale, Properties texts) {
         this.locale = locale;
         this.texts = texts;
-    }
-
-    /**
-     * A program's texts: {@code <bundle>.properties} beside the anchor's classes for the first language, the default,
-     * {@code <bundle>_<lang>.properties} for the others ({@code I18n.catalogue(App.class, "i18n.messages", ENGLISH, FRENCH)}).
-     */
-    public static Catalogue catalogue(Class<?> anchor, String bundle, Locale... languages) {
-        return new Catalogue(anchor, bundle, List.of(languages));
     }
 
     public Locale locale() {
@@ -86,11 +77,5 @@ public final class I18n {
             case "fr", "pt" -> n == 0 || n == 1;
             default -> n == 1;
         };
-    }
-
-    /** What an exception says to a person: its message, else its class and nothing more. */
-    public static String message(Throwable e) {
-        String message = e.getMessage();
-        return message == null || message.isBlank() ? e.toString() : message;
     }
 }

@@ -132,7 +132,7 @@ line, so that a reader of the reference knows what to call:
 
 | Library | API | Public for a technical reason |
 |---|---|---|
-| `jtools-support` | `Json`, `I18n`, `Catalogue`, `Installation` | — |
+| `jtools-support` | `Json`, `Catalogue`, `Texts`, `Installation` | — |
 | `jtools-server` | `WebServer` (and `Route`, `Refusal`), `Exchange`, `Answer`, `PageWatch` (what `pages()` answers) | `Http` (the content types a route may name: keep, document the constants); `DesktopOpener` moves into `jtools-app`, package-private, its only caller |
 | `jtools-app` | `WebApp`, `SettingsFields`, `UserSettings` | `LaunchOptions` (its option and `.ini` names: document them as the command line's vocabulary), `LogFormatter` (java.util.logging instantiates it by name) |
 | `jtools-desktop` | `FileDialogs` (and `Filter`) | — |
@@ -213,7 +213,7 @@ and a test starting it with `WebApp.start`:
 - **`examples/hello/`** — the hello world: one route, the page's presence in three lines, Quit.
 - **`examples/todo/`** — the server holds the business: a to-do list, its rule (a title is not empty) a refusal the
   page shows as it is; the page holds no state.
-- **`examples/greeter/`** — the program's own: texts in English and French (`I18n`, the page's language), an option
+- **`examples/greeter/`** — the program's own: texts in English and French (`Catalogue`, the page's language), an option
   (`--greeting`), a setting kept from one run to the next (`SettingsFields`).
 
 The page style the generated project does not show; the Angular style is shown, and built by the CI, through the

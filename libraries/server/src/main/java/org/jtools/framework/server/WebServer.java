@@ -37,7 +37,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jtools.framework.support.Catalogue;
-import org.jtools.framework.support.I18n;
+import org.jtools.framework.support.Texts;
 import org.jtools.framework.support.Json;
 
 import com.sun.net.httpserver.Filter;
@@ -80,7 +80,7 @@ public final class WebServer implements AutoCloseable {
     /** The hosts a request may name besides the one given: this computer's. */
     private static final Set<String> LOCAL_HOSTS = Set.of("localhost", "127.0.0.1", "[::1]", "::1");
     private static final Set<String> WILDCARD_HOSTS = Set.of("0.0.0.0", "::", "[::]", "");
-    private static final Catalogue SERVER_TEXTS = I18n.catalogue(WebServer.class, "org.jtools.framework.server.texts", Locale.ENGLISH, Locale.FRENCH);
+    private static final Catalogue SERVER_CATALOGUE = Catalogue.load(WebServer.class, "org.jtools.framework.server.texts", Locale.ENGLISH, Locale.FRENCH);
 
     /** An application's route: what it answers (a tree, {@link Json#raw}, an {@link Answer}, or null for 204). */
     @FunctionalInterface
@@ -112,7 +112,7 @@ public final class WebServer implements AutoCloseable {
     private final List<Filter> filters = new ArrayList<>();
     private final StaticFiles files;
     private final PageWatch pages;
-    private Catalogue texts = SERVER_TEXTS;
+    private Catalogue catalogue = SERVER_CATALOGUE;
     private HttpServer http;
     private HttpContext context;
     private ExecutorService executor;
@@ -131,9 +131,9 @@ public final class WebServer implements AutoCloseable {
 
     // ---- what the application gives the server --------------------------------------------------------------
 
-    /** The program's texts and languages: what {@link Exchange#language()} chooses among, {@link Exchange#i18n()} answers in. */
-    public WebServer texts(Catalogue programTexts) {
-        this.texts = programTexts;
+    /** The program's texts and languages: what {@link Exchange#language()} chooses among, {@link Exchange#texts()} answers in. */
+    public WebServer catalogue(Catalogue programCatalogue) {
+        this.catalogue = programCatalogue;
         return this;
     }
 
@@ -271,7 +271,7 @@ public final class WebServer implements AutoCloseable {
 
     /** Answers 403 to a request naming another host, or changing state from another site's page: true when it did. */
     private boolean rejectForeign(HttpExchange ex) throws IOException {
-        I18n say = SERVER_TEXTS.of(ex.getRequestHeaders().getFirst("Accept-Language"));
+        Texts say = SERVER_CATALOGUE.of(ex.getRequestHeaders().getFirst("Accept-Language"));
         String hostHeader = ex.getRequestHeaders().getFirst(Http.HEADER_HOST);
         if (hostHeader != null && !allowedHost(hostHeader)) {
             LOG.warning(() -> ex.getRequestURI().getPath() + " refused: host " + hostHeader);
@@ -339,7 +339,7 @@ public final class WebServer implements AutoCloseable {
             mount.handler().handle(ex);
             return;
         }
-        Exchange exchange = new Exchange(ex, texts, SERVER_TEXTS, mount.prefix() ? path.substring(mount.path().length()) : "");
+        Exchange exchange = new Exchange(ex, catalogue, SERVER_CATALOGUE, mount.prefix() ? path.substring(mount.path().length()) : "");
         Object answer;
         try {
             answer = mount.route().answer(exchange);
@@ -352,7 +352,7 @@ public final class WebServer implements AutoCloseable {
                 sendRefusal(exchange, e, status);
             } else {
                 LOG.log(Level.SEVERE, method + " " + path + " failed", e);
-                Http.error(ex, 500, exchange.serverTexts().t("http.internalError", I18n.message(e)));
+                Http.error(ex, 500, exchange.serverTexts().t("http.internalError", reason(e)));
             }
             return;
         }
@@ -371,9 +371,15 @@ public final class WebServer implements AutoCloseable {
     }
 
     private static void sendRefusal(Exchange ex, Exception e, int status) throws IOException {
-        LOG.info(() -> ex.getRequestMethod() + " " + ex.getRequestURI().getPath() + " refused: " + I18n.message(e));
+        LOG.info(() -> ex.getRequestMethod() + " " + ex.getRequestURI().getPath() + " refused: " + reason(e));
         LOG.log(Level.FINE, "the refusal's trace", e);
-        Http.error(ex, status, I18n.message(e));
+        Http.error(ex, status, reason(e));
+    }
+
+    /** What an exception says to a person: its message, else its class and nothing more. */
+    static String reason(Throwable e) {
+        String message = e.getMessage();
+        return message == null || message.isBlank() ? e.toString() : message;
     }
 
     /** 405, with the methods the path takes in {@code Allow} and in the refusal. */
@@ -383,7 +389,7 @@ public final class WebServer implements AutoCloseable {
     }
 
     private static void sendError(HttpExchange ex, int status, String key, Object... args) throws IOException {
-        Http.error(ex, status, SERVER_TEXTS.of(ex.getRequestHeaders().getFirst("Accept-Language")).t(key, args));
+        Http.error(ex, status, SERVER_CATALOGUE.of(ex.getRequestHeaders().getFirst("Accept-Language")).t(key, args));
     }
 
     private static void send(HttpExchange ex, Object answer) throws IOException {
