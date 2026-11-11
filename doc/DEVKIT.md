@@ -40,7 +40,7 @@ own `scripts/jtools` differs from the devkit's (copy it by hand to take it). It 
 1. `JTOOLS_HOME`, in `jtools.conf` or the environment: a clone of JToolsFramework, its working tree as it is — for whoever
    develops the framework and a project together;
 2. `~/.m2/repository/org/jtools/framework/jtools-devkit/<version>/` (`M2_REPO` for another local repository): what the
-   framework's `scripts/install.sh`, or any Maven build, put there;
+   framework's `scripts/install.sh`, the delivery's `install.sh`, or any Maven build, put there;
 3. the mirror, `<MIRROR>/jtools-devkit-<version>.jar`, with its authentication (below);
 4. Maven Central.
 

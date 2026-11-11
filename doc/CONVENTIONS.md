@@ -114,7 +114,8 @@ What each gives, and the class to start from: [LIBRARIES.md](LIBRARIES.md). Each
 
 ## Sharing the framework
 
-`scripts/install.sh` installs the framework into `~/.m2`: enough on this machine. For another machine, or a CI, deploy
+`scripts/install.sh` installs the framework into `~/.m2`: enough on this machine. The delivery — a release's
+`jtools-<version>.tar.gz`, `install.sh` inside — does the same on any machine, without a clone. For another machine, or a CI, deploy
 it to the Artifactory the externals already use, then name that repository in the projects' Maven settings:
 
 ```bash

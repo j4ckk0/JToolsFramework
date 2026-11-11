@@ -67,6 +67,10 @@ project of its own.
 5. Then tag the version (`git tag v1.2.0 && git push origin v1.2.0`) — doc/GETTING-STARTED.md downloads
    `scripts/jtools` from that tag — and, in the projects, name the new version as their parent's and as
    `JTOOLS_VERSION` (`scripts/jtools sync` reports the ones behind).
+6. The delivery: `scripts/delivery.sh` builds `target/delivery/jtools-<version>.tar.gz` and its `.sha256` from what the
+   tag holds (it refuses when `libraries/`, `conventions/`, `devkit/` or `starter/` differ from it); attach both to the
+   tag's release on GitHub (*Releases* ▸ *Draft a new release* ▸ the tag), which README.md and GETTING-STARTED.md
+   download it from.
 
 ## 4. Learnt the first time
 

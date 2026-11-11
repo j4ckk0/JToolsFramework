@@ -29,26 +29,28 @@ in `~/.m2`). [doc/CONCEPTS.md](doc/CONCEPTS.md) says the idea behind it in one p
 no Java, Maven nor Node.js to install: a project downloads its own into its `external/` folder the first time (about
 450 MB).
 
-**1. Get `jtools`**, the one script that makes and updates projects. Until 1.2.0 is on Maven Central, from a clone:
+**1. Download the delivery** — one archive, the framework and its installer, from the
+[release](https://github.com/j4ckk0/JToolsFramework/releases/tag/v1.2.0):
 
 ```bash
-git clone https://github.com/j4ckk0/JToolsFramework.git
-(cd JToolsFramework && scripts/setup.sh && scripts/install.sh)   # its tools, then built, tested, installed into ~/.m2
-cp JToolsFramework/devkit/scripts/jtools .
-export JTOOLS_DOWNLOADS=$PWD/JToolsFramework/external/downloads   # your project reuses the clone's downloads
+curl -fsSLO https://github.com/j4ckk0/JToolsFramework/releases/download/v1.2.0/jtools-1.2.0.tar.gz
+tar xzf jtools-1.2.0.tar.gz
 ```
 
-Once it is published, the script alone is enough:
-`curl -fsSLO https://raw.githubusercontent.com/j4ckk0/JToolsFramework/v1.2.0/devkit/scripts/jtools && chmod +x jtools`.
-
-**2. Make your project**:
+**2. Install, and make your project** — `install.sh` asks the project's name and the folder its files go in:
 
 ```bash
-./jtools new Bookshelf          # ./Bookshelf, on port 8090, a git repository, its tools, built
+jtools-1.2.0/install.sh                                   # asks; or says it all at once:
+jtools-1.2.0/install.sh Bookshelf --dir ~/work/bookshelf
 ```
 
+It puts the framework into your local Maven repository (`~/.m2`) and `jtools` into `~/.local/bin`, then makes the
+project: its files in that folder, its development environment — a JDK, Maven and Node.js of its own, in its
+`external/` — downloaded, a git repository, a first build. A minute or two the first time; later projects,
+`jtools new <Name> --dir <folder>`.
+
 ```
-Bookshelf/
+bookshelf/
 ├── core/       the business: Bookshelf.java, pure Java — every rule, every computation, every state
 ├── api/        its HTTP face: BookshelfApi.java — each route asks core and turns its answer into JSON
 ├── frontend/   the Angular page: a view, it decides nothing — api.service.ts is its one door to the server
@@ -56,7 +58,7 @@ Bookshelf/
 └── scripts/    setup, build, ci, run, stop, package — and jtools
 ```
 
-**3. Run it**: `cd Bookshelf && scripts/run.sh` — the page opens in your browser; close it, and 15 seconds later the
+**3. Run it**: `cd ~/work/bookshelf && scripts/run.sh` — the page opens in your browser; close it, and 15 seconds later the
 program stops (`--keep-alive` keeps it serving).
 
 **4. Add a feature**, one layer at a time: a method in `core` decides, a route in `api` translates it to JSON, a method
@@ -68,6 +70,11 @@ in `api.service.ts` and a view in `frontend` show it. `scripts/run.sh` rebuilds 
 each with its launchers and a trimmed Java runtime: unpack, run, nothing to install.
 
 **7. Keep it up to date**: `scripts/jtools sync` refreshes the scripts at the framework version `jtools.conf` names.
+
+The internet is needed the first time: the project's tools and the libraries its build uses (Maven plugins, npm
+packages) are downloaded; the framework itself is in the archive. To change the framework too, clone it instead:
+`git clone`, then `scripts/setup.sh && scripts/install.sh` in the clone, and its `devkit/scripts/jtools` is your
+`jtools`.
 
 [doc/GETTING-STARTED.md](doc/GETTING-STARTED.md) is the same walk in full — what to type, what you should see, the code of
 step 4, what to do when something goes wrong — in fifteen minutes.
@@ -171,9 +178,10 @@ curl 'http://127.0.0.1:8089/api/hello?name=script'   # {"message":"Hello, script
 | [`conventions/`](conventions) | `parent`: the build; `bom`: the versions alone; `dist`: the distributions' build (jdeps, jlink, the archives) and launchers | `jtools-parent`, `jtools-bom`, `jtools-dist` |
 | [`devkit/`](devkit) | what a project carries: its scripts, its pre-push hook, `.gitattributes`, the default `externals.conf`; `scripts/jtools` | `jtools-devkit`, with the starter |
 | [`starter/`](starter) | the template and `new-project.sh`, which `jtools new` runs | in `jtools-devkit` |
+| [`delivery/`](delivery) | the delivery's installer and README; `scripts/delivery.sh` builds the archive a release carries | `jtools-<version>.tar.gz`, on GitHub's releases |
 | [`examples/`](examples) | `hello`, `todo`, `greeter`: three very small programs, each a step further | never: built and tested with the rest |
 | [`doc/`](doc) | [GETTING-STARTED](doc/GETTING-STARTED.md), [CONCEPTS](doc/CONCEPTS.md), [LIBRARIES](doc/LIBRARIES.md), [CONVENTIONS](doc/CONVENTIONS.md), [DEVKIT](doc/DEVKIT.md), [ADOPTING](doc/ADOPTING.md) (moving an existing program onto it), [design/](doc/design) (why it is as it is) | — |
-| `scripts/` | the framework's own — `install`, `check-versions`, `ci.local` — and the devkit's, which the framework carries like any project | — |
+| `scripts/` | the framework's own — `install`, `check-versions`, `ci.local`, `delivery` — and the devkit's, which the framework carries like any project | — |
 
 **Developing the framework itself**:
 

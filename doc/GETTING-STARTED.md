@@ -15,31 +15,37 @@ for tool in bash curl unzip tar git; do command -v $tool >/dev/null || echo "mis
 
 *You should see*: nothing. A `missing:` line names what to install first, with your system's package manager.
 
-## 1. Get `jtools`
+## 1. Install JToolsFramework
 
-`jtools` is one script, the devkit's `scripts/jtools`: it fetches the rest at the version it names.
+One archive, the framework and its installer — no clone, nothing built:
 
 ```bash
 mkdir jtools-start && cd jtools-start
-curl -fsSLO https://raw.githubusercontent.com/j4ckk0/JToolsFramework/v1.2.0/devkit/scripts/jtools && chmod +x jtools
-./jtools --help
+curl -fsSLO https://github.com/j4ckk0/JToolsFramework/releases/download/v1.2.0/jtools-1.2.0.tar.gz
+tar xzf jtools-1.2.0.tar.gz
+jtools-1.2.0/install.sh --no-project
+jtools --help
 ```
 
-*You should see* its commands: `sync`, `version`, `new`.
+*You should see* `== JToolsFramework 1.2.0 in …/.m2/repository`, `== jtools in …/.local/bin`, then `jtools`'s commands:
+`sync`, `version`, `new`. *If `jtools` is not found*: `~/.local/bin` is not on your `PATH` — the installer says the
+line to add to `~/.bashrc`; until then, `~/.local/bin/jtools`.
 
-*Until JToolsFramework 1.2.0 is on Maven Central* — or to read and change the framework too —, take it from a clone,
-installed into your local Maven repository:
+`install.sh` without `--no-project` goes on with step 3 at once: it asks the project's name and the folder its files go
+in (`install.sh Bookshelf --dir ~/work/bookshelf` says them).
+
+*To read and change the framework too*, take it from a clone instead, installed into your local Maven repository:
 
 ```bash
 git clone https://github.com/j4ckk0/JToolsFramework.git
 (cd JToolsFramework && scripts/setup.sh && scripts/install.sh)   # the framework built, tested, installed into ~/.m2
-cp JToolsFramework/devkit/scripts/jtools .
+alias jtools=$PWD/JToolsFramework/devkit/scripts/jtools
 export JTOOLS_DOWNLOADS=$PWD/JToolsFramework/external/downloads   # your project takes the clone's downloads: 450 MB once, not twice
 ```
 
 ## 2. Run the examples (optional, five minutes)
 
-From the clone, after `scripts/install.sh`: three very small programs, each one step further —
+From a clone, after `scripts/install.sh` (step 1's second way): three very small programs, each one step further —
 [examples/README.md](../examples/README.md).
 
 ```bash
@@ -52,7 +58,7 @@ and `greeter.jar` beside it are the next two.
 ## 3. Make your project
 
 ```bash
-./jtools new Bookshelf
+jtools new Bookshelf
 ```
 
 *You should see*, after a minute or two the first time (the downloads):
@@ -68,7 +74,7 @@ and `greeter.jar` beside it are the next two.
 == Bookshelf ready in …/jtools-start/Bookshelf: scripts/run.sh starts it
 ```
 
-`--port N` for another port than 8090, `--dir DIR` for another place, `--no-build` to build later: `./jtools new --help`.
+`--port N` for another port than 8090, `--dir DIR` for another folder, `--no-build` to build later: `jtools new --help`.
 
 What it made:
 
@@ -196,7 +202,7 @@ scripts/jtools sync
 
 | What you see | What to do |
 |---|---|
-| `jtools: download failed: … (JTOOLS_VERSION=1.2.0: is there such a version?)` | the version is not on Maven Central yet: step 1's clone, `scripts/install.sh` |
+| `jtools: download failed: … (JTOOLS_VERSION=1.2.0: is there such a version?)` | the framework is neither in `~/.m2` nor on Maven Central: step 1's `install.sh` |
 | a download that never ends, or is refused, behind a company's proxy | a mirror: `MIRROR=` in `externals.local.conf`, its token beside it ([DEVKIT.md](DEVKIT.md)) |
 | `external/ is not set up: missing …` | `scripts/setup.sh`, which the scripts offer to run |
 | `Port 8090 is in use: is Bookshelf already running?` | it is — open the page it names, or `scripts/stop.sh`; or `--port` |
