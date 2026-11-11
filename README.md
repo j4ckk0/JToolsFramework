@@ -111,8 +111,8 @@ In the project's folder, then:
 
 The internet is needed the first time: the project's tools and the libraries its build uses (Maven plugins, npm
 packages) are downloaded; the framework itself is in the archive. To change the framework too, clone it instead:
-`git clone`, then `scripts/linux/setup.sh && scripts/install-locally.sh` in the clone, and its `devkit/scripts/linux/jtools` is your
-`jtools`.
+`git clone`, then `scripts/linux/setup.sh && scripts/install-locally.sh` in the clone, and its
+`devkit/scripts/linux/jtools` is your `jtools`.
 
 [doc/GETTING-STARTED.md](doc/GETTING-STARTED.md) is the same walk in full — what to type, what you should see, the code of
 step 4, what to do when something goes wrong — in fifteen minutes.
@@ -212,12 +212,12 @@ curl 'http://127.0.0.1:8089/api/hello?name=script'   # {"message":"Hello, script
 |---|---|---|
 | [`libraries/`](libraries) | `support`, `server`, `app`, `desktop`: the Java libraries; `web`: `@jtools/web`, for an Angular page | `jtools-support`, `-server`, `-app`, `-desktop`, `-web` |
 | [`conventions/`](conventions) | `parent`: the build; `bom`: the versions alone; `dist`: the distributions' build (jdeps, jlink, the archives) and launchers | `jtools-parent`, `jtools-bom`, `jtools-dist` |
-| [`devkit/`](devkit) | what a project carries: its scripts, its pre-push hook, `.gitattributes`, the default `externals.conf`; `scripts/linux/jtools` | `jtools-devkit`, with the starter |
-| [`starter/`](starter) | the template and `new-project.sh`, which `jtools new` runs | in `jtools-devkit` |
+| [`devkit/`](devkit) | what a project carries: its scripts, its pre-push hook, `.gitattributes`, the default `externals.conf`; the two stubs, `scripts/linux/jtools` and `scripts/windows/jtools.bat`; `new-project.list`, what else a new project gets, read on Linux and on Windows alike | `jtools-devkit`, with the starter |
+| [`starter/`](starter) | the template, and `new-project.sh` and `new-project.bat`, which `jtools new` runs | in `jtools-devkit` |
 | [`delivery/`](delivery) | the delivery's installers — `install.sh` for Linux, `install.bat` for Windows — and README; `scripts/delivery.sh` builds the archives a release carries | `jtools-<version>.tar.gz` and `.zip`, on GitHub's releases |
 | [`examples/`](examples) | `hello`, `todo`, `greeter`: three very small programs, each a step further | never: built and tested with the rest |
 | [`doc/`](doc) | [GETTING-STARTED](doc/GETTING-STARTED.md), [CONCEPTS](doc/CONCEPTS.md), [LIBRARIES](doc/LIBRARIES.md), [CONVENTIONS](doc/CONVENTIONS.md), [DEVKIT](doc/DEVKIT.md), [ADOPTING](doc/ADOPTING.md) (moving an existing program onto it), [design/](doc/design) (why it is as it is) | — |
-| `scripts/` | the framework's own — `install`, `check-versions`, `delivery`, `linux/ci.local` — and the devkit's, in `linux/` and `windows/`, which the framework carries like any project | — |
+| `scripts/` | the framework's own — `install-locally`, `check-versions`, `delivery`, `linux/ci.local` — and the devkit's, in `linux/` and `windows/`, which the framework carries like any project | — |
 
 **Developing the framework itself**:
 
