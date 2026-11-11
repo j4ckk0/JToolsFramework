@@ -39,9 +39,9 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpPrincipal;
 
 /**
- * A request to one of the application's routes ({@link WebServer.Route}): the JDK's exchange it wraps — everything
- * that takes an {@link HttpExchange} takes it — and what a route asks of a request: its body as text, bytes or JSON,
- * its query, the path below a prefix route, the page's language. The body is read once and kept.
+ * A request to one of the application's endpoints ({@link WebServer.Endpoint}): the JDK's exchange it wraps — everything
+ * that takes an {@link HttpExchange} takes it — and what an endpoint asks of a request: its body as text, bytes or JSON,
+ * its query, the path below a prefix endpoint, the page's language. The body is read once and kept.
  */
 public final class Exchange extends HttpExchange {
 
@@ -60,7 +60,7 @@ public final class Exchange extends HttpExchange {
         this.rest = rest;
     }
 
-    // ---- what a route asks of a request ---------------------------------------------------------------------
+    // ---- what an endpoint asks of a request ---------------------------------------------------------------------
 
     /** The body, read once and kept. */
     public byte[] bytes() throws IOException {
@@ -104,7 +104,7 @@ public final class Exchange extends HttpExchange {
         return value == null ? fallback : value;
     }
 
-    /** For a prefix route ({@code /api/store/}), the path below it ({@code reports/2026.json}); empty for an exact route. */
+    /** For a prefix endpoint ({@code /api/store/}), the path below it ({@code reports/2026.json}); empty for an exact endpoint. */
     public String rest() {
         return rest;
     }
@@ -119,7 +119,7 @@ public final class Exchange extends HttpExchange {
         return programCatalogue.of(language());
     }
 
-    /** Whether the request comes from this computer: a route acting on its desktop (opening a file) answers only then. */
+    /** Whether the request comes from this computer: an endpoint acting on its desktop (opening a file) answers only then. */
     public boolean fromThisComputer() {
         InetSocketAddress remote = exchange.getRemoteAddress();
         return remote != null && remote.getAddress() != null && remote.getAddress().isLoopbackAddress();

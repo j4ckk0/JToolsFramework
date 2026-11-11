@@ -18,7 +18,7 @@ public final class Launcher {
     public static void main(String[] args) {
         __APP_NAME__ application = new __APP_NAME__();
         WebApp.named(__APP_NAME__.NAME).id("__APP_ID__").defaultPort(DEFAULT_PORT)
-                .routes(server -> __APP_NAME__Api.routes(server, application))
+                .endpoints(server -> __APP_NAME__Api.endpoints(server, application))
                 .launch(args);
     }
 }

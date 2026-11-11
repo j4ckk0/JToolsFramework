@@ -12,7 +12,7 @@
   <artifactId>jtools-server</artifactId>
   <packaging>jar</packaging>
   <name>JToolsFramework server</name>
-  <description>A local web application's server, on the JDK's own HTTP server: JSON routes under /api, the page from the classpath's static/ (any other path gets its index.html), the pages' presence and the automatic stop once the last one has gone, the browser. It knows nothing of any application.</description>
+  <description>A local web application's server, on the JDK's own HTTP server: JSON endpoints under /api, the page from the classpath's static/ (any other path gets its index.html), the pages' presence and the automatic stop once the last one has gone, the browser. It knows nothing of any application.</description>
   <dependencies>
     <dependency>
       <groupId>org.jtools.framework</groupId>

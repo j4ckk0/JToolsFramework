@@ -15,9 +15,9 @@ business; an Angular page is its view only. It serves `http://127.0.0.1:__APP_PO
 | Module | Key files |
 |---|---|
 | `core/` the business, pure Java | `__APP_NAME__.java` (the one entry point) |
-| `api/` | `__APP_NAME__Api.java` (`routes(server, application)`: core → JSON) |
+| `api/` | `__APP_NAME__Api.java` (`endpoints(server, application)`: core → JSON) |
 | `frontend/` Angular, signals, standalone, zoneless | `src/app/api.service.ts` (TS mirror of the API), `app.ts`, `app.routes.ts`, `home/`; `@jtools/web` is unpacked in `target/jtools-web` |
-| `app/` | `Launcher.java` (a `WebApp` with the API's routes) |
+| `app/` | `Launcher.java` (a `WebApp` with the API's endpoints) |
 
 ## Commands
 

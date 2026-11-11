@@ -76,7 +76,7 @@ The shade execution lives in the parent's build rather than in the module, on pu
 plugins run before its profiles', and the distributions must find the embedded jar, not the module's own.
 
 A program's tests start its server as `launch` would with `WebApp.start(args…)` — the arguments, the operands, the
-Settings menu's port, the routes —, and nothing of a process: no `.ini` read, no log, no browser, no exit.
+Settings menu's port, the endpoints —, and nothing of a process: no `.ini` read, no log, no browser, no exit.
 
 ## jtools-bom: the versions, for a build that does not inherit jtools-parent
 

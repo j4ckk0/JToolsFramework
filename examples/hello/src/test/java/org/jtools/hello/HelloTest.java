@@ -15,7 +15,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/** The program started as main starts it — on a free port, kept running —, its route and its page asked over HTTP. */
+/** The program started as main starts it — on a free port, kept running —, its endpoint and its page asked over HTTP. */
 class HelloTest {
 
     private final HttpClient client = HttpClient.newHttpClient();
@@ -41,7 +41,7 @@ class HelloTest {
     }
 
     @Test
-    void answersItsRoute() throws Exception {
+    void answersItsEndpoint() throws Exception {
         assertEquals("{\"message\":\"Hello, Ada!\"}", get("api/hello?name=Ada").body());
         assertEquals("{\"message\":\"Hello, world!\"}", get("api/hello").body());
     }

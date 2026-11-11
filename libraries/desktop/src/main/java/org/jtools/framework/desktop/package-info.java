@@ -22,7 +22,7 @@
  * jtools-desktop: the native file dialogs a local program opens on its own desktop.
  *
  * {@link org.jtools.framework.desktop.FileDialogs}: open, save and folder dialogs — kdialog or zenity on Linux, the system's
- * on Windows and macOS, Swing's otherwise —, {@code available()} false when the program runs without a display (a route
+ * on Windows and macOS, Swing's otherwise —, {@code available()} false when the program runs without a display (an endpoint
  * then answers 409 and the page offers the browser's own). A module of its own: choosing files is a feature a program
  * opts into.
  * <pre>{@code

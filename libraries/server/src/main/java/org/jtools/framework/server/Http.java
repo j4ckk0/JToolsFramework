@@ -32,8 +32,8 @@ import org.jtools.framework.support.Json;
 import com.sun.net.httpserver.HttpExchange;
 
 /**
- * The HTTP plumbing below the routes: the query, sending an answer, the types of the files, the refusals' shape. Public
- * for its content types ({@link #TYPE_JSON}, {@link #TYPE_XML}, {@link #TYPE_ZIP}…), which an {@link Answer} names; a route
+ * The HTTP plumbing below the endpoints: the query, sending an answer, the types of the files, the refusals' shape. Public
+ * for its content types ({@link #TYPE_JSON}, {@link #TYPE_XML}, {@link #TYPE_ZIP}…), which an {@link Answer} names; an endpoint
  * answers through what it returns, not through these methods, which a raw {@link WebServer#handle handler} may use.
  */
 public final class Http {

@@ -120,7 +120,7 @@ A whole program, its page aside:
 ```java
 public static void main(String[] args) {
     WebApp.named("Hello").defaultPort(8089).pageRoot("web")
-          .routes(server -> server.get("/api/hello", ex -> Map.of("message", "Hello, " + ex.query("name", "world"))))
+          .endpoints(server -> server.get("/api/hello", ex -> Map.of("message", "Hello, " + ex.query("name", "world"))))
           .launch(args);
 }
 ```
@@ -176,8 +176,8 @@ name the one library they use. `jtools-desktop`, for native file dialogs, is opt
 
 ### A page and an API
 
-Every endpoint a program declares — `server.get("/api/books", …)`, `server.post(…)` — is plain HTTP and JSON; in the
-code, an endpoint is called a *route*. Its page is one client of it; anything that speaks HTTP is another:
+Every endpoint a program declares — `server.get("/api/books", …)`, `server.post(…)` — is plain HTTP and JSON. Its page
+is one client of it; anything that speaks HTTP is another:
 
 ```bash
 curl 'http://127.0.0.1:8089/api/hello?name=script'   # {"message":"Hello, script!"}, from examples/hello

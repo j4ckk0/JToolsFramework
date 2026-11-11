@@ -48,7 +48,7 @@ import org.jtools.framework.support.Json;
 
 /**
  * A local web application's program: the browser is its window. It reads the command line, the user's settings and
- * the installation's {@code <id>.ini}, sets up the log, starts a {@link WebServer} with the application's routes and
+ * the installation's {@code <id>.ini}, sets up the log, starts a {@link WebServer} with the application's endpoints and
  * its own ({@code /api/settings}, {@code /api/about}, {@code /api/quit}, {@code /api/log/open}), opens the page, and
  * stops once the last page has been closed ({@link PageWatch}) — unless {@code --keep-alive}, {@code --no-browser}, or
  * the user switched the automatic stop off. A startup failure is said in the user's language, on the console and in a
@@ -58,7 +58,7 @@ import org.jtools.framework.support.Json;
  * public static void main(String[] args) {
  *     Bookshelf shelf = new Bookshelf();
  *     WebApp.named("Bookshelf").defaultPort(8090)
- *           .routes(server -> BookshelfApi.routes(server, shelf))
+ *           .endpoints(server -> BookshelfApi.endpoints(server, shelf))
  *           .launch(args);
  * }
  * }</pre>
@@ -70,7 +70,7 @@ public final class WebApp {
     /** What the log says of a failure: English, whoever runs the program (a log is read by whoever helps, and searched). */
     static final Texts ENGLISH = APP_CATALOGUE.of(Locale.ENGLISH);
 
-    /** The framework's own routes. */
+    /** The framework's own endpoints. */
     public static final String SETTINGS = WebServer.API + "/settings", ABOUT = WebServer.API + "/about", QUIT = WebServer.API + "/quit",
             LOG_OPEN = WebServer.API + "/log/open";
     private static final String J_AUTO_STOP = "autoStop", J_PORT = "port", J_DEFAULT_PORT = "defaultPort", J_CURRENT_PORT = "currentPort",
@@ -85,7 +85,7 @@ public final class WebApp {
     private String pageRoot = WebServer.DEFAULT_PAGE_ROOT;
     private Duration grace = PageWatch.GRACE;
     private Catalogue catalogue;
-    private Consumer<WebServer> routes = server -> {};
+    private Consumer<WebServer> endpoints = server -> {};
     private Runnable onStop = () -> {};
     private SettingsFields settingsFields;
     private Consumer<Map<String, Object>> aboutFields = about -> {};
@@ -132,9 +132,9 @@ public final class WebApp {
         return this;
     }
 
-    /** The application's API: registers its routes, filters and refusals on the server before it starts. */
-    public WebApp routes(Consumer<WebServer> routes) {
-        this.routes = routes;
+    /** The application's API: registers its endpoints, filters and refusals on the server before it starts. */
+    public WebApp endpoints(Consumer<WebServer> endpoints) {
+        this.endpoints = endpoints;
         return this;
     }
 
@@ -189,7 +189,7 @@ public final class WebApp {
     /**
      * The language this run speaks where no page asks for one — its console, and what the program says to a client
      * that names none (a tool endpoint other programs call): {@code --lang}'s, else the machine's. Known once the command line is
-     * read, so from {@link #routes} on.
+     * read, so from {@link #endpoints} on.
      */
     public Locale language() {
         return language;
@@ -250,7 +250,7 @@ public final class WebApp {
 
     /**
      * The program's server for its tests, started as {@link #launch} would start it: the arguments read (a usage error
-     * is an {@link IllegalArgumentException}), the operands handed over, the Settings menu's port, the routes, the
+     * is an {@link IllegalArgumentException}), the operands handed over, the Settings menu's port, the endpoints, the
      * automatic stop. And nothing of a process: <b>no {@code .ini} is read</b> — a stray one in the repository must not
      * change a test run —, no log is set up, no browser opened, nothing ever exits (the stop and {@code /api/quit} close
      * the server only). {@code start("--port", "0", "--keep-alive", "data/books.csv")}; close the server after.
@@ -270,15 +270,15 @@ public final class WebApp {
     }
 
     /**
-     * Starts the server: the application's routes and the framework's, the automatic stop armed unless the run or the
+     * Starts the server: the application's endpoints and the framework's, the automatic stop armed unless the run or the
      * user said otherwise. What {@link #launch} and {@link #start(String...)} do once the command line is read.
      */
     WebServer startServer(LaunchOptions options, Class<?> program) throws IOException {
         UserSettings settings = UserSettings.of(id);
         WebServer server = new WebServer(pageRoot, new PageWatch(grace));
         if (catalogue != null) server.catalogue(catalogue);
-        builtInRoutes(server, settings, program);
-        routes.accept(server);   // after the framework's: a route of the program's own replaces one of them (logged)
+        builtInEndpoints(server, settings, program);
+        endpoints.accept(server);   // after the framework's: an endpoint of the program's own replaces one of them (logged)
         server.start(options.host(), options.port());
         server.pages().setAutoStop(!options.keepAlive() && settings.autoStop());
         server.pages().onLastPageGone(() -> {
@@ -295,7 +295,7 @@ public final class WebApp {
         });
     }
 
-    private void builtInRoutes(WebServer server, UserSettings settings, Class<?> program) {
+    private void builtInEndpoints(WebServer server, UserSettings settings, Class<?> program) {
         server.get(SETTINGS, ex -> settings(server, settings))
               .post(SETTINGS, ex -> {
                   Map<String, Object> asked = ex.jsonObject();

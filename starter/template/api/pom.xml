@@ -10,7 +10,7 @@
   </parent>
   <artifactId>__APP_ID__-api</artifactId>
   <name>__APP_NAME__ API</name>
-  <description>The HTTP API over core: what the page may ask of __APP_NAME__, as JSON routes on JToolsFramework's WebServer. A translation only — the business stays in core.</description>
+  <description>The HTTP API over core: what the page may ask of __APP_NAME__, as JSON endpoints on JToolsFramework's WebServer. A translation only — the business stays in core.</description>
   <dependencies>
     <dependency>
       <groupId>org.jtools</groupId>

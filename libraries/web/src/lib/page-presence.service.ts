@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-/** The paths of the server's presence routes (WebServer.ALIVE, WebServer.BYE on the server). */
+/** The paths of the server's presence endpoints (WebServer.ALIVE, WebServer.BYE on the server). */
 const ALIVE = 'api/alive';
 const BYE = 'api/bye';
 

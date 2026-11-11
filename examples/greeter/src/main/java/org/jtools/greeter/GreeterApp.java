@@ -29,7 +29,7 @@ public final class GreeterApp {
         return WebApp.named("Greeter").defaultPort(8087).pageRoot("web").catalogue(CATALOGUE)
                 .option("--greeting", "WORD", "option.greeting", word -> greeter.word = word)
                 .settingsFields(new NameSetting())
-                .routes(server -> server.get(GREETING, greeter::greet));
+                .endpoints(server -> server.get(GREETING, greeter::greet));
     }
 
     /** {@code GET /api/greeting}: {@code {"text"}}, the greeting in the page's language, to the name kept. */

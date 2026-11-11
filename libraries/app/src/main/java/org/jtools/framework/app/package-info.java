@@ -29,7 +29,7 @@
  * <pre>{@code
  * public static void main(String[] args) {
  *     WebApp.named("Hello").defaultPort(8089).pageRoot("web")
- *           .routes(server -> server.get("/api/hello", ex -> Map.of("message", "Hello")))
+ *           .endpoints(server -> server.get("/api/hello", ex -> Map.of("message", "Hello")))
  *           .launch(args);
  * }
  * }</pre>

@@ -18,7 +18,7 @@ class __APP_NAME__ApiTest {
     @Test
     void answersTheBusinessStatus() throws Exception {
         __APP_NAME__ application = new __APP_NAME__();
-        try (WebServer server = __APP_NAME__Api.routes(new WebServer(), application).start("127.0.0.1", 0)) {
+        try (WebServer server = __APP_NAME__Api.endpoints(new WebServer(), application).start("127.0.0.1", 0)) {
             HttpResponse<String> status = HttpClient.newHttpClient().send(
                     HttpRequest.newBuilder(URI.create(server.url() + __APP_NAME__Api.STATUS.substring(1))).build(),
                     HttpResponse.BodyHandlers.ofString());

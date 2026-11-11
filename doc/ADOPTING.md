@@ -23,9 +23,9 @@ properties ([CONVENTIONS.md](CONVENTIONS.md)), and loses its shade and jar confi
 
 1. **The `main`** becomes a `WebApp` ([LIBRARIES.md](LIBRARIES.md)): its name, its default port, the page's folder
    (`pageRoot("web")` for a page outside `static/`), the program's own options (`option`, `fileOperand`), and
-   `routes(server -> …)`. What the old launcher did — the command line, the `.ini`, the log, the browser, the stop —
+   `endpoints(server -> …)`. What the old launcher did — the command line, the `.ini`, the log, the browser, the stop —
    goes.
-2. **Each route** registers on the `WebServer` with `get` or `post` and returns its answer: a `Map` or `List` tree,
+2. **Each endpoint** registers on the `WebServer` with `get` or `post` and returns its answer: a `Map` or `List` tree,
    `Json.raw(text)` for JSON the program's own writer made, an `Answer` for bytes or XML. A refusal throws
    `WebServer.Refusal(status, reason)`; the program's exceptions map to statuses with `refuse(MyException.class, 400)`.
    What the old server did — the static files, `/api/alive`, `/api/bye`, `/api/quit`, `/api/settings`, `/api/about`,

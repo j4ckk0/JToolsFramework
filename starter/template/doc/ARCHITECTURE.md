@@ -19,19 +19,19 @@ beyond what it displays; it asks `api/…` and shows the answer. A rule found in
 | Module | Package | What it is |
 |---|---|---|
 | `core` | `org.jtools.__APP_ID__.core` | the business: `__APP_NAME__`, the one entry point |
-| `api` | `org.jtools.__APP_ID__.api` | the HTTP API over core: `__APP_NAME__Api.routes(server, application)` |
+| `api` | `org.jtools.__APP_ID__.api` | the HTTP API over core: `__APP_NAME__Api.endpoints(server, application)` |
 | `frontend` | — (Angular) | the page, as a jar of `static/` resources |
 | `app` | `org.jtools.__APP_ID__.app` | the program: `Launcher`, a `WebApp` serving the API |
 
-What is not here is JToolsFramework's: `WebServer` (the routes, the page, the presence, the Host and Origin checks),
-`Exchange` (what a route reads of a request), `PageWatch` (the stop once the last page has gone), `WebApp` (the command
-line, the Settings menu's port, the `.ini`, the log, the browser, and the routes `/api/settings`, `/api/about`,
+What is not here is JToolsFramework's: `WebServer` (the endpoints, the page, the presence, the Host and Origin checks),
+`Exchange` (what an endpoint reads of a request), `PageWatch` (the stop once the last page has gone), `WebApp` (the command
+line, the Settings menu's port, the `.ini`, the log, the browser, and the endpoints `/api/settings`, `/api/about`,
 `/api/quit`, `/api/log/open`), `@jtools/web` (the page's presence, the server's errors), the build (`jtools-parent`:
 the page, the program's jar, the jlink distributions) and the scripts. Its `doc/CONCEPTS.md` says the conventions.
 
 ## The API
 
-| Route | Answer | core |
+| Endpoint | Answer | core |
 |---|---|---|
 | `GET /api/status` | `{"summary"}` | `__APP_NAME__.status()` |
 
@@ -40,7 +40,7 @@ Its TypeScript mirror is `frontend/src/app/api.service.ts`.
 ## Where a new feature goes
 
 1. **core**: the business — the model, the rules, the state — with its tests (`core/src/test`), no HTTP.
-2. **api**: a route in `__APP_NAME__Api` reading the request, calling core, returning a Map/List tree (a refusal is a
+2. **api**: an endpoint in `__APP_NAME__Api` reading the request, calling core, returning a Map/List tree (a refusal is a
    `WebServer.Refusal`, which the page reads with `apiErrorMessage`); tested against a `WebServer` on port 0.
 3. **frontend**: a method in `ApiService`, a component showing its answer, a route in `app.routes.ts`; tested with
    vitest (`*.spec.ts`), the HTTP calls faked by `HttpTestingController`.

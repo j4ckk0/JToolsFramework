@@ -27,7 +27,7 @@ import java.util.Map;
 import org.jtools.framework.support.Json;
 
 /**
- * A route's answer when it is not a JSON tree sent with 200 (what a route returns otherwise, {@link WebServer.Route}):
+ * An endpoint's answer when it is not a JSON tree sent with 200 (what an endpoint returns otherwise, {@link WebServer.Endpoint}):
  * another status, bytes of another type (a zip, an XML document), headers of its own.
  */
 public record Answer(int status, String contentType, byte[] body, Map<String, String> headers) {

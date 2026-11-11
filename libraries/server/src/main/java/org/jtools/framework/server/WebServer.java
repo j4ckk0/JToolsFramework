@@ -47,29 +47,29 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * A local web application's server, on the JDK's own HTTP server: the application's routes under {@link #API}, plain
+ * A local web application's server, on the JDK's own HTTP server: the application's endpoints under {@link #API}, plain
  * handlers it mounts, the page from the classpath, and the pages' presence. Every request, whatever serves it:
  * <ol>
  *   <li>is refused (403) when its {@code Host} is not this computer's or the {@code --host} given — the defence
  *       against DNS rebinding; a wildcard host serves the network on purpose and takes any — and, when it changes
  *       state (not a GET), when its {@code Origin} is another site's: nothing but the page drives the program;</li>
- *   <li>goes through the application's filters ({@link #filter}): the JDK's own {@link Filter}s, around routes,
+ *   <li>goes through the application's filters ({@link #filter}): the JDK's own {@link Filter}s, around endpoints,
  *       handlers, files and the presence streams alike;</li>
  *   <li>is logged at FINE with its status and its duration.</li>
  * </ol>
- * A route's answer is a JSON tree, {@link Json#raw}, an {@link Answer}, or null (204). Every refusal is
+ * An endpoint's answer is a JSON tree, {@link Json#raw}, an {@link Answer}, or null (204). Every refusal is
  * {@code {"error": reason}}: a {@link Refusal}, an {@link IllegalArgumentException} (400), an exception the
- * application mapped ({@link #refuse}), a wrong method (405), an unknown route (404); anything else is a 500, its
+ * application mapped ({@link #refuse}), a wrong method (405), an unknown endpoint (404); anything else is a 500, its
  * trace logged. Each request has a virtual thread of its own: a page's presence stream holds one for its whole life.
  */
 public final class WebServer implements AutoCloseable {
 
     private static final Logger LOG = Logger.getLogger(WebServer.class.getName());
 
-    /** Where the application's routes live; everything else is the page's, but for the handlers it mounts. */
+    /** Where the application's endpoints live; everything else is the page's, but for the handlers it mounts. */
     public static final String API = "/api";
     public static final String ALIVE = API + "/alive", BYE = API + "/bye";
-    /** The page id the presence routes take. */
+    /** The page id the presence endpoints take. */
     public static final String PARAM_PAGE = "id";
     /** The classpath folder of the page by default: the frontend's jar puts its build there. */
     public static final String DEFAULT_PAGE_ROOT = "static";
@@ -82,9 +82,9 @@ public final class WebServer implements AutoCloseable {
     private static final Set<String> WILDCARD_HOSTS = Set.of("0.0.0.0", "::", "[::]", "");
     private static final Catalogue SERVER_CATALOGUE = Catalogue.load(WebServer.class, "org.jtools.framework.server.texts", Locale.ENGLISH, Locale.FRENCH);
 
-    /** An application's route: what it answers (a tree, {@link Json#raw}, an {@link Answer}, or null for 204). */
+    /** An application's endpoint: what it answers (a tree, {@link Json#raw}, an {@link Answer}, or null for 204). */
     @FunctionalInterface
-    public interface Route {
+    public interface Endpoint {
         Object answer(Exchange exchange) throws Exception;
     }
 
@@ -102,8 +102,8 @@ public final class WebServer implements AutoCloseable {
         }
     }
 
-    /** What answers a path: a route taking one method (or any), or a plain handler; a path ending in / is a prefix. */
-    private record Mount(String path, String method, Route route, HttpHandler handler) {
+    /** What answers a path: an endpoint taking one method (or any), or a plain handler; a path ending in / is a prefix. */
+    private record Mount(String path, String method, Endpoint endpoint, HttpHandler handler) {
         boolean prefix() { return path.endsWith(ROOT); }
     }
 
@@ -138,18 +138,18 @@ public final class WebServer implements AutoCloseable {
     }
 
     /** Answers {@code GET path}; a path ending in / answers every path under it ({@link Exchange#rest()}). */
-    public WebServer get(String path, Route route) {
-        return mount(new Mount(apiPath(path), Http.METHOD_GET, route, null));
+    public WebServer get(String path, Endpoint endpoint) {
+        return mount(new Mount(apiPath(path), Http.METHOD_GET, endpoint, null));
     }
 
     /** Answers {@code POST path}. */
-    public WebServer post(String path, Route route) {
-        return mount(new Mount(apiPath(path), Http.METHOD_POST, route, null));
+    public WebServer post(String path, Endpoint endpoint) {
+        return mount(new Mount(apiPath(path), Http.METHOD_POST, endpoint, null));
     }
 
-    /** Answers any method on {@code path}: the route looks at the method itself, if it cares. */
-    public WebServer route(String path, Route route) {
-        return mount(new Mount(apiPath(path), ANY_METHOD, route, null));
+    /** Answers any method on {@code path}: the endpoint looks at the method itself, if it cares. */
+    public WebServer endpoint(String path, Endpoint endpoint) {
+        return mount(new Mount(apiPath(path), ANY_METHOD, endpoint, null));
     }
 
     /**
@@ -169,7 +169,7 @@ public final class WebServer implements AutoCloseable {
     }
 
     /**
-     * Answers a route's exception of that class (or of a subclass) with that status and its message —
+     * Answers an endpoint's exception of that class (or of a subclass) with that status and its message —
      * {@code refuse(UnknownBookException.class, 404)}. The most specific mapping wins; {@link IllegalArgumentException} is
      * 400 already. An exception mapped to nothing is a 500.
      */
@@ -188,7 +188,7 @@ public final class WebServer implements AutoCloseable {
     }
 
     private static String apiPath(String path) {
-        if (!path.startsWith(API + ROOT)) throw new IllegalArgumentException("a route lives under " + API + ROOT + ": " + path);
+        if (!path.startsWith(API + ROOT)) throw new IllegalArgumentException("an endpoint lives under " + API + ROOT + ": " + path);
         return path;
     }
 
@@ -213,7 +213,7 @@ public final class WebServer implements AutoCloseable {
 
     /**
      * The address it listens on, as the program was told ({@code --host}): {@code 127.0.0.1} by default, a wildcard
-     * ({@code 0.0.0.0}) when it serves the network; null before {@link #start}. For a route with a rule of its own on
+     * ({@code 0.0.0.0}) when it serves the network; null before {@link #start}. For an endpoint with a rule of its own on
      * the {@code Host} it accepts — a tool endpoint answering this computer only, even then.
      */
     public String host() {
@@ -342,7 +342,7 @@ public final class WebServer implements AutoCloseable {
         Exchange exchange = new Exchange(ex, catalogue, SERVER_CATALOGUE, mount.prefix() ? path.substring(mount.path().length()) : "");
         Object answer;
         try {
-            answer = mount.route().answer(exchange);
+            answer = mount.endpoint().answer(exchange);
         } catch (Refusal e) {
             sendRefusal(exchange, e, e.status());
             return;

@@ -7,8 +7,8 @@ import org.jtools.framework.server.WebServer;
 import org.jtools.framework.support.Json;
 
 /**
- * __APP_NAME__'s HTTP API: each route reads the request, asks {@link __APP_NAME__}, and turns its answer into JSON.
- * A translation and nothing more — a rule found here belongs in core. The page's TypeScript mirror of these routes
+ * __APP_NAME__'s HTTP API: each endpoint reads the request, asks {@link __APP_NAME__}, and turns its answer into JSON.
+ * A translation and nothing more — a rule found here belongs in core. The page's TypeScript mirror of these endpoints
  * is frontend/src/app/api.service.ts. The program's name and version are the framework's {@code GET /api/about}.
  */
 public final class __APP_NAME__Api {
@@ -19,8 +19,8 @@ public final class __APP_NAME__Api {
 
     private __APP_NAME__Api() {}
 
-    /** Registers the routes on the server, answered by the application. */
-    public static WebServer routes(WebServer server, __APP_NAME__ application) {
+    /** Registers the endpoints on the server, answered by the application. */
+    public static WebServer endpoints(WebServer server, __APP_NAME__ application) {
         return server.get(STATUS, ex -> status(application.status()));
     }
 

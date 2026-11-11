@@ -26,7 +26,7 @@ public static void main(String[] args) {
           .fileOperand("[file.xml]", "a file to open", file -> initial = file)
           .settingsFields(new MyFields())                   // the program's own fields of /api/settings
           .aboutFields(about -> about.put("dialogs", FileDialogs.available()))
-          .routes(server -> MyApi.routes(server, business))
+          .endpoints(server -> MyApi.endpoints(server, business))
           .launch(args);
 }
 ```
@@ -40,7 +40,7 @@ What `launch` does, so that the program does not have to:
 - **the port**, in this order: `--port`, the Settings menu's choice, `<id>.ini` beside the jar, the program's default;
 - **the log**: the console and `~/.<id>/logs/<id>.0.log` (two files of 5 MB), in English — `org.jtools` and every logger
   under it at the level asked;
-- **the built-in routes**: `GET`/`POST /api/settings` (`autoStop`, `port`, `defaultPort`, `currentPort`, and the program's
+- **the built-in endpoints**: `GET`/`POST /api/settings` (`autoStop`, `port`, `defaultPort`, `currentPort`, and the program's
   fields), `GET /api/about` (`name`, `version`, `javaVersion`, `language`, `logFile`, and the program's), `POST /api/quit`,
   `POST /api/log/open` (the log in the system's viewer, for a page of this computer only);
 - **the browser**, opened on the page; **the stop**, once the last page has been closed for 15 s.
@@ -54,24 +54,24 @@ Public for a technical reason: `LaunchOptions` (the options' and the `.ini`'s na
 
 ## jtools-server — the server
 
-`org.jtools.framework.server`. **Start from `WebServer`**; a program built with jtools-app gets it in `routes`.
+`org.jtools.framework.server`. **Start from `WebServer`**; a program built with jtools-app gets it in `endpoints`.
 
 ```java
 server.get("/api/books", ex -> books.list())                         // a List, a Map: JSON
       .post("/api/books", ex -> books.add(ex.jsonObject()))          // the body as a JSON object; malformed: 400
-      .get("/api/store/", ex -> store.read(ex.rest()))               // a prefix route: ex.rest() is what follows
+      .get("/api/store/", ex -> store.read(ex.rest()))               // a prefix endpoint: ex.rest() is what follows
       .get("/api/report", ex -> Answer.xml(report.xml()))           // anything else: an Answer
       .refuse(UnknownBookException.class, 404)                       // an exception of the domain, mapped to a status
       .handle("/mcp", rawHandler)                                    // a plain JDK handler, the checks still applied
       .filter(languageFilter);                                       // a JDK Filter around every request
 ```
 
-- **A route answers with what it returns**: a `Map` / `List` / `String` / `Number` tree as JSON, `Json.raw(text)` for JSON
+- **An endpoint answers with what it returns**: a `Map` / `List` / `String` / `Number` tree as JSON, `Json.raw(text)` for JSON
   already written, an `Answer` (bytes, XML, text, a status, headers), `null` for 204.
 - **A refusal is `{"error": reason}`**, whatever refuses: `throw new WebServer.Refusal(status, reason)`, an
   `IllegalArgumentException` (400), an exception mapped with `refuse`, a wrong method (405, with `Allow`), no such
-  route (404); anything else is a 500, its trace in the log.
-- **`Exchange`**, a route's request: `text()`, `bytes()`, `json()`, `jsonObject()`, `query(name[, fallback])`, `rest()`,
+  endpoint (404); anything else is a 500, its trace in the log.
+- **`Exchange`**, an endpoint's request: `text()`, `bytes()`, `json()`, `jsonObject()`, `query(name[, fallback])`, `rest()`,
   `language()` (the page's, from `Accept-Language`), `texts()` (the program's texts in it), `fromThisComputer()`.
 - **Every request is checked first**: a `Host` that is not this computer's (or the `--host` given) is refused — the
   defence against DNS rebinding —, and so is a request changing state from another site's `Origin`.
@@ -104,7 +104,7 @@ catalogue.of(ex.language()).tn("books.count", n);   // books.count.one / books.c
 
 `org.jtools.framework.desktop`. **`FileDialogs`**: open, save and folder dialogs on the program's own desktop —
 kdialog or zenity on Linux, the system's on Windows and macOS, Swing's otherwise. `available()` is false without a
-display: a route then answers 409, and the page offers the browser's own. A library of its own: choosing files is a feature
+display: an endpoint then answers 409, and the page offers the browser's own. A library of its own: choosing files is a feature
 a program opts into.
 
 ```java

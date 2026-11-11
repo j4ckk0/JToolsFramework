@@ -45,8 +45,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/** The framework's own routes, on a running server; the user's preferences in a node of the test's own. */
-class BuiltInRoutesTest {
+/** The framework's own endpoints, on a running server; the user's preferences in a node of the test's own. */
+class BuiltInEndpointsTest {
 
     private static final String ID = "jtoolstest";
     private final HttpClient client = HttpClient.newHttpClient();
@@ -76,7 +76,7 @@ class BuiltInRoutesTest {
                 .aboutFields(about -> about.put("dialogs", false))
                 .exitWith(code -> { exitCode.set(code); exited.countDown(); });
         LaunchOptions options = app.options(new String[] {"--port", "0"}, new Properties(), OptionalInt.empty());
-        server = app.startServer(options, BuiltInRoutesTest.class);
+        server = app.startServer(options, BuiltInEndpointsTest.class);
     }
 
     @AfterEach
@@ -157,21 +157,21 @@ class BuiltInRoutesTest {
 
     @Test
     void letsTheProgramReplaceOneOfThem() throws Exception {
-        WebApp own = WebApp.named("JToolsTest").id(ID).routes(s -> s.get(WebApp.ABOUT, ex -> Map.of("capabilities", "its own")));
+        WebApp own = WebApp.named("JToolsTest").id(ID).endpoints(s -> s.get(WebApp.ABOUT, ex -> Map.of("capabilities", "its own")));
         try (WebServer other = own.start("--port", "0")) {
             HttpResponse<String> about = client.send(HttpRequest.newBuilder(URI.create(other.url() + "api/about")).build(), HttpResponse.BodyHandlers.ofString());
             assertEquals("{\"capabilities\":\"its own\"}", about.body());
         }
     }
 
-    /** --lang is the run's language, known to the program's routes: what it says to a client naming none. */
+    /** --lang is the run's language, known to the program's endpoints: what it says to a client naming none. */
     @Test
     void tellsTheProgramTheRunsLanguage() throws Exception {
         java.util.concurrent.atomic.AtomicReference<java.util.Locale> seen = new java.util.concurrent.atomic.AtomicReference<>();
         WebApp[] app = new WebApp[1];
-        app[0] = WebApp.named("JToolsTest").id(ID).routes(s -> seen.set(app[0].language()));
+        app[0] = WebApp.named("JToolsTest").id(ID).endpoints(s -> seen.set(app[0].language()));
         try (WebServer other = app[0].start("--port", "0", "--lang", "fr")) {
-            assertEquals(java.util.Locale.FRENCH, seen.get(), "known when the routes are registered");
+            assertEquals(java.util.Locale.FRENCH, seen.get(), "known when the endpoints are registered");
             assertEquals(java.util.Locale.FRENCH, app[0].language());
         }
         app[0] = WebApp.named("JToolsTest").id(ID);

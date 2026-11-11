@@ -19,13 +19,13 @@
  */
 
 /**
- * jtools-server: a local web application's server — the page, the routes, the pages' presence, the checks.
+ * jtools-server: a local web application's server — the page, the endpoints, the pages' presence, the checks.
  *
- * Start from {@link org.jtools.framework.server.WebServer}: a route answers an
+ * Start from {@link org.jtools.framework.server.WebServer}: an endpoint answers an
  * {@link org.jtools.framework.server.Exchange} with what it returns — a JSON tree, {@code Json.raw(...)}, an
  * {@link org.jtools.framework.server.Answer}, or null for 204 —, a refusal is a
  * {@link org.jtools.framework.server.WebServer.Refusal} answered {@code {"error": ...}}. A program built with jtools-app
- * gets its server from {@code WebApp.routes}, and registers its routes there.
+ * gets its server from {@code WebApp.endpoints}, and registers its endpoints there.
  * <pre>{@code
  * server.get("/api/hello", ex -> Map.of("message", "Hello, " + ex.query("name", "world")))
  *       .post("/api/echo", ex -> ex.jsonObject())

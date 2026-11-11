@@ -14,8 +14,8 @@ its libraries the server and the program (`jtools-app`), `@jtools/web` the page'
 ## First steps
 
 1. **Run it**: `scripts/run.sh` — the page opens; close it, and the program stops.
-2. **Add a feature**: a rule in `core` (`__APP_NAME__.java`), a route in `api` (`__APP_NAME__Api.java`) that asks it, a
-   method in `frontend/src/app/api.service.ts` that calls the route, a view that shows it — JToolsFramework's
+2. **Add a feature**: a rule in `core` (`__APP_NAME__.java`), an endpoint in `api` (`__APP_NAME__Api.java`) that asks it, a
+   method in `frontend/src/app/api.service.ts` that calls the endpoint, a view that shows it — JToolsFramework's
    `doc/GETTING-STARTED.md`, step 5, walks through one; `doc/ARCHITECTURE.md` here says where each kind of code goes.
 3. **Test it**: `scripts/build.sh` — every Java test and the page's.
 4. **Ship it**: `scripts/package.sh` — the Linux, macOS and Windows archives in `releases/`, each with its own Java.
@@ -51,7 +51,7 @@ scripts/run.sh [--rebuild] [--port N] [--host H] [--no-browser] [--keep-alive] [
 Settings menu (`/api/settings`), else `__APP_ID__.ini`'s next to the jar (`port=__APP_PORT__`). The log goes to
 `~/.__APP_ID__/logs/__APP_ID__.0.log` (`--log-file`, or `log.folder` in the `.ini`), its lines in English.
 
-The framework answers four routes of its own beside the application's: `/api/settings` (the automatic stop, the
+The framework answers four endpoints of its own beside the application's: `/api/settings` (the automatic stop, the
 port), `/api/about` (name, version, log file), `/api/quit` and `/api/log/open`.
 
 **The page alone, live-reloaded**: start the server (`scripts/run.sh --no-browser`), then `cd frontend && npm start`

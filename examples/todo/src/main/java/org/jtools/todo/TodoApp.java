@@ -9,7 +9,7 @@ import org.jtools.framework.server.WebServer;
 import org.jtools.framework.support.Json;
 
 /**
- * The program: {@link Todos} served to its page. A route reads the request, asks the business, and says its answer as
+ * The program: {@link Todos} served to its page. An endpoint reads the request, asks the business, and says its answer as
  * JSON — a translation, no rule. A rule broken is the business's exception, which the server answers {@code {"error"}}:
  * an {@code IllegalArgumentException} as 400, a to-do that is not there as 404 ({@code refuse}).
  */
@@ -21,11 +21,11 @@ public final class TodoApp {
 
     public static WebApp program() {
         Todos todos = new Todos();
-        return WebApp.named("Todo").defaultPort(8088).pageRoot("web").routes(server -> routes(server, todos));
+        return WebApp.named("Todo").defaultPort(8088).pageRoot("web").endpoints(server -> endpoints(server, todos));
     }
 
     /** {@code GET /api/todos}: the list; {@code POST /api/todos} {@code {"title"}}: one added; {@code POST /api/todos/done?id=}. */
-    static WebServer routes(WebServer server, Todos todos) {
+    static WebServer endpoints(WebServer server, Todos todos) {
         return server.refuse(NoSuchElementException.class, 404)
                 .get(TODOS, ex -> json(todos.list()))
                 .post(TODOS, ex -> json(todos.add(ex.jsonObject().get("title") instanceof String title ? title : null)))

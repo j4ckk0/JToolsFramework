@@ -15,7 +15,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/** The business on its own, then the program over HTTP: its routes, and the business's refusals as {"error"}. */
+/** The business on its own, then the program over HTTP: its endpoints, and the business's refusals as {"error"}. */
 class TodoTest {
 
     private final HttpClient client = HttpClient.newHttpClient();

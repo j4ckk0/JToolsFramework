@@ -81,7 +81,7 @@ What it made:
 ```
 Bookshelf/
 ├── core/       the business: Bookshelf.java, pure Java — every rule, every computation, every state
-├── api/        its HTTP face: BookshelfApi.java — each route asks core and turns its answer into JSON
+├── api/        its HTTP face: BookshelfApi.java — each endpoint asks core and turns its answer into JSON
 ├── frontend/   the Angular page: a view, it decides nothing — api.service.ts is its one door to the server
 ├── app/        the program: Launcher.java, a WebApp serving the API; its one jar and its distributions
 ├── pom.xml     the modules and five jtools.app.* properties; everything else is jtools-parent's
@@ -121,18 +121,18 @@ public int bookCount() {
 ```
 
 **The API** translates — `api/src/main/java/org/jtools/bookshelf/api/BookshelfApi.java`: a path beside `STATUS`,
-a route beside its own.
+an endpoint beside its own.
 
 ```java
 public static final String BOOKS = WebServer.API + "/books";
 
-public static WebServer routes(WebServer server, Bookshelf application) {
+public static WebServer endpoints(WebServer server, Bookshelf application) {
     return server.get(STATUS, ex -> status(application.status()))
                  .get(BOOKS, ex -> Map.of("count", application.bookCount()));
 }
 ```
 
-A route answers with what it returns — a `Map` or a `List` as JSON, `null` as 204. A request it refuses throws
+An endpoint answers with what it returns — a `Map` or a `List` as JSON, `null` as 204. A request it refuses throws
 `new WebServer.Refusal(400, reason)`, and the page reads `{"error": reason}` — [examples/todo](../examples/todo)
 shows one.
 
@@ -167,7 +167,7 @@ scripts/build.sh
 ```
 
 *You should see* `BUILD SUCCESS`, the Java tests of `core`, `api` and `app`, and the page's (vitest) passed. The
-generated `BookshelfApiTest` shows a route's test: the API's routes on a `WebServer` started on a free port, asked
+generated `BookshelfApiTest` shows an endpoint's test: the API's endpoints on a `WebServer` started on a free port, asked
 over HTTP. The whole program starts the same way, as `main` would but never exiting —
 `WebApp.start("--port", "0", "--keep-alive")`, as the examples' tests do.
 

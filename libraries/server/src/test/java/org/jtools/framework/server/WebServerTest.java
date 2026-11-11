@@ -80,7 +80,7 @@ class WebServerTest {
                 .get("/api/store/count", ex -> Map.of("count", 3))
                 .post("/api/nothing", ex -> null)
                 .post("/api/parse", ex -> ex.jsonObject())
-                .route("/api/any", ex -> Map.of("method", ex.getRequestMethod()))
+                .endpoint("/api/any", ex -> Map.of("method", ex.getRequestMethod()))
                 .handle("/mcp", ex -> Http.send(ex, 202, null, new byte[0]))
                 .filter(new Filter() {
                     @Override public void doFilter(HttpExchange ex, Chain chain) throws IOException {
@@ -144,7 +144,7 @@ class WebServerTest {
         assertEquals(405, post("/index.html", "", null).statusCode());
     }
 
-    // ---- the routes ----------------------------------------------------------------------------------------
+    // ---- the endpoints ----------------------------------------------------------------------------------------
 
     @Test
     void answersTreesRawJsonAndBytes() throws Exception {
@@ -179,16 +179,16 @@ class WebServerTest {
         assertEquals(405, wrong.statusCode());
         assertEquals("GET", wrong.headers().firstValue("Allow").orElseThrow());
         assertEquals("GET expected", error(wrong));
-        assertEquals("{\"method\":\"POST\"}", post("/api/any", "", null).body(), "a route taking any method");
+        assertEquals("{\"method\":\"POST\"}", post("/api/any", "", null).body(), "an endpoint taking any method");
         HttpResponse<String> unknown = get("/api/unknown");
         assertEquals(404, unknown.statusCode());
         assertEquals("not found", error(unknown));
     }
 
     @Test
-    void answersEveryPathUnderAPrefixRoute() throws Exception {
+    void answersEveryPathUnderAPrefixEndpoint() throws Exception {
         assertEquals("{\"rest\":\"spifs/X/labels\"}", get("/api/store/spifs/X/labels").body());
-        assertEquals("{\"count\":3}", get("/api/store/count").body(), "an exact route wins over the prefix");
+        assertEquals("{\"count\":3}", get("/api/store/count").body(), "an exact endpoint wins over the prefix");
     }
 
     @Test
@@ -246,7 +246,7 @@ class WebServerTest {
         try (WebServer open = new WebServer("test-page", new PageWatch()).start("0.0.0.0", 0)) {
             assertTrue(open.allowedHost("192.168.1.20:" + open.port()));
             assertTrue(open.url().startsWith("http://localhost:"));
-            assertEquals("0.0.0.0", open.host(), "the address as given, for a route of stricter rules");
+            assertEquals("0.0.0.0", open.host(), "the address as given, for an endpoint of stricter rules");
         }
     }
 
@@ -265,7 +265,7 @@ class WebServerTest {
         assertTrue(stopped.await(5, TimeUnit.SECONDS), "the stop once the grace has elapsed");
         stream.body().close();
         assertEquals(400, get("/api/alive").statusCode(), "a stream without a page id");
-        assertEquals(405, get("/api/bye?id=page-1").statusCode(), "the presence routes say which method they take");
+        assertEquals(405, get("/api/bye?id=page-1").statusCode(), "the presence endpoints say which method they take");
         assertEquals(405, post("/api/alive?id=page-1", "", null).statusCode());
     }
 

@@ -14,7 +14,7 @@
   <artifactId>jtools-example-hello</artifactId>
   <packaging>jar</packaging>
   <name>JToolsFramework example: hello</name>
-  <description>The smallest program on JToolsFramework: one route, one page in plain JavaScript.</description>
+  <description>The smallest program on JToolsFramework: one endpoint, one page in plain JavaScript.</description>
 
   <properties>
     <!-- the program: its one jar, hello.jar, and with -Pdist its distributions -->
