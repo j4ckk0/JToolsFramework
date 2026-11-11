@@ -85,8 +85,8 @@ jobs:
           if-no-files-found: error
       - name: A project made with 1.3.1, moved to 1.4's layout by its own scripts/jtools sync
         run: |
+          version=$(cat jtools-*/VERSION)   # the delivery under test, before 1.3.1's is unpacked beside it
           curl -fsSLO https://github.com/j4ckk0/JToolsFramework/releases/download/v1.3.1/jtools-1.3.1.tar.gz && tar xzf jtools-1.3.1.tar.gz
-          version=$(cat jtools-1.4*/VERSION)
           jtools-1.3.1/install.sh --no-project > /dev/null   # 1.3.1's devkit, as a developer on 1.3.1 has it
           jtools-1.3.1/jtools new Old --dir "$RUNNER_TEMP/old" --port 18095 --no-git --no-build
           cd "$RUNNER_TEMP/old"
@@ -213,7 +213,7 @@ jobs:
           function Report($title) { & $env:REPORT $title "$env:RUNNER_TEMP\step.log"; exit 1 }
           Invoke-WebRequest -UseBasicParsing -Uri https://github.com/j4ckk0/JToolsFramework/releases/download/v1.3.1/jtools-1.3.1.zip -OutFile old.zip
           Expand-Archive -Path old.zip -DestinationPath old-delivery
-          $version = (Get-Content (Get-Item jtools-1.4*\VERSION -Exclude *.zip).FullName).Trim()
+          $version = (Get-Content (Get-Item jtools-*\VERSION).FullName).Trim()
           cmd /c "old-delivery\jtools-1.3.1\install.bat --no-project" 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\step.log"
           if ($LASTEXITCODE -ne 0) { Report 'install.bat 1.3.1' }
           cmd /c "old-delivery\jtools-1.3.1\jtools.bat new Old --dir `"$env:RUNNER_TEMP\old`" --port 18095 --no-git --no-build" 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\step.log"
