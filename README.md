@@ -5,10 +5,7 @@ computer, with a Java server holding all the business logic and a web page in th
 server's routes form an HTTP API — JSON in, JSON out — so scripts and other programs can use the application just as
 its page does ([A page and an API](#a-page-and-an-api)).
 
-You write the business logic, the API's routes and the page. JToolsFramework provides the rest: the server, its
-command line, settings and log, and the stop once the last page is closed; a build that makes one jar and
-self-contained archives for Linux, macOS and Windows; a development environment that downloads its own JDK, Maven
-and Node.js; and a project template, so that `jtools new` starts you on a project that already runs.
+You write the business logic, the API's routes and the page; JToolsFramework provides the rest.
 
 ## What it is
 
