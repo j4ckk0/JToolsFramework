@@ -130,51 +130,49 @@ says what each library gives in full.
 
 ### Architecture
 
-A program on the framework — `Bookshelf`, as `jtools new` makes it — and the libraries it stands on. Each arrow is a
-dependency, but the two at the top, which are requests over HTTP.
+**How the application runs.** The web page and any other program talk to the same API endpoints; only the business
+logic decides.
+
+```mermaid
+flowchart LR
+    page["Web page<br/>in the browser"]
+    scripts["Scripts and<br/>other programs"]
+    subgraph application["Your application, on your computer"]
+        endpoints["API endpoints"] --> logic["Business logic"]
+    end
+    page -- "HTTP + JSON" --> endpoints
+    scripts -- "HTTP + JSON" --> endpoints
+```
+
+**What a project is built from.** Each of its four parts stands on one of the framework's libraries.
 
 ```mermaid
 flowchart TB
-    subgraph clients["Its clients"]
-        browser["The page, in the browser"]
-        other["Scripts, other programs, curl,<br/>an assistant's tools"]
+    subgraph project["Your project, as jtools new makes it"]
+        frontend["frontend<br/>the web page"]
+        api["api<br/>the endpoints"]
+        core["core<br/>the business logic"]
+        app["app<br/>the program"]
     end
-
-    subgraph program["Bookshelf — a program on JToolsFramework"]
-        app["app/ · Launcher<br/>main: WebApp.named(Bookshelf)…launch(args)<br/>one jar, the distributions"]
-        api["api/ · BookshelfApi<br/>its endpoints: GET /api/status, /api/books…<br/>a translation, no rule"]
-        core["core/ · Bookshelf<br/>the business: every rule, every state<br/>pure Java, no HTTP"]
-        frontend["frontend/ · the Angular page<br/>a view only; in the jar as static/"]
-    end
-
     subgraph libraries["JToolsFramework's libraries"]
-        japp["jtools-app · WebApp<br/>command line, .ini, settings, log,<br/>the browser, the stop; /api/settings, /api/about"]
-        jserver["jtools-server · WebServer<br/>endpoints, the page's files, the pages' presence,<br/>the Host and Origin checks"]
-        jsupport["jtools-support<br/>Json, Catalogue and Texts, Installation"]
-        jdesktop["jtools-desktop · FileDialogs<br/>native file dialogs, when a program wants them"]
-        jweb["@jtools/web<br/>the page's presence, the API's refusals"]
+        web["@jtools/web"]
+        server["jtools-server"]
+        support["jtools-support"]
+        japp["jtools-app"]
     end
-
-    browser -- "HTTP: the page, its JSON, /api/alive" --> app
-    other -- "HTTP: the same JSON endpoints" --> app
-
-    app --> api
-    app --> frontend
+    frontend --> web
+    api --> server
+    core --> support
     app --> japp
-    api --> core
-    api --> jserver
-    core --> jsupport
-    frontend --> jweb
-    japp --> jserver
-    jserver --> jsupport
-    jdesktop --> jsupport
 ```
 
-- **The business is `core`'s alone**: pure Java, testable and usable without a server or a page.
-- **`api` translates**: each endpoint asks `core` and turns its answer into JSON; a refusal is `{"error": reason}`.
-- **The page decides nothing**: it shows what the API answers. Any other client sees exactly the same API.
-- **`app` is the program**: `WebApp` puts the server, the API, the page and the framework's own endpoints together, and
-  the build makes them one jar and its distributions.
+- **core** holds the business logic: pure Java, testable without a server or a page.
+- **api** translates: each endpoint asks `core`, and turns the answer into JSON.
+- **frontend** is the web page: it shows what the API answers, and decides nothing.
+- **app** is the program: `WebApp` (from `jtools-app`) puts it all together; the build makes it one jar.
+
+The program's module depends on `jtools-app`, which brings `jtools-server` and `jtools-support`; `core` and `api` each
+name the one library they use. `jtools-desktop`, for native file dialogs, is optional.
 
 ### A page and an API
 
