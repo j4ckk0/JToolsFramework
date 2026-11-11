@@ -25,7 +25,7 @@ its libraries the server and the program (`jtools-app`), `@jtools/web` the page'
 
 Everything the build needs comes from `external/` (see [Externals](#externals)): run `scripts/linux/setup.sh` once — the
 other scripts offer to when it has not been run. JToolsFramework comes from Maven Central, or from the local Maven
-repository where a clone of it puts it (its `scripts/install.sh`).
+repository where a clone of it puts it (its `scripts/install-locally.sh`).
 
 ```bash
 scripts/linux/setup.sh                 # the externals: JDK 25, Maven, Node.js, each platform's jmods (once)

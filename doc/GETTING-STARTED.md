@@ -50,14 +50,14 @@ in (`install.sh Bookshelf --dir ~/work/bookshelf` says them).
 
 ```bash
 git clone https://github.com/j4ckk0/JToolsFramework.git
-(cd JToolsFramework && scripts/linux/setup.sh && scripts/install.sh)   # the framework built, tested, installed into ~/.m2
+(cd JToolsFramework && scripts/linux/setup.sh && scripts/install-locally.sh)   # the framework built, tested, installed into ~/.m2
 alias jtools=$PWD/JToolsFramework/devkit/scripts/linux/jtools
 export JTOOLS_DOWNLOADS=$PWD/JToolsFramework/external/downloads   # your project takes the clone's downloads: 450 MB once, not twice
 ```
 
 ## 2. Run the examples (optional, five minutes)
 
-From a clone, after `scripts/install.sh` (step 1's second way): three very small programs, each one step further —
+From a clone, after `scripts/install-locally.sh` (step 1's second way): three very small programs, each one step further —
 [examples/README.md](../examples/README.md).
 
 ```bash

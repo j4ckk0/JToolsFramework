@@ -22,12 +22,12 @@ code, comments, tests, poms or docs. An example is a generic one (`Bookshelf`, `
 | `.github/workflows/delivery.yml` | at every push: the delivery built, then installed on Linux and on Windows, a project made, built, packaged, synced; Windows' project compared with Linux's |
 | `.github/workflows/release.yml` | on a pushed tag, on GitHub's machines: `scripts/delivery.sh`, then the tag's release with the delivery attached (or *Run workflow* for an older tag) |
 | `delivery/` | the delivery's `install.sh` and `install.bat` (Windows, .bat only) and README; `scripts/delivery.sh` packs them with the nine artifacts and the stub into `releases/delivery/jtools-<version>.tar.gz` |
-| `scripts/` | the framework's own (`install.sh`, `check-versions.sh`, `delivery.sh`; `linux/ci.local.sh`) and copies of the devkit's in `linux/` and `windows/`, `JTOOLS_HOME=.` |
+| `scripts/` | the framework's own (`install-locally.sh`, `check-versions.sh`, `delivery.sh`; `linux/ci.local.sh`) and copies of the devkit's in `linux/` and `windows/`, `JTOOLS_HOME=.` |
 
 ## Commands
 
 ```bash
-scripts/install.sh                  # versions agree, build, test, install into ~/.m2
+scripts/install-locally.sh          # versions agree, build, test, install into ~/.m2
 scripts/linux/ci.sh                       # quiet install with npm ci, then ci.local.sh: scripts/ equal devkit/, and a
                                     # project made by a lone scripts/linux/jtools from the installed devkit passes its CI
 scripts/linux/jtools sync [--check]       # the framework's own copies of the managed files, from devkit/

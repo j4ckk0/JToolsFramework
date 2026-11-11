@@ -13,7 +13,7 @@
 #
 # Where the devkit comes from, in this order:
 #   JTOOLS_HOME     a clone of JToolsFramework (jtools.conf or the environment): its working tree, as it is
-#   ~/.m2           the local Maven repository (M2_REPO says another): what scripts/install.sh, or Maven, put there
+#   ~/.m2           the local Maven repository (M2_REPO says another): what scripts/install-locally.sh, or Maven, put there
 #   MIRROR          <MIRROR>/jtools-devkit-<version>.jar, its authentication with it (MIRROR_TOKEN, MIRROR_USER…),
 #                   from the environment, externals.local.conf or externals.conf — setup's own keys
 #   Maven Central   https://repo1.maven.org/maven2/…

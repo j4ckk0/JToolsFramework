@@ -111,7 +111,7 @@ In the project's folder, then:
 
 The internet is needed the first time: the project's tools and the libraries its build uses (Maven plugins, npm
 packages) are downloaded; the framework itself is in the archive. To change the framework too, clone it instead:
-`git clone`, then `scripts/linux/setup.sh && scripts/install.sh` in the clone, and its `devkit/scripts/linux/jtools` is your
+`git clone`, then `scripts/linux/setup.sh && scripts/install-locally.sh` in the clone, and its `devkit/scripts/linux/jtools` is your
 `jtools`.
 
 [doc/GETTING-STARTED.md](doc/GETTING-STARTED.md) is the same walk in full — what to type, what you should see, the code of
@@ -222,10 +222,10 @@ curl 'http://127.0.0.1:8089/api/hello?name=script'   # {"message":"Hello, script
 **Developing the framework itself**:
 
 ```bash
-scripts/linux/setup.sh   # the externals: JDK 25, Maven, Node.js, each platform's jmods (once)
-scripts/install.sh       # versions agree, build, test, install into ~/.m2
-scripts/linux/ci.sh      # the same quietly, then: the framework's scripts equal the devkit's, and a project made by a
-                         # lone scripts/linux/jtools from the installed devkit passes its own CI
+scripts/linux/setup.sh       # the externals: JDK 25, Maven, Node.js, each platform's jmods (once)
+scripts/install-locally.sh   # versions agree, build, test, install into ~/.m2
+scripts/linux/ci.sh          # the same quietly, then: the framework's scripts equal the devkit's, and a project
+                             # made by a lone scripts/linux/jtools from the installed devkit passes its own CI
 ```
 
 `git config core.hooksPath .githooks` runs `scripts/linux/ci.sh` before every push. A project developed together with the

@@ -93,5 +93,5 @@ These builds use the network (plugins, the upload): the framework does not.
 
 ## 5. Once on Central
 
-The projects no longer need `scripts/install.sh` first: Maven resolves jtools-parent and the libraries from Central,
+The projects no longer need `scripts/install-locally.sh` first: Maven resolves jtools-parent and the libraries from Central,
 `scripts/linux/jtools` the devkit; a hosted CI builds a project with nothing but Maven.

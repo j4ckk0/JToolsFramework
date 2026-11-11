@@ -48,7 +48,7 @@ own `scripts/linux/jtools` differs from the devkit's (copy it by hand to take it
 1. `JTOOLS_HOME`, in `jtools.conf` or the environment: a clone of JToolsFramework, its working tree as it is — for whoever
    develops the framework and a project together;
 2. `~/.m2/repository/org/jtools/framework/jtools-devkit/<version>/` (`M2_REPO` for another local repository): what the
-   framework's `scripts/install.sh`, the delivery's `install.sh`, or any Maven build, put there;
+   framework's `scripts/install-locally.sh`, the delivery's `install.sh`, or any Maven build, put there;
 3. the mirror, `<MIRROR>/jtools-devkit-<version>.jar`, with its authentication (below);
 4. Maven Central.
 
@@ -110,8 +110,8 @@ In JToolsFramework, never in a project: the source is the framework's `devkit/`;
 `scripts/linux/jtools` from the devkit just installed, and checks that the framework's own copies are the devkit's. A new
 version of the framework carries the change; a project takes it with `JTOOLS_VERSION` and `scripts/linux/jtools sync`.
 
-The framework's own tools, in its `scripts/` (its own `ci.local.sh` in `scripts/linux/`, as a project's): `install.sh` (the versions agree, build, test, install into `~/.m2`),
-`check-versions.sh` (every pom and `scripts/linux/jtools` name one version), `ci.local.sh` (the checks above).
+The framework's own tools, in its `scripts/` (its own `ci.local.sh` in `scripts/linux/`, as a project's):
+`install-locally.sh` (the versions agree, build, test, install into `~/.m2`), `check-versions.sh` (every pom and `scripts/linux/jtools` name one version), `ci.local.sh` (the checks above).
 
 ---
 

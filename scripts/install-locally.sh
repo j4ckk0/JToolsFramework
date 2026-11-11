@@ -4,8 +4,8 @@
 # projects find jtools-parent, the libraries, jtools-dist and jtools-web. Run it after every change to the framework,
 # before building a project against it.
 #
-#   scripts/install.sh
-#   scripts/install.sh -DskipTests     # extra arguments are passed to mvn
+#   scripts/install-locally.sh
+#   scripts/install-locally.sh -DskipTests     # extra arguments are passed to mvn
 #
 # To share the framework with other machines, deploy it to the Artifactory the externals' MIRROR names
 # (doc/CONVENTIONS.md, "Sharing the framework").

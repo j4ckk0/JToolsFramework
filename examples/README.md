@@ -12,7 +12,7 @@ test. Built and tested with the framework, so that they never go stale; never pu
 ## Run one
 
 ```bash
-scripts/install.sh                                             # once, from the root: the framework and its examples
+scripts/install-locally.sh                                     # once, from the root: the framework and its examples
 external/jdk/bin/java -jar examples/hello/target/hello.jar     # the page opens in the browser; close it, it stops
 external/jdk/bin/java -jar examples/todo/target/todo.jar
 external/jdk/bin/java -jar examples/greeter/target/greeter.jar --greeting Howdy
