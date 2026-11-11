@@ -19,8 +19,8 @@ for pom in pom.xml */*/pom.xml; do
   done < <(grep -A1 '<artifactId>jtools-parent</artifactId>' "$pom" | sed -n 's:.*<version>\(.*\)</version>.*:\1:p')
 done
 # scripts/jtools: the version `jtools new` makes outside a project
-for stub in devkit/scripts/jtools scripts/jtools; do
-  said=$(sed -n 's/^JTOOLS_DEFAULT_VERSION=\([^ ]*\).*/\1/p' "$stub")
+for stub in devkit/scripts/jtools scripts/jtools devkit/scripts/jtools.bat scripts/jtools.bat; do
+  said=$(sed -n 's/^\(set "\)\{0,1\}JTOOLS_DEFAULT_VERSION=\([0-9][^" \r]*\).*/\2/p' "$stub")
   [ "$said" = "$version" ] || { echo "$stub: JTOOLS_DEFAULT_VERSION=$said, but jtools.version is $version" >&2; status=1; }
 done
 # jtools-bom inherits nothing: its own version, said once in its pom

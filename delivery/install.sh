@@ -10,7 +10,8 @@
 #   ./install.sh --no-project                      the framework and jtools alone
 #
 # The framework goes into the local Maven repository (~/.m2/repository; M2_REPO says another), jtools into
-# ~/.local/bin (JTOOLS_BIN says another). Needs bash, curl, unzip, tar and git — on Windows, Git Bash.
+# ~/.local/bin (JTOOLS_BIN says another). Needs bash, curl, unzip, tar and git: on Windows, Git for Windows — whose Git
+# Bash install.bat runs this with, when double-clicked.
 #
 set -euo pipefail
 here="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
@@ -40,9 +41,23 @@ mkdir -p "$bin"
 cp "$here/jtools" "$bin/jtools"
 chmod +x "$bin/jtools"
 echo "== jtools in $bin"
-case ":$PATH:" in
-  *":$bin:"*) ;;
-  *) echo "   $bin is not on your PATH: add it, in ~/.bashrc (or ~/.zshrc):  export PATH=\"$bin:\$PATH\"" ;;
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*)
+    # jtools from cmd and PowerShell too: Git's own bash.exe, which puts Git Bash's tools on its PATH
+    git_root=$(cygpath -w /); git_root=${git_root%\\}
+    printf '@echo off\r\nsetlocal\r\nset "JTOOLS_SCRIPT=%%~dp0jtools"\r\n"%s\\bin\\bash.exe" "%%JTOOLS_SCRIPT:\\=/%%" %%*\r\n' "$git_root" > "$bin/jtools.cmd"
+    echo "== jtools.cmd in $bin: jtools from cmd and PowerShell too"
+    case ":$PATH:" in
+      *":$bin:"*) ;;
+      *) echo "   $(cygpath -w "$bin") is not on your PATH: add it, from PowerShell:"
+         echo "   [Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + ';$(cygpath -w "$bin")', 'User')"
+         echo "   then open a new window" ;;
+    esac ;;
+  *)
+    case ":$PATH:" in
+      *":$bin:"*) ;;
+      *) echo "   $bin is not on your PATH: add it, in ~/.bashrc:  export PATH=\"$bin:\$PATH\"" ;;
+    esac ;;
 esac
 
 # The project: named on the command line, else asked at a terminal. By default beside this folder, never inside it.

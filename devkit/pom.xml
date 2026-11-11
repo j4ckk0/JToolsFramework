@@ -17,8 +17,8 @@
          jtools-devkit/version                the version, which scripts/jtools and jtools-sync.sh read
          jtools-devkit/managed-files.list     the files a project carries and never edits
          jtools-devkit/scripts/ .githooks/ .gitattributes externals.conf   those files, and the default externals
-         jtools-devkit/jtools-sync.sh         what scripts/jtools sync runs
-         jtools-devkit/starter/               new-project.sh, the template, and frontend/: the page's npm files
+         jtools-devkit/jtools-sync.sh, .bat   what scripts/jtools sync runs (on Windows, jtools.bat runs the .bat)
+         jtools-devkit/starter/               new-project.sh and .bat, the template, and frontend/: the page's npm files
        Nothing is filtered but the version: the template's __PLACEHOLDERS__ are the starter's to fill. -->
   <properties>
     <!-- no Java: Maven Central's javadoc jar is a README (jtools-parent, profile publish) -->
@@ -36,6 +36,7 @@
           <include>externals.conf</include>
           <include>managed-files.list</include>
           <include>jtools-sync.sh</include>
+          <include>jtools-sync.bat</include>
         </includes>
         <targetPath>jtools-devkit</targetPath>
       </resource>

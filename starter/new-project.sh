@@ -48,6 +48,9 @@ done
 id=${id:-$(tr '[:upper:]' '[:lower:]' <<< "$name")}
 [[ $id =~ ^[a-z][a-z0-9]*$ ]] || { echo "$id: an id of lower-case letters and digits (it is a Java package)" >&2; exit 2; }
 dir=${dir:-$PWD/$name}
+# a Windows path — C:\work\shelf, from cmd or install.bat — as Git Bash names it
+case "$dir" in [A-Za-z]:[\\/]*) command -v cygpath >/dev/null && dir=$(cygpath -u "$dir") ;; esac
+case "$bare" in [A-Za-z]:[\\/]*) command -v cygpath >/dev/null && bare=$(cygpath -u "$bare") ;; esac
 case "$dir" in /*) ;; *) dir=$PWD/$dir ;; esac
 [ ! -e "$dir" ] || { echo "$dir exists: choose another name or --dir" >&2; exit 1; }
 if [ -n "$bare" ]; then
@@ -77,7 +80,7 @@ grep -v -E '^(#|$)' "$devkit/managed-files.list" | while read -r file; do
   mkdir -p "$dir/$(dirname "$file")"
   cp -p "$devkit/$file" "$dir/$file"
 done
-cp -p "$devkit/scripts/jtools" "$dir/scripts/jtools"
+for stub in jtools jtools.bat; do cp -p "$devkit/scripts/$stub" "$dir/scripts/$stub"; done   # Linux's, Windows'
 chmod +x "$dir"/scripts/*.sh "$dir/scripts/jtools" "$dir/.githooks/pre-push"
 cp "$devkit/externals.conf" "$dir/"
 for file in package.json package-lock.json tsconfig.spec.json .editorconfig .prettierrc .gitignore; do

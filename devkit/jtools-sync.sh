@@ -47,10 +47,14 @@ while IFS='=' read -r key value; do
   [ "$theirs" = "$value" ] || { echo "   $key: ${theirs:-(absent)} -> $value"; differs=1; }
 done < "$devkit/externals.conf"
 
-# scripts/jtools runs this very sync: it is never replaced by it, only said to differ — copied by hand when wanted
-if ! cmp -s "$devkit/scripts/jtools" "$project/scripts/jtools"; then
-  echo "== scripts/jtools differs from the devkit's: cp $devkit/scripts/jtools $project/scripts/jtools to take it"
-fi
+# scripts/jtools runs this very sync: it is never replaced by it, only said to differ — copied by hand when wanted;
+# likewise its Windows twin, jtools.bat
+for stub in jtools jtools.bat; do
+  [ -f "$devkit/scripts/$stub" ] || continue
+  if ! cmp -s "$devkit/scripts/$stub" "$project/scripts/$stub"; then
+    echo "== scripts/$stub differs from the devkit's: cp $devkit/scripts/$stub $project/scripts/$stub to take it"
+  fi
+done
 
 if [ $differs = 0 ]; then echo "== $project is in line with JToolsFramework $version"
 elif $check; then exit 1

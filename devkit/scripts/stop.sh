@@ -17,6 +17,7 @@ while IFS='=' read -r key value; do
   case "$key" in APP_ID|APP_NAME) printf -v "$key" '%s' "$value" ;; esac
 done < jtools.conf
 [ -n "$APP_ID" ] || { echo "jtools.conf names no program (APP_ID): there is nothing to stop in this project" >&2; exit 1; }
+command -v pgrep >/dev/null || { echo "scripts/stop.sh finds the program with pgrep, which Git Bash has not: on Windows, scripts\\stop.bat" >&2; exit 1; }
 
 port=
 case "${1:-}" in

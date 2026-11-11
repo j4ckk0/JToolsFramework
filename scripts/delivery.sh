@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 #
-# Builds the delivery: releases/delivery/jtools-<version>.tar.gz, what a developer downloads to start without a clone —
+# Builds the delivery: releases/delivery/jtools-<version>.tar.gz and .zip (the same, for Windows), what a developer
+# downloads to start without a clone —
 # the framework's artifacts as a Maven repository (the nine jtools-bom names, with jtools-parent and jtools-bom), the
-# stub scripts/jtools, and delivery/install.sh, which installs them and makes a first project. Every test runs first.
+# stub scripts/jtools (jtools.bat on Windows), and delivery/install.sh (install.bat), which installs them and makes a first
+# project.
+# Every test runs first.
 #
 #   scripts/delivery.sh                 the delivery of the tagged version (v<version> must hold what is built)
 #   scripts/delivery.sh --untagged      a try, before the tag
@@ -41,11 +44,13 @@ for artifact in $artifacts; do
   find "$from" -maxdepth 1 -type f ! -name '*.md5' ! -name 'maven-metadata*' -exec cp {} "$to/" \;
 done
 cp devkit/scripts/jtools delivery/install.sh LICENSE "$stage/"
+for bat in delivery/install.bat devkit/scripts/jtools.bat; do sed 's/\r*$/\r/' "$bat" > "$stage/${bat##*/}"; done   # cmd reads its labels only with CRLF
 sed "s/__VERSION__/$version/g" delivery/README.md > "$stage/README.md"
 echo "$version" > "$stage/VERSION"
 chmod +x "$stage/jtools" "$stage/install.sh"
 tar czf "$out/jtools-$version.tar.gz" -C "$out" "jtools-$version"
-(cd "$out" && sha256sum "jtools-$version.tar.gz" > "jtools-$version.tar.gz.sha256")
+(cd "$out" && "$JAVA_HOME/bin/jar" --create --no-manifest --file "jtools-$version.zip" "jtools-$version")   # a zip Explorer opens
+(cd "$out" && for archive in "jtools-$version.tar.gz" "jtools-$version.zip"; do sha256sum "$archive" > "$archive.sha256"; done)
 rm -rf "$deployed"
-echo "== $out/jtools-$version.tar.gz ($(du -h "$out/jtools-$version.tar.gz" | cut -f1)), $(echo $artifacts | wc -w) artifacts:"
+echo "== $out/jtools-$version.tar.gz and .zip ($(du -h "$out/jtools-$version.tar.gz" | cut -f1)), $(echo $artifacts | wc -w) artifacts:"
 (cd "$stage" && find repository -name '*.jar' -o -name '*.pom' | sort | sed 's/^/   /')

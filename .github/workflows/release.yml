@@ -1,4 +1,4 @@
-# The GitHub release of a version: its delivery, jtools-X.Y.Z.tar.gz and its .sha256, built by scripts/delivery.sh from
+# The GitHub release of a version: its delivery, jtools-X.Y.Z.tar.gz and .zip with their .sha256, built by scripts/delivery.sh from
 # what the tag holds, every test first. It runs on GitHub's machines — gh and the token are theirs — when a tag vX.Y.Z
 # is pushed; for a tag pushed before this workflow existed, from Actions ▸ release ▸ Run workflow, with that tag.
 name: release
@@ -51,8 +51,11 @@ jobs:
             echo "jtools-$version/install.sh        # asks the project's name and the folder its files go in"
             echo '```'
             echo
+            echo "On Windows, with [Git for Windows](https://git-scm.com/download/win): unzip jtools-$version.zip, double-click install.bat."
+            echo
             echo "It installs the framework into ~/.m2 and jtools into ~/.local/bin, then makes the project — its JDK, Maven"
             echo "and Node.js downloaded into it, built. The guide: [GETTING-STARTED](https://github.com/$GITHUB_REPOSITORY/blob/master/doc/GETTING-STARTED.md)."
           } > notes.md
           gh release view "$TAG" > /dev/null 2>&1 || gh release create "$TAG" --verify-tag --title "JToolsFramework $version" --notes-file notes.md
-          gh release upload "$TAG" --clobber "releases/delivery/jtools-$version.tar.gz" "releases/delivery/jtools-$version.tar.gz.sha256"
+          gh release upload "$TAG" --clobber releases/delivery/jtools-$version.tar.gz releases/delivery/jtools-$version.zip \
+            releases/delivery/jtools-$version.tar.gz.sha256 releases/delivery/jtools-$version.zip.sha256
