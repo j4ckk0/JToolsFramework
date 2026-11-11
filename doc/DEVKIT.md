@@ -62,6 +62,13 @@ and again when `~/.m2` holds a newer jar of that version. It needs `curl` and `u
 
 `KEY=VALUE` lines, `#` comments, a value is the rest of its line (spaces included, no quotes).
 
+The scripts of `scripts/linux/` and `scripts\windows\` read it — the stubs, `jtools` and `jtools.bat`, for
+`JTOOLS_VERSION` and `JTOOLS_HOME`, the others for the rest —; Maven never does. It is the project's own file:
+`jtools sync` never changes it, and it goes in git with the project. A value the environment already sets wins over
+the file's, in every script: `JTOOLS_HOME=../JToolsFramework scripts/linux/jtools sync`, `BUILD_GOALS=verify
+scripts/linux/build.sh`. A key written twice counts once, by its first line — but for `PACKAGE_OPTION` and
+`PACKAGE_ARCHIVES`, which `package` reads line by line, one per option. Written on Windows (CRLF), it reads the same.
+
 | Key | Default | What it is |
 |---|---|---|
 | `APP_ID` | — | the program's id: `<APP_MODULE>/target/<APP_ID>.jar`, `<APP_ID>.ini`, the releases' names, the process `stop.sh` looks for. Empty: a library — `run`, `stop` and `package` say there is nothing to run |

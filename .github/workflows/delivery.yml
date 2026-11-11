@@ -70,6 +70,11 @@ jobs:
           if scripts/linux/package.sh --quick -q > "$RUNNER_TEMP/quick.log" 2>&1; then echo "a missing declared archive passed"; exit 1; fi
           grep -q 'no releases/demo-0.1.0-quick.txt: --quick makes it' "$RUNNER_TEMP/quick.log"
           git checkout -- .
+      - name: The environment wins over jtools.conf - BUILD_GOALS=clean, and build.sh only cleans
+        working-directory: ${{ runner.temp }}/demo
+        run: |
+          BUILD_GOALS=clean scripts/linux/build.sh -q
+          if [ -d app/target ]; then echo "app/target is there: jtools.conf's BUILD_GOALS won over the environment's"; exit 1; fi
       - name: A project's files as Linux makes them, for Windows to compare
         run: ~/.local/bin/jtools new Demo --dir "$RUNNER_TEMP/fresh" --port 18096 --no-git --no-build
       - name: Without git, a project without a repository
@@ -180,6 +185,14 @@ jobs:
           if ($LASTEXITCODE -eq 0) { Write-Output "::error title=package.bat --quick::a missing declared archive passed"; exit 1 }
           if (-not (Select-String -Path "$env:RUNNER_TEMP\step.log" -SimpleMatch 'no releases\demo-0.1.0-quick.txt: --quick makes it' -Quiet)) { & $env:REPORT 'package.bat --quick: not the missing archive' "$env:RUNNER_TEMP\step.log"; exit 1 }
           git checkout -- .
+      - name: The environment wins over jtools.conf - BUILD_GOALS=clean, and build.bat only cleans
+        working-directory: ${{ runner.temp }}\demo
+        run: |
+          $ErrorActionPreference = 'Continue'
+          $env:BUILD_GOALS = 'clean'
+          cmd /c "scripts\windows\build.bat -q" 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\step.log"
+          if ($LASTEXITCODE -ne 0) { & $env:REPORT 'build.bat, BUILD_GOALS=clean' "$env:RUNNER_TEMP\step.log"; exit 1 }
+          if (Test-Path app\target) { Write-Output "::error title=build.bat, BUILD_GOALS=clean::app\target is there: jtools.conf's BUILD_GOALS won over the environment's"; exit 1 }
       - name: run.bat builds when a file changed, and only then (Windows' archive marks)
         working-directory: ${{ runner.temp }}\demo
         run: |

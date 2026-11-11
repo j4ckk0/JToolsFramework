@@ -17,6 +17,7 @@ rem
 rem The runtimes are linked from the jmods of external\ (scripts\windows\setup.bat deploys them). The version is the root pom's <revision>, or its own <version>.
 rem The releases of the previous versions are removed once the new one is built.
 rem
+setlocal
 cd /d "%~dp0..\.."
 rem (the project root)
 call "%~dp0externals.bat" || exit /b 1
