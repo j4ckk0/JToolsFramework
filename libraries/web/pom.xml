@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.jtools.framework</groupId>
     <artifactId>jtools-parent</artifactId>
-    <version>1.4.2</version>
+    <version>1.5.0</version>
     <relativePath>../../conventions/parent/pom.xml</relativePath>
   </parent>
   <artifactId>jtools-web</artifactId>

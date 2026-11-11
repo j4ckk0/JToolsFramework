@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.jtools.framework</groupId>
     <artifactId>jtools-parent</artifactId>
-    <version>1.4.2</version>
+    <version>1.5.0</version>
     <relativePath>../../conventions/parent/pom.xml</relativePath>
   </parent>
   <artifactId>jtools-example-todo</artifactId>
@@ -23,7 +23,7 @@
     <jtools.app.name>Todo</jtools.app.name>
     <jtools.app.mainClass>org.jtools.todo.TodoApp</jtools.app.mainClass>
     <jtools.app.port>8088</jtools.app.port>
-    <jtools.app.windowsVersion>1.4.2.0</jtools.app.windowsVersion>
+    <jtools.app.windowsVersion>1.5.0.0</jtools.app.windowsVersion>
   </properties>
 
   <dependencies>

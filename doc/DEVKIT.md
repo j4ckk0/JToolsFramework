@@ -15,7 +15,7 @@ A project on JToolsFramework builds, runs and packages with the same scripts as 
 | `scripts/linux/ci.sh` | the same, quiet, the page's dependencies installed exactly (`npm ci`), then `scripts/linux/ci.local.sh` when there is one: what `.githooks/pre-push` runs before every push (`git config core.hooksPath .githooks`, which `jtools new` sets) |
 | `scripts/linux/run.sh` | builds when a source is newer than the jar, then runs a copy of it (so that a build can replace the jar meanwhile) with the arguments given: `scripts/linux/run.sh --no-browser --port 9090`; `--rebuild` forces the build |
 | `scripts/linux/stop.sh` | stops the program running from this project |
-| `scripts/linux/package.sh` | `mvn package -Pdist`: the Linux, macOS and Windows archives into `releases/`; the previous versions' removed |
+| `scripts/linux/package.sh` | `mvn package -Pdist`: the Linux, macOS and Windows archives into `releases/`; the previous versions' removed. The project's own options, which `jtools.conf` declares (`PACKAGE_OPTION`, below), add their Maven arguments: `scripts/linux/package.sh --with-model` |
 | `scripts/linux/jtools` | the devkit itself: `sync`, `sync --check`, `version`, `new` (below) — the one script the devkit never refreshes |
 
 Each has its `.bat` twin in `scripts\windows\` — `setup.bat`, `build.bat`, `ci.bat`, `run.bat`, `stop.bat`,
@@ -23,7 +23,7 @@ Each has its `.bat` twin in `scripts\windows\` — `setup.bat`, `build.bat`, `ci
 Plain `.bat` files, Windows 10's own `curl` and `tar`: no Git Bash, no PowerShell. The shell scripts also run in Git
 Bash, where they take the Windows tools.
 
-**A project made before 1.4** has its scripts in `scripts/` alone: name 1.4.2 in its `jtools.conf` and its pom, then
+**A project made before 1.4** has its scripts in `scripts/` alone: name 1.5.0 in its `jtools.conf` and its pom, then
 `scripts/jtools sync` (or `scripts\jtools sync`) moves them — the devkit's own into `linux/` and `windows/`, the
 project's `*.local.sh` and `*.local.bat` beside them —, and puts the new `jtools` and `jtools.bat` in place: remove the
 old two by hand, the sync may be running from one of them. `sync --check` lists what is still to move.
@@ -70,6 +70,19 @@ and again when `~/.m2` holds a newer jar of that version. It needs `curl` and `u
 | `BUILD_GOALS` | `clean package` | what `build`, `ci`, `run` (with `-DskipTests`) and `package` (with `-Pdist`) run |
 | `JTOOLS_VERSION` | — | the devkit `scripts/linux/jtools` takes the managed files from |
 | `JTOOLS_HOME` | — | a clone of JToolsFramework to take them from instead (relative to the project, or absolute) |
+| `PACKAGE_OPTION` | — | `<name> <Maven arguments>`: an option of `package`'s own, `--<name>`, which adds those arguments to its build — a profile of the project's, `-Pdist-model`. One line per option |
+| `PACKAGE_ARCHIVES` | — | `<name> <suffix>…`: what else `--<name>` makes in `releases/`, `<APP_ID>-<version><suffix>` — `-linux-with-model.tar.gz`: `package` checks it is there, and removes its previous versions as it does the standard archives'. One line per option |
+
+An option of `package`'s own, declared once for both systems:
+
+```
+PACKAGE_OPTION=with-model -Pdist-model
+PACKAGE_ARCHIVES=with-model -linux-with-model.tar.gz -windows-with-model.zip
+```
+
+`scripts/linux/package.sh --with-model` (or `scripts\windows\package.bat --with-model`) then builds with
+`-Pdist -Pdist-model`, checks the standard archives as always, then that both "with model" archives are there. Its
+arguments other than the declared options go to Maven as they are (`-DskipTests`); an option takes no value.
 
 ## externals.conf
 

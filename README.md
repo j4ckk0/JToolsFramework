@@ -53,7 +53,7 @@ up to date with the framework; for a project made before 1.4, it also moves them
 (`frontend`) and the program (`app`), with a first endpoint, its tests and a first build. You start
 from working code, not from a blank folder.
 
-Apache License 2.0. Version 1.4.2; on Maven Central once published (until then, the delivery's `install.sh` — the
+Apache License 2.0. Version 1.5.0; on Maven Central once published (until then, the delivery's `install.sh` — the
 [quick start](#quick-start-a-new-project-step-by-step) — puts it in `~/.m2`). [doc/CONCEPTS.md](doc/CONCEPTS.md) says
 the idea behind it in one page.
 
@@ -64,25 +64,25 @@ Nothing else — no Java, Maven nor Node.js to install: a project downloads its 
 first time (about 450 MB).
 
 **1. Download the delivery** — one archive, the framework and its installer, from the
-[release](https://github.com/j4ckk0/JToolsFramework/releases/tag/v1.4.2):
+[release](https://github.com/j4ckk0/JToolsFramework/releases/tag/v1.5.0):
 
 ```bash
-curl -fsSLO https://github.com/j4ckk0/JToolsFramework/releases/download/v1.4.2/jtools-1.4.2.tar.gz
-tar xzf jtools-1.4.2.tar.gz
+curl -fsSLO https://github.com/j4ckk0/JToolsFramework/releases/download/v1.5.0/jtools-1.5.0.tar.gz
+tar xzf jtools-1.5.0.tar.gz
 ```
 
 **2. Install, and make your project** — `install.sh` asks the project's name and the folder its files go in:
 
 ```bash
-jtools-1.4.2/install.sh                                   # asks; or says it all at once:
-jtools-1.4.2/install.sh Bookshelf --dir ~/work/bookshelf
+jtools-1.5.0/install.sh                                   # asks; or says it all at once:
+jtools-1.5.0/install.sh Bookshelf --dir ~/work/bookshelf
 ```
 
 **On Windows**, the same with `.bat` scripts — no Git Bash, no PowerShell script: plain `.bat` files, with the `curl`
-and `tar` Windows 10 comes with. Download `jtools-1.4.2.zip` from the
-[release](https://github.com/j4ckk0/JToolsFramework/releases/tag/v1.4.2), extract it (right-click ▸ *Extract All*),
-and double-click `jtools-1.4.2\install.bat`: it asks the project's name and folder, and offers to put `jtools` on
-your `PATH`. From a command prompt, `jtools-1.4.2\install.bat Bookshelf --dir C:\work\bookshelf` says them at once.
+and `tar` Windows 10 comes with. Download `jtools-1.5.0.zip` from the
+[release](https://github.com/j4ckk0/JToolsFramework/releases/tag/v1.5.0), extract it (right-click ▸ *Extract All*),
+and double-click `jtools-1.5.0\install.bat`: it asks the project's name and folder, and offers to put `jtools` on
+your `PATH`. From a command prompt, `jtools-1.5.0\install.bat Bookshelf --dir C:\work\bookshelf` says them at once.
 The steps below give each command for both systems.
 
 It puts the framework into your local Maven repository (`~/.m2`) and `jtools` into `~/.local/bin`, then makes the
@@ -243,7 +243,7 @@ framework ([doc/ADOPTING.md](doc/ADOPTING.md)):
 <parent>
   <groupId>org.jtools.framework</groupId>
   <artifactId>jtools-parent</artifactId>
-  <version>1.4.2</version>
+  <version>1.5.0</version>
   <relativePath/>
 </parent>
 <properties>
@@ -281,7 +281,7 @@ conventions (the one jar and the distributions are jtools-parent's):
 
 ```kotlin
 dependencies {
-    implementation(platform("org.jtools.framework:jtools-bom:1.4.2"))
+    implementation(platform("org.jtools.framework:jtools-bom:1.5.0"))
     implementation("org.jtools.framework:jtools-app")
 }
 ```

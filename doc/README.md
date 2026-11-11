@@ -14,6 +14,6 @@
 
 - [ADOPTING.md](ADOPTING.md) — moving a program that already exists onto the framework, step by step.
 - [design/](design) — why the framework is as it is: the designs of [1.1](design/DESIGN-1.1.md),
-  [1.2](design/DESIGN-1.2.md), [1.3](design/DESIGN-1.3.md) and [1.4](design/DESIGN-1.4.md), each with what its implementation changed.
+  [1.2](design/DESIGN-1.2.md), [1.3](design/DESIGN-1.3.md), [1.4](design/DESIGN-1.4.md) and [1.5](design/DESIGN-1.5.md), each with what its implementation changed.
 - The javadoc — each library's package page says what it gives and where to start.
 - [../examples](../examples) — programs to read; [../PUBLISHING.md](../PUBLISHING.md) — the framework on Maven Central.

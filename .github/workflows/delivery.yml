@@ -53,9 +53,22 @@ jobs:
         working-directory: ${{ runner.temp }}/demo
         run: |
           sed -i -e 's/\${revision}/0.1.0/g' -e '/<revision>/d' pom.xml */pom.xml
-          ! grep -q revision pom.xml
+          if grep -q revision pom.xml; then echo "pom.xml still names a revision"; exit 1; fi
           scripts/linux/package.sh -q -DskipTests
           ls -l releases/demo-0.1.0-linux.tar.gz releases/demo-0.1.0-windows.zip
+          git checkout -- .
+      - name: Options jtools.conf declares - package.sh --quick adds its Maven arguments, checks and cleans its archives
+        working-directory: ${{ runner.temp }}/demo
+        run: |
+          printf 'PACKAGE_OPTION=quick -DskipTests\nPACKAGE_ARCHIVES=quick -quick.txt\n' >> jtools.conf
+          echo old > releases/demo-0.0.9-quick.txt && echo made > releases/demo-0.1.0-quick.txt
+          scripts/linux/package.sh --quick -Djtools.ci.probe=a=b -q | tee "$RUNNER_TEMP/quick.log"
+          grep -q -- '--quick: demo-0.1.0-quick.txt' "$RUNNER_TEMP/quick.log"
+          [ ! -e releases/demo-0.0.9-quick.txt ] && [ -e releases/demo-0.1.0-quick.txt ]
+          if compgen -G '*/target/surefire-reports' > /dev/null; then echo "tests ran: -DskipTests did not reach Maven"; exit 1; fi
+          rm releases/demo-0.1.0-quick.txt
+          if scripts/linux/package.sh --quick -q > "$RUNNER_TEMP/quick.log" 2>&1; then echo "a missing declared archive passed"; exit 1; fi
+          grep -q 'no releases/demo-0.1.0-quick.txt: --quick makes it' "$RUNNER_TEMP/quick.log"
           git checkout -- .
       - name: A project's files as Linux makes them, for Windows to compare
         run: ~/.local/bin/jtools new Demo --dir "$RUNNER_TEMP/fresh" --port 18096 --no-git --no-build
@@ -150,6 +163,22 @@ jobs:
           cmd /c "scripts\windows\package.bat -q -DskipTests" 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\step.log"
           if ($LASTEXITCODE -ne 0) { & $env:REPORT 'package.bat, no revision' "$env:RUNNER_TEMP\step.log"; exit 1 }
           if (-not (Test-Path releases\demo-0.1.0-windows.zip)) { Write-Output "::error title=package.bat, no revision::no releases\demo-0.1.0-windows.zip"; exit 1 }
+          git checkout -- .
+      - name: Options jtools.conf declares - package.bat --quick adds its Maven arguments, checks and cleans its archives
+        working-directory: ${{ runner.temp }}\demo
+        run: |
+          $ErrorActionPreference = 'Continue'
+          Add-Content -Path jtools.conf -Value "PACKAGE_OPTION=quick -DskipTests`r`nPACKAGE_ARCHIVES=quick -quick.txt"
+          Set-Content releases\demo-0.0.9-quick.txt old; Set-Content releases\demo-0.1.0-quick.txt made
+          cmd /c "scripts\windows\package.bat --quick -Djtools.ci.probe=a=b -q" 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\step.log"
+          if ($LASTEXITCODE -ne 0) { & $env:REPORT 'package.bat --quick' "$env:RUNNER_TEMP\step.log"; exit 1 }
+          if (-not (Select-String -Path "$env:RUNNER_TEMP\step.log" -SimpleMatch '--quick: demo-0.1.0-quick.txt' -Quiet)) { & $env:REPORT 'package.bat --quick: no line for its archive' "$env:RUNNER_TEMP\step.log"; exit 1 }
+          if ((Test-Path releases\demo-0.0.9-quick.txt) -or -not (Test-Path releases\demo-0.1.0-quick.txt)) { Write-Output "::error title=package.bat --quick::the previous version's archive kept, or this version's removed"; exit 1 }
+          if (Get-ChildItem -Directory -Path */target/surefire-reports -ErrorAction SilentlyContinue) { Write-Output "::error title=package.bat --quick::tests ran: -DskipTests did not reach Maven"; exit 1 }
+          Remove-Item releases\demo-0.1.0-quick.txt
+          cmd /c "scripts\windows\package.bat --quick -q" 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\step.log"
+          if ($LASTEXITCODE -eq 0) { Write-Output "::error title=package.bat --quick::a missing declared archive passed"; exit 1 }
+          if (-not (Select-String -Path "$env:RUNNER_TEMP\step.log" -SimpleMatch 'no releases\demo-0.1.0-quick.txt: --quick makes it' -Quiet)) { & $env:REPORT 'package.bat --quick: not the missing archive' "$env:RUNNER_TEMP\step.log"; exit 1 }
           git checkout -- .
       - name: run.bat builds when a file changed, and only then (Windows' archive marks)
         working-directory: ${{ runner.temp }}\demo
