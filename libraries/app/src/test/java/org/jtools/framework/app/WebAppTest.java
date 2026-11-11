@@ -1,8 +1,8 @@
-package org.jtools.framework.launcher;
+package org.jtools.framework.app;
 
 /*-
  * #%L
- * JToolsFramework launcher
+ * JToolsFramework app
  * %%
  * Copyright (C) 2026 jtools.org
  * %%
@@ -102,7 +102,7 @@ class WebAppTest {
         LaunchOptions options = withOwn.options(new String[] {"--data", "/tmp/d", "a.xml", "--offline", "b.xml"}, new Properties(), NO_USER_PORT);
         assertEquals(List.of("data=/tmp/d", "offline"), seen);
         assertEquals(List.of("a.xml", "b.xml"), options.operands());
-        String usage = withOwn.usage(org.jtools.framework.support.I18n.catalogue(WebApp.class, "org.jtools.framework.launcher.texts", Locale.ENGLISH).of(Locale.ENGLISH));
+        String usage = withOwn.usage(org.jtools.framework.support.I18n.catalogue(WebApp.class, "org.jtools.framework.app.texts", Locale.ENGLISH).of(Locale.ENGLISH));
         assertTrue(usage.contains("[--data DIR]") && usage.contains("[file ...]") && usage.contains("where the data is kept"), usage);
     }
 
@@ -131,7 +131,7 @@ class WebAppTest {
 
     @Test
     void speaksTheUsersLanguage() {
-        var texts = org.jtools.framework.support.I18n.catalogue(WebApp.class, "org.jtools.framework.launcher.texts", Locale.ENGLISH, Locale.FRENCH);
+        var texts = org.jtools.framework.support.I18n.catalogue(WebApp.class, "org.jtools.framework.app.texts", Locale.ENGLISH, Locale.FRENCH);
         assertTrue(app.usage(texts.of(Locale.ENGLISH)).startsWith("Usage: demo "), app.usage(texts.of(Locale.ENGLISH)));
         assertTrue(app.usage(texts.of(Locale.FRENCH)).startsWith("Usage : demo "));
         assertTrue(app.usage(texts.of(Locale.FRENCH)).contains("ne pas ouvrir le navigateur"));

@@ -6,12 +6,12 @@
   <parent>
     <groupId>org.jtools.framework</groupId>
     <artifactId>jtools-parent</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <relativePath>../../conventions/parent/pom.xml</relativePath>
   </parent>
-  <artifactId>jtools-launcher</artifactId>
+  <artifactId>jtools-app</artifactId>
   <packaging>jar</packaging>
-  <name>JToolsFramework launcher</name>
+  <name>JToolsFramework app</name>
   <description>A local web application's program: the command line every org.jtools program shares (--port, --host, --no-browser, --keep-alive, --log-level, --help) and its own options, the installation's .ini, the logging, the server with the application's routes, the browser, the stop once the last page is closed, the startup failure said in a dialog.</description>
   <dependencies>
     <dependency>
@@ -32,7 +32,7 @@
         <configuration>
           <archive>
             <manifestEntries>
-              <Automatic-Module-Name>org.jtools.framework.launcher</Automatic-Module-Name>
+              <Automatic-Module-Name>org.jtools.framework.app</Automatic-Module-Name>
             </manifestEntries>
           </archive>
         </configuration>

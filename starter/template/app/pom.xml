@@ -28,7 +28,7 @@
     </dependency>
     <dependency>
       <groupId>org.jtools.framework</groupId>
-      <artifactId>jtools-launcher</artifactId>
+      <artifactId>jtools-app</artifactId>
     </dependency>
   </dependencies>
 

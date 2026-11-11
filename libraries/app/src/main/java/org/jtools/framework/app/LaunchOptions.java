@@ -1,8 +1,8 @@
-package org.jtools.framework.launcher;
+package org.jtools.framework.app;
 
 /*-
  * #%L
- * JToolsFramework launcher
+ * JToolsFramework app
  * %%
  * Copyright (C) 2026 jtools.org
  * %%
@@ -30,6 +30,8 @@ import java.util.logging.Level;
  * installation's {@code .ini} over the program's defaults. {@code keepAlive} is true with {@code --keep-alive}, and with
  * {@code --no-browser}: a page opened later, by hand, must not find the server gone. {@code logFile} is the one given,
  * or null; {@code logFolder} the {@code .ini}'s, or null; {@code lang} the console's language, or null for the machine's.
+ * Public for its names — the options ({@code OPT_*}) and the {@code .ini}'s keys ({@code INI_*}) —, the command line's
+ * vocabulary; a program is handed none of it, {@link WebApp} reads it.
  */
 public record LaunchOptions(int port, String host, boolean browser, boolean keepAlive, Level logLevel, Path logFile,
                             String logFolder, Locale lang, boolean help, List<String> operands) {

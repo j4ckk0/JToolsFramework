@@ -9,7 +9,7 @@ What the artifacts hold
 =======================
 
 The artifacts published on Maven Central — jtools-parent, jtools-support, jtools-server,
-jtools-launcher, jtools-dist and jtools-web — hold the framework's own code and files
+jtools-app, jtools-dist and jtools-web — hold the framework's own code and files
 only: the Java libraries depend on nothing but the JDK, and jtools-web holds TypeScript
 sources, no library of anyone else's.
 

@@ -1,8 +1,8 @@
-package org.jtools.framework.launcher;
+package org.jtools.framework.app;
 
 /*-
  * #%L
- * JToolsFramework launcher
+ * JToolsFramework app
  * %%
  * Copyright (C) 2026 jtools.org
  * %%
@@ -34,7 +34,7 @@ import java.util.logging.LogRecord;
  * One line per record — {@code 2026-11-10 21:34:38 INFO    org.jtools.… - message} — the stack trace below when there is
  * one. The level is its English name and the numbers are written alike on every machine: the JDK's {@code SimpleFormatter}
  * speaks the machine's language ({@code INFOS}, {@code AVERTISSEMENT}, {@code 8 093}), and a log is read by whoever
- * helps, and searched.
+ * helps, and searched. Public because {@code java.util.logging} makes it from its name, in a {@code logging.properties}.
  */
 public final class LogFormatter extends Formatter {
 

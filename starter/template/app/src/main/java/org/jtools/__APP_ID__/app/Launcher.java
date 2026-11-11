@@ -2,7 +2,7 @@ package org.jtools.__APP_ID__.app;
 
 import org.jtools.__APP_ID__.api.__APP_NAME__Api;
 import org.jtools.__APP_ID__.core.__APP_NAME__;
-import org.jtools.framework.launcher.WebApp;
+import org.jtools.framework.app.WebApp;
 
 /**
  * The program: JToolsFramework's {@link WebApp} — the command line, __APP_ID__.ini, the browser, the stop once the last

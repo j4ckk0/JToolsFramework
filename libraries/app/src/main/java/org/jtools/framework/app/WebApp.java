@@ -1,8 +1,8 @@
-package org.jtools.framework.launcher;
+package org.jtools.framework.app;
 
 /*-
  * #%L
- * JToolsFramework launcher
+ * JToolsFramework app
  * %%
  * Copyright (C) 2026 jtools.org
  * %%
@@ -20,7 +20,7 @@ package org.jtools.framework.launcher;
  * #L%
  */
 
-import static org.jtools.framework.launcher.LaunchOptions.*;
+import static org.jtools.framework.app.LaunchOptions.*;
 
 import java.awt.GraphicsEnvironment;
 import java.io.IOException;
@@ -72,7 +72,7 @@ import org.jtools.framework.support.Json;
 public final class WebApp {
 
     private static final Logger LOG = Logger.getLogger(WebApp.class.getName());
-    private static final Catalogue LAUNCHER_TEXTS = I18n.catalogue(WebApp.class, "org.jtools.framework.launcher.texts", Locale.ENGLISH, Locale.FRENCH);
+    private static final Catalogue LAUNCHER_TEXTS = I18n.catalogue(WebApp.class, "org.jtools.framework.app.texts", Locale.ENGLISH, Locale.FRENCH);
 
     /** The framework's own routes. */
     public static final String SETTINGS = WebServer.API + "/settings", ABOUT = WebServer.API + "/about", QUIT = WebServer.API + "/quit",

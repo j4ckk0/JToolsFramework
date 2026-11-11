@@ -28,7 +28,10 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/** What the desktop opens for the program, as a double-click would: the page in the browser, a file in its viewer. */
+/**
+ * What the desktop opens for the program, as a double-click would: the page in the browser, a file in its viewer. Public
+ * because jtools-app opens the page and the log with it; a program rarely needs it itself.
+ */
 public final class DesktopOpener {
 
     private static final Logger LOG = Logger.getLogger(DesktopOpener.class.getName());

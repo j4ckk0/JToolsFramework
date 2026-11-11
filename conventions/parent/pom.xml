@@ -18,7 +18,7 @@
        doc/BUILD.md in JToolsFramework says it in full. -->
   <groupId>org.jtools.framework</groupId>
   <artifactId>jtools-parent</artifactId>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
   <packaging>pom</packaging>
 
   <name>JToolsFramework parent</name>
@@ -64,7 +64,7 @@
 
   <properties>
     <!-- the framework's version, for the projects' dependencies on its modules: always this pom's own <version> -->
-    <jtools.version>1.1.0</jtools.version>
+    <jtools.version>1.2.0</jtools.version>
     <maven.compiler.release>21</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <junit.version>5.12.2</junit.version>
@@ -72,7 +72,7 @@
     <!-- The program a project builds, set in its root pom:
            jtools.app.id               its jar, .ini, launchers and releases: <id>.jar, <id>.ini, <id>-<version>-linux.tar.gz
            jtools.app.name             its name, as people read it, and its Windows launcher: <name>.exe
-           jtools.app.mainClass        the class starting it (most often a call to org.jtools.framework.launcher.WebApp)
+           jtools.app.mainClass        the class starting it (most often a call to org.jtools.framework.app.WebApp)
            jtools.app.port             the port its .ini says (doc/PORTS.md in JToolsFramework keeps them apart)
            jtools.app.windowsVersion   the version in the four parts an .exe wants: 1.2 is 1.2.0.0 -->
     <jtools.app.id>app</jtools.app.id>
@@ -96,25 +96,13 @@
 
   <dependencyManagement>
     <dependencies>
+      <!-- the framework's versions: jtools-bom's, which a build not inheriting this pom imports itself -->
       <dependency>
         <groupId>org.jtools.framework</groupId>
-        <artifactId>jtools-support</artifactId>
+        <artifactId>jtools-bom</artifactId>
         <version>${jtools.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jtools.framework</groupId>
-        <artifactId>jtools-server</artifactId>
-        <version>${jtools.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jtools.framework</groupId>
-        <artifactId>jtools-launcher</artifactId>
-        <version>${jtools.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jtools.framework</groupId>
-        <artifactId>jtools-desktop</artifactId>
-        <version>${jtools.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.junit.jupiter</groupId>

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.jtools.framework</groupId>
     <artifactId>jtools-parent</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <relativePath>conventions/parent/pom.xml</relativePath>
   </parent>
 
@@ -18,13 +18,14 @@
   <description>What the org.jtools projects share — a Java server holding the business, an Angular page as its view, the program stopping once its last page is closed, self-contained distributions — as a parent pom, libraries, the page's TypeScript, the scripts and a project template.</description>
 
   <!-- The parts, a folder each, named for what a developer does with it (doc/design/DESIGN-1.2.md):
-         conventions/  what a project's build inherits: jtools-parent, jtools-bom, jtools-dist
+         conventions/  what a project's build inherits: jtools-parent, jtools-bom (the versions alone), jtools-dist
          libraries/    what a program's code calls: jtools-support, -server, -app, -desktop, -web
          devkit/       what a project carries — its scripts, its externals — and the starter: jtools-devkit
          examples/     the smallest programs, built and tested with the rest, never published
        One version for all, said in every pom and as jtools.version in conventions/parent/pom.xml:
        scripts/check-versions.sh checks they agree. -->
   <modules>
+    <module>conventions/bom</module>
     <module>conventions/parent</module>
     <module>libraries/support</module>
     <module>libraries/server</module>

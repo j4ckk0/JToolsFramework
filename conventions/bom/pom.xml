@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- jtools-bom has no parent: jtools-parent imports it, and a BOM inheriting jtools-parent would both make that a cycle
+     and hand its importers JUnit's version along with the framework's -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         child.project.url.inherit.append.path="false">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- The versions of JToolsFramework's artifacts, and nothing else: for a build that does not inherit jtools-parent —
+       Gradle, implementation(platform("org.jtools.framework:jtools-bom:1.2.0")), or a Maven project with a parent of its
+       own, an import in its dependencyManagement — the libraries then named without a version. jtools-parent imports it. -->
+  <groupId>org.jtools.framework</groupId>
+  <artifactId>jtools-bom</artifactId>
+  <version>1.2.0</version>
+  <packaging>pom</packaging>
+
+  <name>JToolsFramework BOM</name>
+  <description>The versions of JToolsFramework's libraries and distribution files, for a build that does not inherit jtools-parent.</description>
+
+  <!-- What Maven Central requires of every pom it publishes: jtools-parent's, said again — this pom inherits nothing -->
+  <url>https://github.com/j4ckk0/JToolsFramework</url>
+  <inceptionYear>2026</inceptionYear>
+  <organization>
+    <name>jtools.org</name>
+    <url>https://github.com/j4ckk0</url>
+  </organization>
+  <licenses>
+    <license>
+      <name>Apache License Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>j4ckk0</id>
+      <name>Jacques HENRY</name>
+      <email>j4ckk057@gmail.com</email>
+      <organization>jtools.org</organization>
+      <organizationUrl>https://github.com/j4ckk0</organizationUrl>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git:https://github.com/j4ckk0/JToolsFramework.git</connection>
+    <developerConnection>scm:git:git@github.com:j4ckk0/JToolsFramework.git</developerConnection>
+    <url>https://github.com/j4ckk0/JToolsFramework</url>
+    <tag>HEAD</tag>
+  </scm>
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/j4ckk0/JToolsFramework/issues</url>
+  </issueManagement>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jtools.framework</groupId>
+        <artifactId>jtools-support</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jtools.framework</groupId>
+        <artifactId>jtools-server</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jtools.framework</groupId>
+        <artifactId>jtools-app</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jtools.framework</groupId>
+        <artifactId>jtools-desktop</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jtools.framework</groupId>
+        <artifactId>jtools-web</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jtools.framework</groupId>
+        <artifactId>jtools-dist</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jtools.framework</groupId>
+        <artifactId>jtools-devkit</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <!-- mvn -Ppublish clean deploy: this pom signed and in the framework's bundle, as jtools-parent's publish profile does
+       for the others (PUBLISHING.md) -->
+  <profiles>
+    <profile>
+      <id>publish</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>3.2.4</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>0.11.0</version>
+            <extensions>true</extensions>
+            <configuration>
+              <publishingServerId>central</publishingServerId>
+              <autoPublish>false</autoPublish>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

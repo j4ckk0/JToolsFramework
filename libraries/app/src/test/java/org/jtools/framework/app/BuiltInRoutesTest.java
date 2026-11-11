@@ -1,8 +1,8 @@
-package org.jtools.framework.launcher;
+package org.jtools.framework.app;
 
 /*-
  * #%L
- * JToolsFramework launcher
+ * JToolsFramework app
  * %%
  * Copyright (C) 2026 jtools.org
  * %%
