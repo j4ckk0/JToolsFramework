@@ -292,3 +292,9 @@ dependencies {
 **The tools** — JDK, Maven, Node.js — are named in the project's `externals.conf`, with their versions, and
 `scripts/linux/setup.sh` downloads them into `external/`: none is installed on the machine
 ([doc/DEVKIT.md](doc/DEVKIT.md)).
+
+**The scripts**, for an existing program that wants them: a `jtools.conf` at its root, the two stubs
+(`scripts/linux/jtools`, `scripts\windows\jtools.bat`) copied from the devkit, then `scripts/linux/jtools sync`, which
+puts the devkit's scripts in place. Its poms keep their versions as they are written: `package` reads the root pom's
+`<revision>`, or else its own `<version>`. Optional: a program with scripts of its own keeps them
+([doc/ADOPTING.md](doc/ADOPTING.md)).
