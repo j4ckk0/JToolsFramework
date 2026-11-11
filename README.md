@@ -1,10 +1,14 @@
 # JToolsFramework
 
-**JToolsFramework is a framework that helps developers easily set up an environment to develop a project providing a
-web server — a server that offers both a web page and an API.** The server holds the whole business, in Java. The
-page in the browser is one view of it; the same routes — HTTP and JSON — answer scripts and other programs too
-([A page and an API](#a-page-and-an-api)). You write the business, its routes and its page; everything around them
-comes with the framework, from the first `jtools new` to the archives you ship.
+**JToolsFramework helps Java developers build a local web application**: a program that runs on the user's
+computer, with a Java server holding all the business logic and a web page in the browser as its user interface. The
+server's routes form an HTTP API — JSON in, JSON out — so scripts and other programs can use the application just as
+its page does ([A page and an API](#a-page-and-an-api)).
+
+You write the business logic, the API's routes and the page. JToolsFramework provides the rest: the server, its
+command line, settings and log, and the stop once the last page is closed; a build that makes one jar and
+self-contained archives for Linux, macOS and Windows; a development environment that downloads its own JDK, Maven
+and Node.js; and a project template, so that `jtools new` starts you on a project that already runs.
 
 ## What it is
 
