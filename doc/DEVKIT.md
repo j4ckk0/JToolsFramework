@@ -23,7 +23,7 @@ Each has its `.bat` twin in `scripts\windows\` — `setup.bat`, `build.bat`, `ci
 Plain `.bat` files, Windows 10's own `curl` and `tar`: no Git Bash, no PowerShell. The shell scripts also run in Git
 Bash, where they take the Windows tools.
 
-**A project made before 1.4** has its scripts in `scripts/` alone: name 1.4.0 in its `jtools.conf` and its pom, then
+**A project made before 1.4** has its scripts in `scripts/` alone: name 1.4.1 in its `jtools.conf` and its pom, then
 `scripts/jtools sync` (or `scripts\jtools sync`) moves them — the devkit's own into `linux/` and `windows/`, the
 project's `*.local.sh` and `*.local.bat` beside them —, and puts the new `jtools` and `jtools.bat` in place: remove the
 old two by hand, the sync may be running from one of them. `sync --check` lists what is still to move.
@@ -39,8 +39,10 @@ jtools new <Name> [--dir DIR] [--id ID] [--port N] [--bare DIR] [--no-git] [--no
 
 `sync` refreshes the files `managed-files.list` names (the scripts, `.githooks/pre-push`, `.gitattributes`), and says
 — without changing them, they are the project's to decide — where the project's pom names another `jtools-parent`
-than the devkit's version, where its `externals.conf` names other versions than the devkit's default, and when its
-own `scripts/linux/jtools` differs from the devkit's (copy it by hand to take it). It commits nothing: read the diff, run
+than the devkit's version, where its `externals.conf` names other versions than the devkit's default, and when one of
+its stubs, `scripts/linux/jtools` or `scripts/windows/jtools.bat`, differs from the devkit's (copy it by hand to take it).
+`managed-files.list` and `new-project.list` — what `jtools new` adds to the template: the default port, the stubs, the
+page's npm files — are read by the shell and the batch scripts alike, so that both systems make the same project. It commits nothing: read the diff, run
 `scripts/linux/ci.sh`, commit.
 
 **Where the devkit comes from**, in this order — the Maven Wrapper's way:

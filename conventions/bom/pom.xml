@@ -8,11 +8,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <!-- The versions of JToolsFramework's artifacts, and nothing else: for a build that does not inherit jtools-parent —
-       Gradle, implementation(platform("org.jtools.framework:jtools-bom:1.4.0")), or a Maven project with a parent of its
+       Gradle, implementation(platform("org.jtools.framework:jtools-bom:1.4.1")), or a Maven project with a parent of its
        own, an import in its dependencyManagement — the libraries then named without a version. jtools-parent imports it. -->
   <groupId>org.jtools.framework</groupId>
   <artifactId>jtools-bom</artifactId>
-  <version>1.4.0</version>
+  <version>1.4.1</version>
   <packaging>pom</packaging>
 
   <name>JToolsFramework BOM</name>

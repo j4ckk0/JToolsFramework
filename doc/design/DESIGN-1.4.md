@@ -37,3 +37,18 @@ its README, its CLAUDE.md — name its scripts where 1.3 had them: they are the 
 
 The workflow `delivery` tries it: it makes a project with the 1.3.1 delivery, moves it to 1.4.0 with its old stub, and
 builds it with the new scripts, on Linux and on Windows.
+
+## 4. 1.4.1: what both systems need, said once
+
+1.4.1 changes no project and no API; it acts on the 1.4.0 architecture review.
+- **`devkit/new-project.list`**: what `jtools new` adds to the template and the managed files — the default port, the
+  two stubs, `externals.conf`, the page's npm files. `new-project.sh` and `new-project.bat` read it, and both `jtools-sync`
+  scripts take the stubs from it; Linux and Windows were each writing the list themselves, and a change made on one side
+  only gave the two systems different projects. `scripts/check-versions.sh` also checks that the two stubs fetch the
+  devkit from the same Maven Central URL.
+- **`scripts/install-locally.sh`**, the framework's own installer, was `scripts/install.sh`: one name with the
+  delivery's `install.sh`, which does something else.
+- **`AppTexts`** holds jtools-app's texts, and `LaunchOptions` the `.ini`'s extension: `CommandLine` and `Logging` no
+  longer reach back into `WebApp`, which holds them.
+- **`.github/report-failure.bat`** makes a failed Windows step's log its error annotation, where the workflow repeated
+  the same PowerShell line in each step; the workflow tests it first.
