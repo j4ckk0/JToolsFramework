@@ -2,14 +2,6 @@
 
 ## What it is
 
-For a **local web application in Java**: a server on your computer holds the whole business, a page in the browser is
-its view, and the program stops once its last page is closed — like any program whose window you close. It ships as
-self-contained archives for Linux, macOS and Windows, a Java runtime inside.
-
-The server is more than the page's back end: **its routes are an HTTP API of their own**, JSON in and out, which
-scripts, other programs and tools call as the page does. The same program runs with its page, or without any, as a
-service that keeps serving (`--no-browser`) — [below](#a-page-and-an-api).
-
 JToolsFramework is four things:
 
 - **a small framework** — the libraries a program's code calls: the server, the routes, the command line, the
@@ -20,8 +12,42 @@ JToolsFramework is four things:
   into the project, never taken from the machine (`jtools-devkit`);
 - **a project template** — the way a new project begins (`jtools new`).
 
-Apache License 2.0. Version 1.2.0; on Maven Central once published (until then, a clone's `scripts/install.sh` puts it
-in `~/.m2`). [doc/CONCEPTS.md](doc/CONCEPTS.md) says the idea behind it in one page.
+### The framework
+
+A few Java libraries your program calls. You write the business and its routes; the libraries do the rest: the web
+server, the command line (`--port`, `--help`…), the settings, the log, opening the browser, and stopping the program
+once its page is closed. They need nothing but the JDK. [The libraries](#the-libraries) below says what each gives.
+
+### The build conventions
+
+One parent pom, `jtools-parent`. Your project names it and sets five properties — its id, name, main class, port and
+Windows version — and the build follows: Java 25, the tests, the Angular page built and packed into the program's
+single jar, and with `-Pdist` an archive for Linux, macOS and Windows, each with a Java runtime trimmed to what the
+program needs. Nothing to install to run it.
+
+### The development environment
+
+The scripts every project carries — `setup`, `build`, `ci`, `run`, `stop`, `package`, in `.sh` and `.bat`. `setup`
+downloads the project's own JDK, Maven and Node.js into its `external/` folder, at the versions its `externals.conf`
+names: nothing is taken from your machine, so the project builds the same everywhere. `scripts/jtools sync` keeps the
+scripts up to date with the framework.
+
+### The project template
+
+`jtools new Bookshelf` makes a complete project that runs at once: the business (`core`), its API (`api`), the page
+(`frontend`) and the program (`app`), with a first route, its tests, a git repository and a first build. You start
+from working code, not from a blank folder.
+
+### The goal
+
+An environment in which a project with **a web server providing both a page and an API** is quick to build. The
+server holds the whole business. The page in the browser is one view of it; the same routes — HTTP and JSON — answer
+scripts and other programs too ([A page and an API](#a-page-and-an-api)). You write the business, its routes and its
+page; everything around them comes with the framework, from the first `jtools new` to the archives you ship.
+
+Apache License 2.0. Version 1.2.0; on Maven Central once published (until then, the delivery's `install.sh` — the
+[quick start](#quick-start-a-new-project-step-by-step) — puts it in `~/.m2`). [doc/CONCEPTS.md](doc/CONCEPTS.md) says
+the idea behind it in one page.
 
 ## Quick start: a new project, step by step
 
