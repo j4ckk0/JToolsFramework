@@ -11,7 +11,7 @@ code, comments, tests, poms or docs. An example is a generic one (`SensorMonitor
 
 | Path | What |
 |---|---|
-| `conventions/parent/pom.xml` | jtools-parent: properties `jtools.app.*`, `jtools.program.skip`, profiles `jtools-frontend` (an `angular.json` switches it on), `dist`, `publish`; imports jtools-bom |
+| `conventions/parent/pom.xml` | jtools-parent: properties `jtools.app.*`, `jtools.app.skip`, profiles `jtools-frontend` (an `angular.json` switches it on), `dist`, `publish`; imports jtools-bom |
 | `conventions/bom/pom.xml` | jtools-bom: the artifacts' versions; no parent (jtools-parent imports it), its own Central metadata and publish profile |
 | `conventions/dist/src/main/resources/jtools-dist/` | `build.xml` (jdeps, jlink, the archives) and the launchers, `${jtools.app.*}` left for the project's build |
 | `libraries/{support,server,app,desktop}/` | `Json`, `I18n`, `Catalogue`, `Installation`; `WebServer`, `Exchange`, `Answer`, `PageWatch`, `Http`; `WebApp`, `DesktopOpener` (package-private), `UserSettings`, `SettingsFields`, `LaunchOptions`, `LogFormatter`; `FileDialogs` — the JDK only; a `package-info.java` each |

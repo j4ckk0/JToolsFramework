@@ -18,7 +18,7 @@
 
   <properties>
     <!-- the program: its one jar, todo.jar, and with -Pdist its distributions -->
-    <jtools.program.skip>false</jtools.program.skip>
+    <jtools.app.skip>false</jtools.app.skip>
     <jtools.app.id>todo</jtools.app.id>
     <jtools.app.name>Todo</jtools.app.name>
     <jtools.app.mainClass>org.jtools.todo.TodoApp</jtools.app.mainClass>

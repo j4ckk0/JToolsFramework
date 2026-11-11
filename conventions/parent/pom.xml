@@ -12,7 +12,7 @@
          - Java 25, UTF-8, JUnit 5, the plugins' versions, the tests run from the root of the repository;
          - in a module holding an angular.json: the page built by npm (install, build, test), its build under
            static/ in the module's jar, and @jtools/web unpacked into target/jtools-web (profile jtools-frontend);
-         - in the module setting jtools.program.skip to false: the program's one jar, embedding every module
+         - in the module setting jtools.app.skip to false: the program's one jar, embedding every module
            (jtools-embed), and with -Pdist the Linux, macOS and Windows distributions, each with a runtime jlink trims, the
            launchers and the .ini (profile dist; the descriptors come from jtools-dist).
        doc/CONVENTIONS.md in JToolsFramework says it in full. -->
@@ -84,11 +84,12 @@
     <jtools.app.description>${jtools.app.name}</jtools.app.description>
     <jtools.app.copyright>j4ckk0</jtools.app.copyright>
 
-    <!-- what a module opts out of — or, for the program, into: the module that sets jtools.program.skip to false
-         builds the program's one jar and, with -Pdist, the distributions -->
-    <jtools.program.skip>true</jtools.program.skip>
+    <!-- what a module opts out of — or, for the program, into: the module that sets jtools.app.skip to false
+         builds the program's one jar and, with -Pdist, the distributions; in a page's module, jtools.page.skip leaves
+         the built page out of its jar and jtools.weblib.skip does not unpack @jtools/web, the framework's TypeScript, there -->
+    <jtools.app.skip>true</jtools.app.skip>
     <jtools.page.skip>false</jtools.page.skip>
-    <jtools.web.skip>false</jtools.web.skip>
+    <jtools.weblib.skip>false</jtools.weblib.skip>
     <!-- the way npm installs the page's dependencies: "install", or "ci" for exactly package-lock.json (scripts/ci.sh) -->
     <npm.install>install</npm.install>
     <!-- profile publish: a jar module holding no Java sets it to false (and maven.javadoc.skip to true) to publish a
@@ -256,7 +257,7 @@
       </plugins>
     </pluginManagement>
     <plugins>
-      <!-- The program's jar, in the module that sets jtools.program.skip to false: one jar, java -jar <id>.jar,
+      <!-- The program's jar, in the module that sets jtools.app.skip to false: one jar, java -jar <id>.jar,
            embedding every module and library it depends on, the page included, with the program's main class and
            version. Declared here rather than in that module so that it runs before the dist profile's distributions in the
            same phase: the build's own plugins run before its profiles', and the distributions carry this jar. -->
@@ -271,7 +272,7 @@
               <goal>shade</goal>
             </goals>
             <configuration>
-              <skip>${jtools.program.skip}</skip>
+              <skip>${jtools.app.skip}</skip>
               <createDependencyReducedPom>false</createDependencyReducedPom>
               <filters>
                 <filter>
@@ -332,7 +333,7 @@
                   <goal>unpack</goal>
                 </goals>
                 <configuration>
-                  <skip>${jtools.web.skip}</skip>
+                  <skip>${jtools.weblib.skip}</skip>
                   <artifactItems>
                     <artifactItem>
                       <groupId>org.jtools.framework</groupId>
@@ -446,7 +447,7 @@
 
     <!--
       mvn package -Pdist
-      The self-contained distributions, built by the module that sets jtools.program.skip to false (every other module
+      The self-contained distributions, built by the module that sets jtools.app.skip to false (every other module
       skips them), into releases/ at the root of the repository (not tracked, kept by mvn clean):
         releases/<id>-<version>-linux.tar.gz   <id>.sh, <id>.jar, <id>.ini, README.md, LICENSE, NOTICE, jre/
         releases/<id>-<version>-macos.tar.gz   the same, Apple silicon
@@ -480,7 +481,7 @@
                   <goal>unpack</goal>
                 </goals>
                 <configuration>
-                  <skip>${jtools.program.skip}</skip>
+                  <skip>${jtools.app.skip}</skip>
                   <artifactItems>
                     <artifactItem>
                       <groupId>org.jtools.framework</groupId>
@@ -508,7 +509,7 @@
                   <goal>launch4j</goal>
                 </goals>
                 <configuration>
-                  <skip>${jtools.program.skip}</skip>
+                  <skip>${jtools.app.skip}</skip>
                   <headerType>gui</headerType>
                   <outfile>${project.build.directory}/${jtools.app.name}.exe</outfile>
                   <dontWrapJar>true</dontWrapJar>
@@ -548,7 +549,7 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
-                  <skip>${jtools.program.skip}</skip>
+                  <skip>${jtools.app.skip}</skip>
                   <target>
                     <ant antfile="${jtools.dist.files}/build.xml" target="distributions" inheritAll="false">
                       <property name="jdk.archives" value="${jtools.jdk.archives}"/>

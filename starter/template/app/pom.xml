@@ -14,7 +14,7 @@
 
   <properties>
     <!-- this module builds the program: its one jar, and with -Pdist the distributions (jtools-parent) -->
-    <jtools.program.skip>false</jtools.program.skip>
+    <jtools.app.skip>false</jtools.app.skip>
   </properties>
 
   <dependencies>

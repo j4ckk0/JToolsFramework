@@ -18,7 +18,7 @@
 
   <properties>
     <!-- the program: its one jar, greeter.jar, and with -Pdist its distributions -->
-    <jtools.program.skip>false</jtools.program.skip>
+    <jtools.app.skip>false</jtools.app.skip>
     <jtools.app.id>greeter</jtools.app.id>
     <jtools.app.name>Greeter</jtools.app.name>
     <jtools.app.mainClass>org.jtools.greeter.Greeter</jtools.app.mainClass>

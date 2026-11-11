@@ -20,7 +20,7 @@ everything else of the build is the parent's. A generated project has all of it 
 </properties>
 ```
 
-And in the program's module, `<jtools.program.skip>false</jtools.program.skip>`: that module's jar is the program's.
+And in the program's module, `<jtools.app.skip>false</jtools.app.skip>`: that module's jar is the program's.
 `jtools.app.description` — what Windows says of the `.exe` — is the name unless said; `jtools.app.copyright` likewise.
 
 ## What every module gets
@@ -40,13 +40,13 @@ Switched on by the file itself — the frontend's pom is its coordinates and not
 | `process-resources` | `target/angular/browser` copied to `static/` in the module's jar, `3rdpartylicenses.txt` to `static/licences/` |
 | `test` | `npm test -- --watch=false` (vitest); `-DskipTests` skips it with the Java tests |
 
-npm is the one of `PATH`: `external/node`'s when the scripts run Maven. `jtools.web.skip` and `jtools.page.skip` turn
+npm is the one of `PATH`: `external/node`'s when the scripts run Maven. `jtools.weblib.skip` and `jtools.page.skip` turn
 the unpacking and the copy off (the framework's own `web` module does both: it is what gets unpacked).
 
 `@jtools/web` is shipped as sources, not as an npm package, on purpose: the page compiles them with its own Angular,
 no package to publish nor any `package-lock.json` integrity to keep — the Maven repository is the one channel.
 
-## The program's module (`jtools.program.skip` = false)
+## The program's module (`jtools.app.skip` = false)
 
 - **`jtools-embed`** (shade, `package`): the module's jar becomes the program's one jar — `java -jar <id>.jar` —
   embedding every module and library, the page included, with `Main-Class: ${jtools.app.mainClass}`; a modular

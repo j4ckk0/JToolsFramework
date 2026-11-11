@@ -16,7 +16,7 @@
   <properties>
     <!-- the parent's jtools-frontend profile builds and tests this workspace with npm (its angular.json), but there is
          nothing to unpack here — this is what gets unpacked — and the test page it builds is not shipped -->
-    <jtools.web.skip>true</jtools.web.skip>
+    <jtools.weblib.skip>true</jtools.weblib.skip>
     <jtools.page.skip>true</jtools.page.skip>
     <!-- no Java: Maven Central's javadoc jar is a README (jtools-parent, profile publish) -->
     <maven.javadoc.skip>true</maven.javadoc.skip>

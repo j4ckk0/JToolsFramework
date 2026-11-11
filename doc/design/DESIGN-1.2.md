@@ -150,7 +150,7 @@ code. No `module-info`: each library is one package, and the classpath programs 
 - **`jtools-dist`** gains `jtools.app.description`, the Windows `.exe`'s file description, defaulting to
   `${jtools.app.name}`: a program may say what it is in more than its name.
 - **The guide says the five properties first** (`jtools.app.id`, `name`, `mainClass`, `port`, `windowsVersion`) and
-  `jtools.program.skip` in the program's module, then everything else as reference.
+  `jtools.app.skip` in the program's module, then everything else as reference.
 
 ## 6. The devkit
 

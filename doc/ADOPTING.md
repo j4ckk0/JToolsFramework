@@ -18,7 +18,7 @@ directory. The project's coordinates, modules and its own dependencies stay.
 
 ### 2. The server and the program
 
-The program's module depends on `jtools-app`, sets `jtools.program.skip` to `false` and the `jtools.app.*`
+The program's module depends on `jtools-app`, sets `jtools.app.skip` to `false` and the `jtools.app.*`
 properties ([CONVENTIONS.md](CONVENTIONS.md)), and loses its shade and jar configuration. Then, in the code:
 
 1. **The `main`** becomes a `WebApp` ([LIBRARIES.md](LIBRARIES.md)): its name, its default port, the page's folder
