@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Builds the delivery: target/delivery/jtools-<version>.tar.gz, what a developer downloads to start without a clone —
+# Builds the delivery: releases/delivery/jtools-<version>.tar.gz, what a developer downloads to start without a clone —
 # the framework's artifacts as a Maven repository (the nine jtools-bom names, with jtools-parent and jtools-bom), the
 # stub scripts/jtools, and delivery/install.sh, which installs them and makes a first project. Every test runs first.
 #
@@ -28,7 +28,7 @@ deployed="$PWD/tmp/delivery-repository"
 rm -rf "$deployed"
 mvn -q -B clean deploy "-DaltDeploymentRepository=delivery::file://$deployed" "$@"
 
-out=target/delivery
+out=releases/delivery
 stage=$out/jtools-$version
 rm -rf "$out"
 artifacts="jtools-parent jtools-bom $(sed -n '/<dependencyManagement>/,/<\/dependencyManagement>/s:.*<artifactId>\(.*\)</artifactId>.*:\1:p' conventions/bom/pom.xml)"
