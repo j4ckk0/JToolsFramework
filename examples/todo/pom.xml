@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <!-- A to-do list on JToolsFramework: its business in one class, its HTTP face in another, its page. Built and tested
+       with the framework, never published. Run it: java -jar examples/todo/target/todo.jar -->
+  <parent>
+    <groupId>org.jtools.framework</groupId>
+    <artifactId>jtools-parent</artifactId>
+    <version>1.2.0</version>
+    <relativePath>../../conventions/parent/pom.xml</relativePath>
+  </parent>
+  <artifactId>jtools-example-todo</artifactId>
+  <packaging>jar</packaging>
+  <name>JToolsFramework example: todo</name>
+  <description>A to-do list: the server holds the business, the page is its view.</description>
+
+  <properties>
+    <!-- the program: its one jar, todo.jar, and with -Pdist its distributions -->
+    <jtools.program.skip>false</jtools.program.skip>
+    <jtools.app.id>todo</jtools.app.id>
+    <jtools.app.name>Todo</jtools.app.name>
+    <jtools.app.mainClass>org.jtools.todo.TodoApp</jtools.app.mainClass>
+    <jtools.app.port>8088</jtools.app.port>
+    <jtools.app.windowsVersion>1.2.0.0</jtools.app.windowsVersion>
+  </properties>
+
+  <dependencies>
+    <!-- the one dependency a program needs: it brings jtools-server and jtools-support -->
+    <dependency>
+      <groupId>org.jtools.framework</groupId>
+      <artifactId>jtools-app</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>todo</finalName>
+  </build>
+
+  <profiles>
+    <!-- an example, not something to depend on: left out of what Maven Central gets -->
+    <profile>
+      <id>publish</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <configuration>
+              <skipPublishing>true</skipPublishing>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

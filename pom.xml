@@ -15,7 +15,7 @@
   <packaging>pom</packaging>
 
   <name>JToolsFramework</name>
-  <description>What the org.jtools projects share — a Java server holding the business, an Angular page as its view, the program stopping once its last page is closed, self-contained distributions — as a parent pom, libraries, the page's TypeScript, the scripts and a project template.</description>
+  <description>A framework for local web applications in Java — a server holding the business, a page in the browser as its view, the program stopping once its last page is closed, self-contained distributions — as libraries, build conventions, a development environment and a project template.</description>
 
   <!-- The parts, a folder each, named for what a developer does with it (doc/design/DESIGN-1.2.md):
          conventions/  what a project's build inherits: jtools-parent, jtools-bom (the versions alone), jtools-dist
@@ -35,5 +35,7 @@
     <module>libraries/web</module>
     <module>devkit</module>
     <module>examples/hello</module>
+    <module>examples/todo</module>
+    <module>examples/greeter</module>
   </modules>
 </project>

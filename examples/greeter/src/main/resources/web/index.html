@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Greeter</title>
+  <style>
+    body { font: 16px/1.5 system-ui, sans-serif; max-width: 32rem; margin: 3rem auto; padding: 0 1rem; }
+    input, button, select { font: inherit; padding: .3rem .6rem; }
+    #greeting { font-size: 2rem; }
+  </style>
+</head>
+<body>
+  <p id="greeting"></p>
+  <p>
+    <select id="language"><option value="en">English</option><option value="fr">Français</option></select>
+    <input id="name" placeholder="your name"> <button id="save">Keep this name</button>
+  </p>
+  <p><small>The name is kept by the server for the next runs; the greeting is said in the language chosen here.</small></p>
+  <script>
+    const page = crypto.randomUUID();
+    new EventSource('/api/alive?id=' + page);
+    addEventListener('pagehide', () => navigator.sendBeacon('/api/bye?id=' + page));
+
+    // Every request says the page's language: the server answers in it.
+    const language = () => document.getElementById('language').value;
+    async function ask(path, body) {
+      const options = { headers: { 'Accept-Language': language() } };
+      if (body !== undefined) Object.assign(options, { method: 'POST', body: JSON.stringify(body) });
+      const answer = await fetch(path, options);
+      const json = await answer.json();
+      if (!answer.ok) throw new Error(json.error);
+      return json;
+    }
+    async function greet() {
+      document.getElementById('greeting').textContent = (await ask('/api/greeting')).text;
+    }
+    document.getElementById('language').onchange = greet;
+    document.getElementById('save').onclick = () => ask('/api/settings', { name: document.getElementById('name').value }).then(greet);
+    ask('/api/settings').then((settings) => document.getElementById('name').value = settings.name);
+    greet();
+  </script>
+</body>
+</html>

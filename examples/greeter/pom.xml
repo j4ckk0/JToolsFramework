@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <!-- A greeting on JToolsFramework: texts in two languages, an option and a setting of the program's own. Built and tested
+       with the framework, never published. Run it: java -jar examples/greeter/target/greeter.jar -->
+  <parent>
+    <groupId>org.jtools.framework</groupId>
+    <artifactId>jtools-parent</artifactId>
+    <version>1.2.0</version>
+    <relativePath>../../conventions/parent/pom.xml</relativePath>
+  </parent>
+  <artifactId>jtools-example-greeter</artifactId>
+  <packaging>jar</packaging>
+  <name>JToolsFramework example: greeter</name>
+  <description>A greeting in the page's language: the program's texts, an option and a setting of its own.</description>
+
+  <properties>
+    <!-- the program: its one jar, greeter.jar, and with -Pdist its distributions -->
+    <jtools.program.skip>false</jtools.program.skip>
+    <jtools.app.id>greeter</jtools.app.id>
+    <jtools.app.name>Greeter</jtools.app.name>
+    <jtools.app.mainClass>org.jtools.greeter.Greeter</jtools.app.mainClass>
+    <jtools.app.port>8087</jtools.app.port>
+    <jtools.app.windowsVersion>1.2.0.0</jtools.app.windowsVersion>
+  </properties>
+
+  <dependencies>
+    <!-- the one dependency a program needs: it brings jtools-server and jtools-support -->
+    <dependency>
+      <groupId>org.jtools.framework</groupId>
+      <artifactId>jtools-app</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>greeter</finalName>
+  </build>
+
+  <profiles>
+    <!-- an example, not something to depend on: left out of what Maven Central gets -->
+    <profile>
+      <id>publish</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <configuration>
+              <skipPublishing>true</skipPublishing>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
