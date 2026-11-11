@@ -27,7 +27,7 @@ scripts/run.sh                  # the page in the browser; close it, and the pro
 
 `jtools` is one script, the devkit's [`scripts/jtools`](devkit/scripts/jtools): download it, or take it from a clone of
 this repository. [doc/GETTING-STARTED.md](doc/GETTING-STARTED.md) walks through the generated project — where the
-business goes, a feature added from core to the page, tested, packaged — in ten minutes.
+business goes, a feature added from core to the page, tested, packaged — in fifteen minutes.
 
 ## Use the libraries
 

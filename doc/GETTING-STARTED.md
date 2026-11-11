@@ -7,7 +7,7 @@ don't.
 ## 0. What you need
 
 Linux, macOS, or Windows with Git Bash; `bash`, `curl`, `unzip`, `tar` and `git`. **Nothing else** — no Java, Maven
-nor Node.js to install: a project downloads its own into its `external/` folder, the first time, about 600 MB.
+nor Node.js to install: a project downloads its own into its `external/` folder, the first time, about 650 MB.
 
 ```bash
 for tool in bash curl unzip tar git; do command -v $tool >/dev/null || echo "missing: $tool"; done
@@ -34,6 +34,7 @@ installed into your local Maven repository:
 git clone https://github.com/j4ckk0/JToolsFramework.git
 (cd JToolsFramework && scripts/setup.sh && scripts/install.sh)   # the framework built, tested, installed into ~/.m2
 cp JToolsFramework/devkit/scripts/jtools .
+export JTOOLS_DOWNLOADS=$PWD/JToolsFramework/external/downloads   # your project takes the clone's downloads: 650 MB once, not twice
 ```
 
 ## 2. Run the examples (optional, five minutes)

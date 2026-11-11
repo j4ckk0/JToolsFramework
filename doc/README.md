@@ -4,7 +4,7 @@
 
 | Step | Page | What you get from it | Time |
 |---|---|---|---|
-| 1 | [GETTING-STARTED.md](GETTING-STARTED.md) | a project made, run, a feature added from the business to the page, tested, packaged | 10 min |
+| 1 | [GETTING-STARTED.md](GETTING-STARTED.md) | the examples run; a project made, run, a feature added from the business to the page, tested, packaged | 15 min |
 | 2 | [CONCEPTS.md](CONCEPTS.md) | the idea: the server holds the business, the page is its view, the program stops with its last page — and the words the other pages use | 5 min |
 | 3 | [LIBRARIES.md](LIBRARIES.md) | what your code calls: `WebApp`, `WebServer`, `Exchange`, `Answer`, `Json`, `I18n`, `FileDialogs` | 10 min |
 | 4 | [CONVENTIONS.md](CONVENTIONS.md) | what your build inherits: the parent pom's five properties, the BOM, the distributions | 5 min |
