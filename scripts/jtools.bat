@@ -11,6 +11,8 @@ setlocal EnableExtensions DisableDelayedExpansion
 rem what `new` makes outside a project when JTOOLS_VERSION says nothing: this file's own version (scripts/check-versions.sh)
 set "JTOOLS_DEFAULT_VERSION=1.3.0"
 set "CENTRAL=https://repo1.maven.org/maven2/org/jtools/framework/jtools-devkit"
+rem this script's folder, read before any shift: shift moves %0 too
+set "HERE=%~dp0"
 rem Windows' own curl and tar: a Git or Cygwin tar earlier on the PATH cannot read a jar
 set "CURL=%SystemRoot%\System32\curl.exe"
 if not exist "%CURL%" set "CURL=curl"
@@ -42,7 +44,7 @@ goto :rest
 
 :project
 set "PROJECT="
-if exist "%~dp0..\jtools.conf" for %%p in ("%~dp0..") do set "PROJECT=%%~fp"
+if exist "%HERE%..\jtools.conf" for %%p in ("%HERE%..") do set "PROJECT=%%~fp"
 rem KEY=VALUE files, # comments: what is set already (the environment, then the files read before) wins
 if defined PROJECT (
   call :conf "%PROJECT%\jtools.conf"
