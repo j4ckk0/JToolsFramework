@@ -21,7 +21,7 @@ jobs:
     env:
       TAG: ${{ github.event_name == 'push' && github.ref_name || inputs.tag }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0   # the tags: delivery.sh checks that what it builds is what the tag holds
 

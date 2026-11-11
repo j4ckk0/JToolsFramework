@@ -16,8 +16,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/cache@v4
+      - uses: actions/checkout@v5
+      - uses: actions/cache@v5
         with:
           path: external/downloads
           key: externals-${{ hashFiles('externals.conf') }}
@@ -25,7 +25,7 @@ jobs:
         run: scripts/linux/setup.sh
       - name: The delivery
         run: scripts/delivery.sh --untagged -DskipTests
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: delivery
           path: |
@@ -37,7 +37,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: delivery
       - name: git's identity, for the projects' first commits
@@ -56,7 +56,7 @@ jobs:
           mkdir nogit && for f in /usr/bin/*; do [ "${f##*/}" = git ] || ln -s "$f" nogit/; done
           env -i PATH="$PWD/nogit" HOME="$HOME" "$HOME/.local/bin/jtools" new NoGit --dir "$RUNNER_TEMP/nogit" --no-build
           [ ! -e "$RUNNER_TEMP/nogit/.git" ] && [ -f "$RUNNER_TEMP/nogit/pom.xml" ]
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: made-on-linux
           path: ${{ runner.temp }}/fresh
@@ -88,14 +88,14 @@ jobs:
     env:
       REPORT: ${{ github.workspace }}\framework\.github\report-failure.bat
     steps:
-      - uses: actions/checkout@v4   # .github alone: its report-failure.bat
+      - uses: actions/checkout@v5   # .github alone: its report-failure.bat
         with:
           path: framework
           sparse-checkout: .github
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: delivery
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: made-on-linux
           path: made-on-linux
