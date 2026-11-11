@@ -33,7 +33,7 @@ the page, the program's jar, the jlink distributions) and the scripts. Its `doc/
 
 | Route | Answer | core |
 |---|---|---|
-| `GET /api/info` | `{"name", "version"}` | `__APP_NAME__.about()` |
+| `GET /api/status` | `{"summary"}` | `__APP_NAME__.status()` |
 
 Its TypeScript mirror is `frontend/src/app/api.service.ts`.
 

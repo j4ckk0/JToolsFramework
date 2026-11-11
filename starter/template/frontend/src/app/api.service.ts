@@ -2,10 +2,15 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-/** What the server says the application is (GET api/info). */
-export interface Info {
+/** What the program is (GET api/about, the framework's own route). */
+export interface About {
   name: string;
   version: string;
+}
+
+/** What the business says of its state (GET api/status). */
+export interface Status {
+  summary: string;
 }
 
 /**
@@ -17,7 +22,11 @@ export interface Info {
 export class ApiService {
   private readonly http = inject(HttpClient);
 
-  info(): Observable<Info> {
-    return this.http.get<Info>('api/info');
+  about(): Observable<About> {
+    return this.http.get<About>('api/about');
+  }
+
+  status(): Observable<Status> {
+    return this.http.get<Status>('api/status');
   }
 }

@@ -106,7 +106,7 @@ stops it then); `scripts/run.sh --help` lists every option.
 The page will show how many sensors there are. Each layer does its part, and only its part.
 
 **The business** decides — `core/src/main/java/org/jtools/sensormonitor/core/SensorMonitor.java`, a method beside
-`about()`:
+`status()`:
 
 ```java
 public int sensorCount() {
@@ -114,14 +114,14 @@ public int sensorCount() {
 }
 ```
 
-**The API** translates — `api/src/main/java/org/jtools/sensormonitor/api/SensorMonitorApi.java`: a path beside `INFO`,
+**The API** translates — `api/src/main/java/org/jtools/sensormonitor/api/SensorMonitorApi.java`: a path beside `STATUS`,
 a route beside its own.
 
 ```java
 public static final String SENSORS = WebServer.API + "/sensors";
 
 public static WebServer routes(WebServer server, SensorMonitor application) {
-    return server.get(INFO, ex -> about(application.about()))
+    return server.get(STATUS, ex -> status(application.status()))
                  .get(SENSORS, ex -> Map.of("count", application.sensorCount()));
 }
 ```
@@ -130,7 +130,7 @@ A route answers with what it returns — a `Map` or a `List` as JSON, `null` as 
 `new WebServer.Refusal(400, reason)`, and the page reads `{"error": reason}` — [examples/todo](../examples/todo)
 shows one.
 
-**The page** shows — its one door to the server, `frontend/src/app/api.service.ts`, a method beside `info()`:
+**The page** shows — its one door to the server, `frontend/src/app/api.service.ts`, a method beside `status()`:
 
 ```typescript
 sensors(): Observable<{ count: number }> {

@@ -15,7 +15,7 @@ describe('App', () => {
   it('shows what the server says the application is', async () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
-    TestBed.inject(HttpTestingController).expectOne('api/info').flush({ name: '__APP_NAME__', version: '1.2.3' });
+    TestBed.inject(HttpTestingController).expectOne('api/about').flush({ name: '__APP_NAME__', version: '1.2.3' });
     await fixture.whenStable();
     const page = fixture.nativeElement as HTMLElement;
     expect(page.querySelector('header')?.textContent).toContain('__APP_NAME__');
@@ -26,7 +26,7 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     TestBed.inject(HttpTestingController)
-      .expectOne('api/info')
+      .expectOne('api/about')
       .error(new ProgressEvent('error'));
     await fixture.whenStable();
     expect((fixture.nativeElement as HTMLElement).querySelector('.error')?.textContent).toContain('cannot be reached');

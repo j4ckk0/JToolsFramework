@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { apiErrorMessage } from '@jtools/web';
-import { ApiService, Info } from './api.service';
+import { About, ApiService } from './api.service';
 
 /** The frame of every page: the header and the footer, with what the server says the application is. */
 @Component({
@@ -11,15 +11,15 @@ import { ApiService, Info } from './api.service';
   templateUrl: './app.html',
 })
 export class App {
-  protected readonly info = signal<Info | undefined>(undefined);
+  protected readonly about = signal<About | undefined>(undefined);
   /** Why the server did not answer, when it did not. */
   protected readonly error = signal<string | undefined>(undefined);
 
   constructor() {
     inject(ApiService)
-      .info()
+      .about()
       .subscribe({
-        next: (info) => this.info.set(info),
+        next: (about) => this.about.set(about),
         error: (error) => this.error.set(apiErrorMessage(error)),
       });
   }

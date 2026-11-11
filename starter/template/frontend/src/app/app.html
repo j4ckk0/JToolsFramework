@@ -1,5 +1,5 @@
 <header>
-  <h1>{{ info()?.name ?? '__APP_NAME__' }}</h1>
+  <h1>{{ about()?.name ?? '__APP_NAME__' }}</h1>
 </header>
 
 <main>
@@ -10,7 +10,7 @@
 </main>
 
 <footer>
-  @if (info(); as info) {
-    <span>{{ info.name }} {{ info.version }}</span>
+  @if (about(); as about) {
+    <span>{{ about.name }} {{ about.version }}</span>
   }
 </footer>
