@@ -73,6 +73,8 @@ public final class WebApp {
 
     private static final Logger LOG = Logger.getLogger(WebApp.class.getName());
     private static final Catalogue LAUNCHER_TEXTS = I18n.catalogue(WebApp.class, "org.jtools.framework.app.texts", Locale.ENGLISH, Locale.FRENCH);
+    /** What the log says of a failure: English, whoever runs the program (a log is read by whoever helps, and searched). */
+    private static final I18n ENGLISH = LAUNCHER_TEXTS.of(Locale.ENGLISH);
 
     /** The framework's own routes. */
     public static final String SETTINGS = WebServer.API + "/settings", ABOUT = WebServer.API + "/about", QUIT = WebServer.API + "/quit",
@@ -103,9 +105,23 @@ public final class WebApp {
 
     private record ExtraOption(String valueName, String help, Consumer<String> action) {}
 
-    /** A command line that cannot be run: what is wrong with it, in the user's language. */
+    /**
+     * A command line that cannot be run: a text of the launcher's and its arguments, so that it is said twice — in English
+     * as its message, what the log keeps, and in the person's language ({@link #in}), what they read.
+     */
     static final class UsageException extends Exception {
-        UsageException(String message) { super(message); }
+        private final String key;
+        private final transient Object[] args;
+
+        UsageException(String key, Object... args) {
+            super(ENGLISH.t(key, args));
+            this.key = key;
+            this.args = args;
+        }
+
+        String in(I18n say) {
+            return say.t(key, args);
+        }
     }
 
     private WebApp(String name) {
@@ -227,13 +243,13 @@ public final class WebApp {
         try {
             ini = Installation.ini(Installation.home(program).resolve(id + INI_EXTENSION));
         } catch (IOException e) {
-            fail(console.t("error.ini", id + INI_EXTENSION, e.getMessage()), EXIT_USAGE);
+            fail(console, EXIT_USAGE, "error.ini", id + INI_EXTENSION, e.getMessage());
             return;
         }
         try {
             options = options(args, ini, UserSettings.of(id).port());
         } catch (UsageException e) {
-            fail(e.getMessage() + System.lineSeparator() + usage(console), EXIT_USAGE);
+            fail(e.getMessage(), e.in(console) + System.lineSeparator() + usage(console), EXIT_USAGE);
             return;
         }
         console = console(options);
@@ -250,10 +266,10 @@ public final class WebApp {
         try {
             server = startServer(options, program);
         } catch (BindException e) {
-            fail(console.t("error.portInUse", options.port(), name, "http://" + options.host() + ":" + options.port() + "/"), EXIT_CANNOT_START);
+            fail(console, EXIT_CANNOT_START, "error.portInUse", options.port(), name, "http://" + options.host() + ":" + options.port() + "/");
             return;
         } catch (IOException e) {
-            fail(console.t("error.cannotStart", name, e.getMessage()), EXIT_CANNOT_START);
+            fail(console, EXIT_CANNOT_START, "error.cannotStart", name, e.getMessage());
             return;
         }
         Runtime.getRuntime().addShutdownHook(Thread.ofPlatform().unstarted(() -> {
@@ -378,14 +394,13 @@ public final class WebApp {
      * host and log, then the defaults. The program's own options run as they are read.
      */
     LaunchOptions options(String[] args, Properties ini, OptionalInt userPort) throws UsageException {
-        I18n say = LAUNCHER_TEXTS.of(Locale.getDefault());
         int port = defaultPort;
         String iniPort = ini.getProperty(INI_PORT);
-        if (iniPort != null && !iniPort.isBlank()) port = port(say, iniPort.trim(), id + INI_EXTENSION + " " + INI_PORT);
+        if (iniPort != null && !iniPort.isBlank()) port = port(iniPort.trim(), id + INI_EXTENSION + " " + INI_PORT);
         if (userPort.isPresent()) port = userPort.getAsInt();
         String host = ini.getProperty(INI_HOST, DEFAULT_HOST).trim();
         String iniLevel = ini.getProperty(INI_LOG_LEVEL);
-        Level logLevel = iniLevel == null || iniLevel.isBlank() ? Level.INFO : level(say, iniLevel.trim(), id + INI_EXTENSION + " " + INI_LOG_LEVEL);
+        Level logLevel = iniLevel == null || iniLevel.isBlank() ? Level.INFO : level(iniLevel.trim(), id + INI_EXTENSION + " " + INI_LOG_LEVEL);
         String logFolder = ini.getProperty(INI_LOG_FOLDER);
         boolean browser = true, keepAlive = false, help = false;
         Path logFile = null;
@@ -394,26 +409,26 @@ public final class WebApp {
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             switch (arg) {
-                case OPT_PORT -> port = port(say, value(say, args, ++i, arg), arg);
-                case OPT_HOST -> host = value(say, args, ++i, arg);
+                case OPT_PORT -> port = port(value(args, ++i, arg), arg);
+                case OPT_HOST -> host = value(args, ++i, arg);
                 case OPT_NO_BROWSER -> { browser = false; keepAlive = true; }
                 case OPT_KEEP_ALIVE, OPT_KEEP_RUNNING -> keepAlive = true;
-                case OPT_LOG_LEVEL -> logLevel = level(say, value(say, args, ++i, arg), arg);
+                case OPT_LOG_LEVEL -> logLevel = level(value(args, ++i, arg), arg);
                 case OPT_VERBOSE -> logLevel = Level.FINE;
-                case OPT_LOG_FILE -> logFile = Path.of(value(say, args, ++i, arg));
-                case OPT_LANG -> lang = language(say, value(say, args, ++i, arg), arg);
+                case OPT_LOG_FILE -> logFile = Path.of(value(args, ++i, arg));
+                case OPT_LANG -> lang = language(value(args, ++i, arg), arg);
                 case OPT_HELP, OPT_HELP_SHORT -> help = true;
                 default -> {
                     ExtraOption extra = extraOptions.get(arg);
-                    if (extra != null) extra.action().accept(extra.valueName() == null ? null : value(say, args, ++i, arg));
-                    else if (arg.startsWith("-") || operands == null) throw new UsageException(say.t("error.unknownOption", arg));
+                    if (extra != null) extra.action().accept(extra.valueName() == null ? null : value(args, ++i, arg));
+                    else if (arg.startsWith("-") || operands == null) throw new UsageException("error.unknownOption", arg);
                     else rest.add(arg);
                 }
             }
         }
         if (oneFile && !help) {
-            if (rest.size() > 1) throw new UsageException(say.t("error.oneOperand", operandsUsage));
-            if (rest.size() == 1 && !Files.isRegularFile(Path.of(rest.get(0)))) throw new UsageException(say.t("error.notAFile", rest.get(0)));
+            if (rest.size() > 1) throw new UsageException("error.oneOperand", operandsUsage);
+            if (rest.size() == 1 && !Files.isRegularFile(Path.of(rest.get(0)))) throw new UsageException("error.notAFile", rest.get(0));
         }
         return new LaunchOptions(port, host, browser, keepAlive, logLevel, logFile, logFolder, lang, help, List.copyOf(rest));
     }
@@ -458,39 +473,49 @@ public final class WebApp {
         usage.append(String.format("  %-20s %s%n", option, help));
     }
 
-    private static String value(I18n say, String[] args, int i, String option) throws UsageException {
-        if (i >= args.length) throw new UsageException(say.t("error.valueExpected", option));
+    private static String value(String[] args, int i, String option) throws UsageException {
+        if (i >= args.length) throw new UsageException("error.valueExpected", option);
         return args[i];
     }
 
-    private static int port(I18n say, String text, String what) throws UsageException {
+    private static int port(String text, String what) throws UsageException {
         try {
             int port = Integer.parseInt(text);
             if (port < 0 || port > PORT_MAX) throw new NumberFormatException();
             return port;
         } catch (NumberFormatException e) {
-            throw new UsageException(say.t("error.notAPort", what, text));
+            throw new UsageException("error.notAPort", what, text);
         }
     }
 
-    private static Level level(I18n say, String text, String what) throws UsageException {
+    private static Level level(String text, String what) throws UsageException {
         try {
             return Level.parse(text.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
-            throw new UsageException(say.t("error.notALevel", what, text));
+            throw new UsageException("error.notALevel", what, text);
         }
     }
 
-    private static Locale language(I18n say, String text, String what) throws UsageException {
+    private static Locale language(String text, String what) throws UsageException {
         for (Locale language : LAUNCHER_TEXTS.languages()) if (language.getLanguage().equalsIgnoreCase(text)) return language;
-        throw new UsageException(say.t("error.badLanguage", what + " " + text, languages()));
+        throw new UsageException("error.badLanguage", what + " " + text, languages());
     }
 
-    private void fail(String message, int code) {
-        LOG.severe(message);
+    /** A failure said with a text of the launcher's: English in the log, the console's language to the person. */
+    private void fail(I18n console, int code, String key, Object... args) {
+        fail(ENGLISH.t(key, args), console.t(key, args), code);
+    }
+
+    /**
+     * A command line or a start that cannot be run: the English text in the log file, when there is one yet; the
+     * person's on the console and, when there is no console to read it (the .exe), in a dialog; then the exit.
+     */
+    private void fail(String logged, String shown, int code) {
+        Logging.toFileOnly(Level.SEVERE, WebApp.class.getName(), logged);
+        System.err.println(shown);
         if (System.console() == null && !GraphicsEnvironment.isHeadless()) {
             try {
-                JOptionPane.showMessageDialog(null, message, name, JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, shown, name, JOptionPane.ERROR_MESSAGE);
             } catch (Exception noDialog) { /* the console said it */ }
         }
         exit.accept(code);

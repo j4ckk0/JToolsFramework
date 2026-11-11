@@ -129,6 +129,15 @@ class WebAppTest {
         assertThrows(WebApp.UsageException.class, () -> app.options(new String[0], ini(LaunchOptions.INI_PORT, "eighty"), NO_USER_PORT));
     }
 
+    /** A command line refused is said twice: in English, what the log keeps; in the person's language, what they read. */
+    @Test
+    void refusesInEnglishForTheLogAndInTheirLanguageForThePerson() {
+        var texts = org.jtools.framework.support.I18n.catalogue(WebApp.class, "org.jtools.framework.app.texts", Locale.ENGLISH, Locale.FRENCH);
+        WebApp.UsageException refused = assertThrows(WebApp.UsageException.class, () -> app.options(new String[] {"--bogus"}, new Properties(), NO_USER_PORT));
+        assertEquals("unknown option: --bogus", refused.getMessage());
+        assertEquals("option inconnue : --bogus", refused.in(texts.of(Locale.FRENCH)));
+    }
+
     @Test
     void speaksTheUsersLanguage() {
         var texts = org.jtools.framework.support.I18n.catalogue(WebApp.class, "org.jtools.framework.app.texts", Locale.ENGLISH, Locale.FRENCH);

@@ -74,12 +74,14 @@
            jtools.app.name             its name, as people read it, and its Windows launcher: <name>.exe
            jtools.app.mainClass        the class starting it (most often a call to org.jtools.framework.app.WebApp)
            jtools.app.port             the port its .ini says (doc/PORTS.md in JToolsFramework keeps them apart)
-           jtools.app.windowsVersion   the version in the four parts an .exe wants: 1.2 is 1.2.0.0 -->
+           jtools.app.windowsVersion   the version in the four parts an .exe wants: 1.2 is 1.2.0.0
+           jtools.app.description      what Windows says of <name>.exe (its file description): its name unless said -->
     <jtools.app.id>app</jtools.app.id>
     <jtools.app.name>App</jtools.app.name>
     <jtools.app.mainClass></jtools.app.mainClass>
     <jtools.app.port>0</jtools.app.port>
     <jtools.app.windowsVersion>0.0.0.0</jtools.app.windowsVersion>
+    <jtools.app.description>${jtools.app.name}</jtools.app.description>
     <jtools.app.copyright>j4ckk0</jtools.app.copyright>
 
     <!-- what a module opts out of — or, for the program, into: the module that sets jtools.program.skip to false
@@ -522,7 +524,7 @@
                   <versionInfo>
                     <fileVersion>${jtools.app.windowsVersion}</fileVersion>
                     <txtFileVersion>${project.version}</txtFileVersion>
-                    <fileDescription>${jtools.app.name}</fileDescription>
+                    <fileDescription>${jtools.app.description}</fileDescription>
                     <copyright>${jtools.app.copyright}</copyright>
                     <productVersion>${jtools.app.windowsVersion}</productVersion>
                     <txtProductVersion>${project.version}</txtProductVersion>

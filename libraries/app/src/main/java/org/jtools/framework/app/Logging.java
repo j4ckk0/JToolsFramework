@@ -28,6 +28,7 @@ import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 /**
@@ -48,6 +49,7 @@ final class Logging {
     static final String NO_FILE = "none";
 
     private static Path file;
+    private static Handler fileHandler;
 
     private Logging() {}
 
@@ -89,10 +91,24 @@ final class Logging {
             handler.setFormatter(new LogFormatter());
             handler.setLevel(Level.ALL);
             Logger.getLogger("").addHandler(handler);
+            fileHandler = handler;
         } catch (IOException | RuntimeException e) {
             LOG.warning("no log file, the console only: " + e.getMessage());
             file = null;
         }
+    }
+
+    /**
+     * A record for the log file alone, not the console: a failure the console says in the person's language
+     * ({@code WebApp.fail}) is kept in English there. Nothing when there is no log file (yet).
+     */
+    static void toFileOnly(Level level, String loggerName, String message) {
+        Handler handler = fileHandler;
+        if (handler == null) return;
+        LogRecord record = new LogRecord(level, message);
+        record.setLoggerName(loggerName);
+        handler.publish(record);
+        handler.flush();
     }
 
     /** The log file of this run; null when there is none. */
