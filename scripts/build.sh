@@ -9,6 +9,6 @@
 set -euo pipefail
 cd "$(dirname "$(readlink -f "$0")")/.."   # the project root
 . scripts/externals.sh   # jtools.conf; setup done? (offers it otherwise); the externals first
-running_instance "building"
+refuse_while_running "building"
 # shellcheck disable=SC2086 # BUILD_GOALS is a list of goals
 exec mvn $BUILD_GOALS "$@"

@@ -12,7 +12,7 @@
 set -euo pipefail
 cd "$(dirname "$(readlink -f "$0")")/.."   # the project root
 . scripts/externals.sh   # jtools.conf; setup done? (offers it otherwise); the externals first
-running_instance "the build"
+refuse_while_running "the build"
 # shellcheck disable=SC2086 # BUILD_GOALS is a list of goals
 mvn -q $BUILD_GOALS -Dnpm.install=ci
 if [ -f scripts/ci.local.sh ]; then bash scripts/ci.local.sh; fi

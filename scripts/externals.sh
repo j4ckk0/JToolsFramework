@@ -10,7 +10,7 @@
 # (prints what of its own extras is missing) and export what its tools need.
 #
 # Sets, for the scripts: APP_ID, APP_NAME, APP_MODULE, BUILD_GOALS (jtools.conf), $jar (the program's jar, when
-# APP_ID names one), require_program and running_instance.
+# APP_ID names one), require_program and refuse_while_running.
 #
 ext="$PWD/external"
 
@@ -78,7 +78,7 @@ require_program() {
 
 # Refuses to go on while the program runs from the jar a build is about to replace: Maven would otherwise fail
 # deleting it, with an error saying nothing of the cause. $1 is what the caller is about to do.
-running_instance() {
+refuse_while_running() {
   [ -n "$APP_ID" ] || return 0
   local pids
   # anchored on the process's own java: a shell command line that merely names the jar is not an instance
