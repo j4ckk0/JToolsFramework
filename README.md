@@ -1,5 +1,11 @@
 # JToolsFramework
 
+**JToolsFramework is a framework that helps developers easily set up an environment to develop a project providing a
+web server — a server that offers both a web page and an API.** The server holds the whole business, in Java. The
+page in the browser is one view of it; the same routes — HTTP and JSON — answer scripts and other programs too
+([A page and an API](#a-page-and-an-api)). You write the business, its routes and its page; everything around them
+comes with the framework, from the first `jtools new` to the archives you ship.
+
 ## What it is
 
 JToolsFramework is four things:
@@ -37,13 +43,6 @@ scripts up to date with the framework.
 `jtools new Bookshelf` makes a complete project that runs at once: the business (`core`), its API (`api`), the page
 (`frontend`) and the program (`app`), with a first route, its tests, a git repository and a first build. You start
 from working code, not from a blank folder.
-
-### The goal
-
-An environment in which a project with **a web server providing both a page and an API** is quick to build. The
-server holds the whole business. The page in the browser is one view of it; the same routes — HTTP and JSON — answer
-scripts and other programs too ([A page and an API](#a-page-and-an-api)). You write the business, its routes and its
-page; everything around them comes with the framework, from the first `jtools new` to the archives you ship.
 
 Apache License 2.0. Version 1.2.0; on Maven Central once published (until then, the delivery's `install.sh` — the
 [quick start](#quick-start-a-new-project-step-by-step) — puts it in `~/.m2`). [doc/CONCEPTS.md](doc/CONCEPTS.md) says
