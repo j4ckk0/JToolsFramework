@@ -1,8 +1,8 @@
 # __APP_NAME__ — orientation for Claude
 
 The documentation is `README.md` (build, run, externals, packaging) and `doc/ARCHITECTURE.md` (modules, API, where a
-feature goes). This project is built on JToolsFramework (`__JTOOLS_HOME__`): its `doc/PATTERN.md` holds the
-conventions every org.jtools project keeps, its `CLAUDE.md` the review rules.
+feature goes). This project is built on JToolsFramework __JTOOLS_VERSION__ (https://github.com/j4ckk0/JToolsFramework): its
+`doc/CONCEPTS.md` holds the conventions every project on it keeps.
 
 ## What it is
 
@@ -33,8 +33,8 @@ scripts/package.sh             # releases/__APP_ID__-<version>-{linux.tar.gz,win
 ## Conventions
 
 - **The page decides nothing**: business goes in `core`, `api` only translates, the page only shows.
-- **The scripts, `.githooks/` and `.gitattributes` are the framework's**: change them in JToolsFramework, then
-  `scripts/jtools-sync.sh` there refreshes this project's copies. Project-only extras go in `scripts/*.local.sh`.
+- **The scripts, `.githooks/` and `.gitattributes` are the devkit's**: never edited here — `scripts/jtools sync`
+  refreshes them at the `JTOOLS_VERSION` of `jtools.conf`. Project-only extras go in `scripts/*.local.sh`.
 - **Versions** are set once: the program's in the root `pom.xml` (`<revision>`, `jtools.app.windowsVersion`), the
   framework's as the parent's version, the externals' in `externals.conf`.
 - **Port** __APP_PORT__: `Launcher.DEFAULT_PORT`, `jtools.app.port`, `frontend/proxy.conf.json` (LauncherTest checks),

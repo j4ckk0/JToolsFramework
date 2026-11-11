@@ -7,14 +7,15 @@ The browser is the program's window: `scripts/run.sh` starts the server on `http
 the page; **closing the last page stops the server** (15 seconds later, so that a reload does not). `--keep-alive`
 keeps it serving.
 
-Built on [JToolsFramework](__JTOOLS_HOME__) __JTOOLS_VERSION__: its parent pom carries the build, its libraries the
-server and the launcher, `@jtools/web` the page's side, and it owns the scripts (see [Scripts](#build-and-run)).
+Built on [JToolsFramework](https://github.com/j4ckk0/JToolsFramework) __JTOOLS_VERSION__: its parent pom carries the build,
+its libraries the server and the program (`jtools-app`), `@jtools/web` the page's side, and its devkit the scripts
+(see [Build and run](#build-and-run)).
 
 ## Build and run
 
 Everything the build needs comes from `external/` (see [Externals](#externals)): run `scripts/setup.sh` once — the
-other scripts offer to when it has not been run. JToolsFramework must be in the local Maven repository: its
-`scripts/install.sh` puts it there.
+other scripts offer to when it has not been run. JToolsFramework comes from Maven Central, or from the local Maven
+repository where a clone of it puts it (its `scripts/install.sh`).
 
 ```bash
 scripts/setup.sh                 # the externals: JDK 21, Maven, Node.js, the JREs (once)
@@ -72,9 +73,9 @@ go in `app/src/dist/files/`.
 
 ```
 pom.xml                  the modules, the program's jtools.app.* properties (the rest: jtools-parent)
-jtools.conf              what the framework's scripts know of this project
+jtools.conf              what the devkit's scripts know of this project, and the devkit's version
 externals.conf           the externals' versions and URLs
-scripts/, .githooks/     the framework's (scripts/jtools-sync.sh in JToolsFramework refreshes them)
+scripts/, .githooks/     the devkit's (scripts/jtools sync refreshes them); scripts/jtools, which fetches the devkit, is yours
 doc/ARCHITECTURE.md      the modules, and where a new feature goes
 core/      __APP_NAME__: the business, pure Java
 api/       __APP_NAME__Api: the HTTP API over core

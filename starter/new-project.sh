@@ -1,26 +1,36 @@
 #!/usr/bin/env bash
 #
-# Creates a new org.jtools project from templates/webapp: a Java server holding the business (core, api), an Angular
-# page as its view (frontend), the program and its distributions (app), the framework's scripts, its externals.conf
-# and a port of its own; then, unless told otherwise, its externals, a first build, a git repository with its first
-# commit, its bare repository, and the first push (which runs the new project's CI).
+# Creates a new project on JToolsFramework, from the template beside this script: a Java server holding the business
+# (core, api), an Angular page as its view (frontend), the program and its distributions (app), the devkit's scripts,
+# its externals.conf and a port; then, unless told otherwise, a git repository with its first commit, its externals and
+# a first build. Run through scripts/jtools new (anywhere), or from a clone of JToolsFramework.
 #
-#   scripts/new-project.sh SensorSimulator                # ~/Developpement/git/SensorSimulator, git-bare/SensorSimulator.git
-#   scripts/new-project.sh SensorSimulator --port 8094    # the port of its .ini (default: the next free one, doc/PORTS.md)
-#   scripts/new-project.sh SensorSimulator --id sensors   # the program's id (default: the name in lower case)
-#   scripts/new-project.sh Demo --dir /tmp/Demo --no-git  # elsewhere, files only (a try, the framework's CI)
-#   scripts/new-project.sh Demo --no-build                # the files and git, no externals nor build (no push either)
+#   jtools new SensorMonitor                         # ./SensorMonitor, on port 8090, a git repository, built
+#   jtools new SensorMonitor --port 8094             # the port of its .ini
+#   jtools new SensorMonitor --id sensors            # the program's id (default: the name in lower case)
+#   jtools new SensorMonitor --dir ~/work/monitor    # elsewhere
+#   jtools new SensorMonitor --bare ~/git-bare/SensorMonitor.git   # and a bare repository, pushed to once built
+#   jtools new Demo --no-git --no-build              # the files alone (a try, the framework's CI)
 #
-# The name is the Java class of the business (core) and the program's name: CamelCase, a letter first. The port is
-# entered in doc/PORTS.md, the registry that keeps the programs apart — commit it in the framework afterwards.
-# A new project is a private one: git/ and git-bare/ beside the folder holding the framework (github/, where the
-# published projects are), whence git-bare/push-to-nas.sh takes it to the NAS.
+# The name is the Java class of the business (core) and the program's name: CamelCase, a letter first.
+# From a clone of JToolsFramework, the port is also one no org.jtools program has (doc/PORTS.md, the family's
+# registry: the next free one by default), and a project with its repository is entered there — commit it in the
+# framework afterwards.
 #
 set -euo pipefail
-framework="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
-cd "$framework"
+starter="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+usage() { sed -n '3,13p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2; }
 
-usage() { sed -n '3,17p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2; }
+# Where its parts are: the unpacked jtools-devkit (a file "version" above this folder), or a clone of the framework.
+if [ -f "$starter/../version" ]; then
+  devkit=$(cd "$starter/.." && pwd) frontend=$starter/frontend clone=
+  version=$(cat "$devkit/version")
+else
+  clone=$(cd "$starter/.." && pwd)
+  devkit=$clone/devkit frontend=$clone/libraries/web
+  version=$(sed -n 's:.*<jtools.version>\(.*\)</jtools.version>.*:\1:p' "$clone/conventions/parent/pom.xml")
+fi
+DEFAULT_PORT=8090
 
 name= id= port= dir= bare= git=true build=true
 while [ $# -gt 0 ]; do
@@ -40,75 +50,70 @@ done
 [[ $name =~ ^[A-Z][A-Za-z0-9]*$ ]] || { echo "$name: a CamelCase name, a letter first (it is a Java class)" >&2; exit 2; }
 id=${id:-$(tr '[:upper:]' '[:lower:]' <<< "$name")}
 [[ $id =~ ^[a-z][a-z0-9]*$ ]] || { echo "$id: an id of lower-case letters and digits (it is a Java package)" >&2; exit 2; }
-developpement=$(dirname "$(dirname "$framework")")   # the folder holding github/, git/ and git-bare/
-dir=${dir:-$developpement/git/$name}
-bare=${bare:-$developpement/git-bare/$name.git}
+dir=${dir:-$PWD/$name}
+case "$dir" in /*) ;; *) dir=$PWD/$dir ;; esac
 [ ! -e "$dir" ] || { echo "$dir exists: choose another name or --dir" >&2; exit 1; }
-if $git; then [ ! -e "$bare" ] || { echo "$bare exists: choose another name or --bare" >&2; exit 1; }; fi
-
-# The port: one no other program of doc/PORTS.md has, the next free one by default.
-ports=$(sed -n 's/^| *\([0-9][0-9]*\) *|.*/\1/p' doc/PORTS.md)
-if [ -z "$port" ]; then
-  port=$(( $(sort -n <<< "$ports" | tail -1) + 1 ))
-  while grep -qx "$port" <<< "$ports"; do port=$((port + 1)); done
+if [ -n "$bare" ]; then
+  case "$bare" in /*) ;; *) bare=$PWD/$bare ;; esac
+  $git || { echo "--bare wants a git repository: not with --no-git" >&2; exit 2; }
+  [ ! -e "$bare" ] || { echo "$bare exists: choose another --bare" >&2; exit 1; }
 fi
+
+# The port. From a clone, one no org.jtools program of doc/PORTS.md has, the next free one by default.
+registry=${clone:+$clone/doc/PORTS.md}
+if [ -n "$registry" ]; then
+  ports=$(sed -n 's/^| *\([0-9][0-9]*\) *|.*/\1/p' "$registry")
+  if [ -z "$port" ]; then
+    port=$(( $(sort -n <<< "$ports" | tail -1) + 1 ))
+    while grep -qx "$port" <<< "$ports"; do port=$((port + 1)); done
+  fi
+  if grep -qx "$port" <<< "$ports"; then
+    echo "port $port is taken in doc/PORTS.md ($(grep -E "^\| *$port *\|" "$registry" | cut -d"|" -f3 | xargs | sed "s/ /, /g")): choose another with --port" >&2; exit 1
+  fi
+fi
+port=${port:-$DEFAULT_PORT}
 [[ $port =~ ^[0-9]+$ ]] && [ "$port" -ge 1024 ] && [ "$port" -le 65535 ] || { echo "$port: a port from 1024 to 65535" >&2; exit 2; }
-if grep -qx "$port" <<< "$ports"; then
-  echo "port $port is taken in doc/PORTS.md ($(grep -E "^\| *$port *\|" doc/PORTS.md | cut -d"|" -f3 | xargs | sed "s/ /, /g")): choose another with --port" >&2; exit 1
-fi
-
-version=$(sed -n 's:.*<jtools.version>\(.*\)</jtools.version>.*:\1:p' conventions/parent/pom.xml)
-mkdir -p "$(dirname "$dir")"
-home=$(realpath --relative-to="$dir" "$framework" 2>/dev/null || echo "$framework")
-case "$dir" in /tmp/*|"${TMPDIR:-/nonexistent}"/*) home=$framework ;; esac   # a try elsewhere: the framework by its full path
 
 echo "== $name ($id, port $port) in $dir, from JToolsFramework $version"
 
 # The template, its placeholders filled in — in the files and in the paths.
 substitute() {
-  sed -e "s/__APP_NAME__/$name/g" -e "s/__APP_ID__/$id/g" -e "s/__APP_PORT__/$port/g" \
-      -e "s/__JTOOLS_VERSION__/$version/g" -e "s#__JTOOLS_HOME__#$home#g"
+  sed -e "s/__APP_NAME__/$name/g" -e "s/__APP_ID__/$id/g" -e "s/__APP_PORT__/$port/g" -e "s/__JTOOLS_VERSION__/$version/g"
 }
-(cd starter/template && find . -type f) | while read -r file; do
+(cd "$starter/template" && find . -type f) | while read -r file; do
   target="$dir/$(substitute <<< "${file#./}")"
   mkdir -p "$(dirname "$target")"
-  substitute < "starter/template/$file" > "$target"
+  substitute < "$starter/template/$file" > "$target"
 done
 
-# What the framework owns: the managed scripts, its externals.conf, the page's dependencies and editor settings
-# (the same Angular as @jtools/web's, which the framework's CI builds).
-grep -v -E '^(#|$)' devkit/managed-files.list | while read -r file; do
+# What the devkit owns: the managed files, scripts/jtools, the default externals.conf; the page's dependencies and
+# editor settings (the same Angular as @jtools/web's, which the framework's CI builds).
+grep -v -E '^(#|$)' "$devkit/managed-files.list" | while read -r file; do
   mkdir -p "$dir/$(dirname "$file")"
-  cp -p "devkit/$file" "$dir/$file"
+  cp -p "$devkit/$file" "$dir/$file"
 done
-cp devkit/externals.conf "$dir/"
+cp -p "$devkit/scripts/jtools" "$dir/scripts/jtools"
+chmod +x "$dir"/scripts/*.sh "$dir/scripts/jtools" "$dir/.githooks/pre-push"
+cp "$devkit/externals.conf" "$dir/"
 for file in package.json package-lock.json tsconfig.spec.json .editorconfig .prettierrc .gitignore; do
-  cp "libraries/web/$file" "$dir/frontend/$file"
+  cp "$frontend/$file" "$dir/frontend/$file"
 done
 sed -i "s/\"name\": \"jtools-web\"/\"name\": \"$id\"/" "$dir/frontend/package.json" "$dir/frontend/package-lock.json"
 
-# The port, entered in the registry (kept sorted by port) — by a real project, with its repository; a try is not one.
-if $git; then
-  # where it is: git/<Name> under the folder holding git/ and git-bare/, its full path elsewhere
-  root=$(dirname "$(dirname "$framework")")
-  case "$dir" in "$root"/*) where=${dir#"$root"/} ;; *) where=$dir ;; esac
+# From a clone, the port entered in the family's registry (kept sorted by port) — by a real project, with its
+# repository; a try is not one.
+if [ -n "$registry" ] && $git; then
+  where=$dir
+  case "$dir" in "$(dirname "$(dirname "$clone")")"/*) where=${dir#"$(dirname "$(dirname "$clone")")"/} ;; esac
   {
-    sed -n '1,/^|---/p' doc/PORTS.md
-    { sed -n '/^|---/,$p' doc/PORTS.md | sed 1d | grep '^|'; echo "| $port | $name | $where |"; } | sort -s -t'|' -k2,2n
-    sed -n '/^|---/,$p' doc/PORTS.md | sed 1d | grep -v '^|' || true
-  } > doc/PORTS.md.new && mv doc/PORTS.md.new doc/PORTS.md
+    sed -n '1,/^|---/p' "$registry"
+    { sed -n '/^|---/,$p' "$registry" | sed 1d | grep '^|'; echo "| $port | $name | $where |"; } | sort -s -t'|' -k2,2n
+    sed -n '/^|---/,$p' "$registry" | sed 1d | grep -v '^|' || true
+  } > "$registry.new" && mv "$registry.new" "$registry"
   echo "== port $port entered in doc/PORTS.md (commit it in JToolsFramework)"
 fi
 
 cd "$dir"
-if $build; then
-  # the externals, from the framework's downloads when it has them: nothing downloaded twice
-  [ -d "$framework/external/downloads" ] && export JTOOLS_DOWNLOADS="$framework/external/downloads"
-  scripts/setup.sh
-  scripts/build.sh -q
-  echo "== built: app/target/$id.jar"
-fi
-
 if $git; then
   git init -q -b master
   git config core.hooksPath .githooks
@@ -116,7 +121,17 @@ if $git; then
   git commit -q -m "Initial commit: $name, generated by JToolsFramework $version
 
 A Java server holding the business (core, api), an Angular page as its view (frontend), the program
-stopping once its last page is closed and its distributions (app); the framework's scripts and externals."
+stopping once its last page is closed and its distributions (app); the devkit's scripts and externals."
+  echo "== a git repository, its first commit made"
+fi
+if $build; then
+  # the externals, from the clone's downloads when it has them: nothing downloaded twice
+  [ -n "$clone" ] && [ -d "$clone/external/downloads" ] && export JTOOLS_DOWNLOADS="$clone/external/downloads"
+  scripts/setup.sh
+  scripts/build.sh -q
+  echo "== built: app/target/$id.jar"
+fi
+if [ -n "$bare" ]; then
   mkdir -p "$(dirname "$bare")"
   git init -q --bare -b master "$bare"
   git remote add origin "$bare"

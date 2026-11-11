@@ -27,7 +27,7 @@ What is not here is JToolsFramework's: `WebServer` (the routes, the page, the pr
 `Exchange` (what a route reads of a request), `PageWatch` (the stop once the last page has gone), `WebApp` (the command
 line, the Settings menu's port, the `.ini`, the log, the browser, and the routes `/api/settings`, `/api/about`,
 `/api/quit`, `/api/log/open`), `@jtools/web` (the page's presence, the server's errors), the build (`jtools-parent`:
-the page, the program's jar, the jlink distributions) and the scripts. Its `doc/PATTERN.md` says the conventions.
+the page, the program's jar, the jlink distributions) and the scripts. Its `doc/CONCEPTS.md` says the conventions.
 
 ## The API
 

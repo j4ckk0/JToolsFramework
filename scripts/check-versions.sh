@@ -18,6 +18,11 @@ for pom in pom.xml */*/pom.xml; do
     if [ "$found" != "$version" ]; then echo "$pom: jtools-parent $found, but jtools.version is $version" >&2; status=1; fi
   done < <(grep -A1 '<artifactId>jtools-parent</artifactId>' "$pom" | sed -n 's:.*<version>\(.*\)</version>.*:\1:p')
 done
+# scripts/jtools: the version `jtools new` makes outside a project
+for stub in devkit/scripts/jtools scripts/jtools; do
+  said=$(sed -n 's/^JTOOLS_DEFAULT_VERSION=\([^ ]*\).*/\1/p' "$stub")
+  [ "$said" = "$version" ] || { echo "$stub: JTOOLS_DEFAULT_VERSION=$said, but jtools.version is $version" >&2; status=1; }
+done
 # jtools-bom inherits nothing: its own version, said once in its pom
 bom=$(grep -A1 '<artifactId>jtools-bom</artifactId>' conventions/bom/pom.xml | sed -n 's:.*<version>\(.*\)</version>.*:\1:p' | head -1)
 [ "$bom" = "$version" ] || { echo "conventions/bom/pom.xml: jtools-bom $bom, but jtools.version is $version" >&2; status=1; }

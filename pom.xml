@@ -33,5 +33,6 @@
     <module>libraries/desktop</module>
     <module>conventions/dist</module>
     <module>libraries/web</module>
+    <module>devkit</module>
   </modules>
 </project>

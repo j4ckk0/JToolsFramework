@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jtools.framework</groupId>
+    <artifactId>jtools-parent</artifactId>
+    <version>1.2.0</version>
+    <relativePath>../conventions/parent/pom.xml</relativePath>
+  </parent>
+  <artifactId>jtools-devkit</artifactId>
+  <packaging>jar</packaging>
+  <name>JToolsFramework devkit</name>
+  <description>What a project carries and does not edit — its scripts (setup, build, ci, run, stop, package), its pre-push hook and .gitattributes, the default externals.conf — and the starter that makes a new project, fetched at the version a project's jtools.conf names by its scripts/jtools (doc/DEVKIT.md).</description>
+  <!-- One jar, jtools-devkit/ inside, laid out as a project is (scripts/, .githooks/), plus what makes one:
+         jtools-devkit/version                the version, which scripts/jtools and jtools-sync.sh read
+         jtools-devkit/managed-files.list     the files a project carries and never edits
+         jtools-devkit/scripts/ .githooks/ .gitattributes externals.conf   those files, and the default externals
+         jtools-devkit/jtools-sync.sh         what scripts/jtools sync runs
+         jtools-devkit/starter/               new-project.sh, the template, and frontend/: the page's npm files
+       Nothing is filtered but the version: the template's __PLACEHOLDERS__ are the starter's to fill. -->
+  <properties>
+    <!-- no Java: Maven Central's javadoc jar is a README (jtools-parent, profile publish) -->
+    <maven.javadoc.skip>true</maven.javadoc.skip>
+    <jtools.javadoc.placeholder.skip>false</jtools.javadoc.placeholder.skip>
+  </properties>
+  <build>
+    <resources>
+      <resource>
+        <directory>${project.basedir}</directory>
+        <includes>
+          <include>scripts/**</include>
+          <include>.githooks/**</include>
+          <include>.gitattributes</include>
+          <include>externals.conf</include>
+          <include>managed-files.list</include>
+          <include>jtools-sync.sh</include>
+        </includes>
+        <targetPath>jtools-devkit</targetPath>
+      </resource>
+      <resource>
+        <directory>${project.basedir}/../starter</directory>
+        <targetPath>jtools-devkit/starter</targetPath>
+      </resource>
+      <!-- the page's dependencies and editor settings a new project's frontend starts from: @jtools/web's own, the
+           Angular the framework's CI builds -->
+      <resource>
+        <directory>${project.basedir}/../libraries/web</directory>
+        <includes>
+          <include>package.json</include>
+          <include>package-lock.json</include>
+          <include>tsconfig.spec.json</include>
+          <include>.editorconfig</include>
+          <include>.prettierrc</include>
+          <include>.gitignore</include>
+        </includes>
+        <targetPath>jtools-devkit/starter/frontend</targetPath>
+      </resource>
+      <resource>
+        <directory>src/version</directory>
+        <filtering>true</filtering>
+        <targetPath>jtools-devkit</targetPath>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <!-- .gitattributes, .gitignore: files of the devkit's, which Maven's default excludes would leave out -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <configuration>
+          <addDefaultExcludes>false</addDefaultExcludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <!-- and which the jar's own default excludes would leave out of it -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <addDefaultExcludes>false</addDefaultExcludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
