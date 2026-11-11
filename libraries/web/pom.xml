@@ -7,7 +7,7 @@
     <groupId>org.jtools.framework</groupId>
     <artifactId>jtools-parent</artifactId>
     <version>1.1.0</version>
-    <relativePath>../parent/pom.xml</relativePath>
+    <relativePath>../../conventions/parent/pom.xml</relativePath>
   </parent>
   <artifactId>jtools-web</artifactId>
   <packaging>jar</packaging>

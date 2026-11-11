@@ -14,7 +14,7 @@ scripts/check-versions.sh
 trial=tmp/ci/CiTrial
 rm -rf tmp/ci
 mkdir -p tmp/ci
-scripts/new-project.sh CiTrial --port 18099 --dir "$PWD/$trial" --no-git --no-build >/dev/null
+starter/new-project.sh CiTrial --port 18099 --dir "$PWD/$trial" --no-git --no-build >/dev/null
 ln -s "$PWD/external" "$trial/external"
 (cd "$trial" && scripts/ci.sh)
 echo "== the template makes a project that passes its CI"

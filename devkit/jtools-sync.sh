@@ -20,19 +20,19 @@ cd "$framework"
 differs=0
 echo "== the managed files"
 while read -r file; do
-  if cmp -s "$file" "$project/$file"; then continue; fi
+  if cmp -s "devkit/$file" "$project/$file"; then continue; fi
   differs=1
   if $check; then
     echo "   differs: $file"
   else
     mkdir -p "$project/$(dirname "$file")"
-    cp -p "$file" "$project/$file"
+    cp -p "devkit/$file" "$project/$file"
     echo "   refreshed: $file"
   fi
-done < <(grep -v -E '^(#|$)' scripts/managed-files.list)
+done < <(grep -v -E '^(#|$)' devkit/managed-files.list)
 
 echo "== the framework version"
-version=$(sed -n 's:.*<jtools.version>\(.*\)</jtools.version>.*:\1:p' parent/pom.xml)
+version=$(sed -n 's:.*<jtools.version>\(.*\)</jtools.version>.*:\1:p' conventions/parent/pom.xml)
 used=$(grep -A1 '<artifactId>jtools-parent</artifactId>' "$project/pom.xml" | sed -n 's:.*<version>\(.*\)</version>.*:\1:p')
 if [ "$used" = "$version" ]; then echo "   $version, the framework's"
 else echo "   the project's pom names jtools-parent ${used:-(none)}, the framework is $version: change it in $project/pom.xml"; differs=1; fi
@@ -42,7 +42,7 @@ while IFS='=' read -r key value; do
   case "$key" in ''|\#*|MIRROR*) continue ;; esac
   theirs=$(sed -n "s|^$key=||p" "$project/externals.conf")
   [ "$theirs" = "$value" ] || { echo "   $key: ${theirs:-(absent)} -> $value"; differs=1; }
-done < externals.conf
+done < devkit/externals.conf
 
 if [ $differs = 0 ]; then echo "== $project is in line with JToolsFramework $version"
 elif $check; then exit 1

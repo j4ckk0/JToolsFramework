@@ -7,18 +7,12 @@
     <groupId>org.jtools.framework</groupId>
     <artifactId>jtools-parent</artifactId>
     <version>1.1.0</version>
-    <relativePath>../parent/pom.xml</relativePath>
+    <relativePath>../../conventions/parent/pom.xml</relativePath>
   </parent>
-  <artifactId>jtools-desktop</artifactId>
+  <artifactId>jtools-support</artifactId>
   <packaging>jar</packaging>
-  <name>JToolsFramework desktop</name>
-  <description>The native file dialogs a local web application's server opens on its own desktop, the browser being unable to give it a file's path: kdialog or zenity on Linux, AWT's on Windows and macOS, Swing's as the fallback. A module of its own, so that a program without dialogs does not carry them.</description>
-  <dependencies>
-    <dependency>
-      <groupId>org.jtools.framework</groupId>
-      <artifactId>jtools-support</artifactId>
-    </dependency>
-  </dependencies>
+  <name>JToolsFramework support</name>
+  <description>What every program leans on and none of them is about: JSON (Map / List trees, no dependency), where the program is installed, its version and its .ini. The JDK and nothing else.</description>
   <build>
     <plugins>
       <!-- the Apache 2.0 header on every Java source (jtools-parent configures it) -->
@@ -32,7 +26,7 @@
         <configuration>
           <archive>
             <manifestEntries>
-              <Automatic-Module-Name>org.jtools.framework.desktop</Automatic-Module-Name>
+              <Automatic-Module-Name>org.jtools.framework.support</Automatic-Module-Name>
             </manifestEntries>
           </archive>
         </configuration>

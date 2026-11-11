@@ -57,7 +57,7 @@ if grep -qx "$port" <<< "$ports"; then
   echo "port $port is taken in doc/PORTS.md ($(grep -E "^\| *$port *\|" doc/PORTS.md | cut -d"|" -f3 | xargs | sed "s/ /, /g")): choose another with --port" >&2; exit 1
 fi
 
-version=$(sed -n 's:.*<jtools.version>\(.*\)</jtools.version>.*:\1:p' parent/pom.xml)
+version=$(sed -n 's:.*<jtools.version>\(.*\)</jtools.version>.*:\1:p' conventions/parent/pom.xml)
 mkdir -p "$(dirname "$dir")"
 home=$(realpath --relative-to="$dir" "$framework" 2>/dev/null || echo "$framework")
 case "$dir" in /tmp/*|"${TMPDIR:-/nonexistent}"/*) home=$framework ;; esac   # a try elsewhere: the framework by its full path
@@ -69,21 +69,21 @@ substitute() {
   sed -e "s/__APP_NAME__/$name/g" -e "s/__APP_ID__/$id/g" -e "s/__APP_PORT__/$port/g" \
       -e "s/__JTOOLS_VERSION__/$version/g" -e "s#__JTOOLS_HOME__#$home#g"
 }
-(cd templates/webapp && find . -type f) | while read -r file; do
+(cd starter/template && find . -type f) | while read -r file; do
   target="$dir/$(substitute <<< "${file#./}")"
   mkdir -p "$(dirname "$target")"
-  substitute < "templates/webapp/$file" > "$target"
+  substitute < "starter/template/$file" > "$target"
 done
 
 # What the framework owns: the managed scripts, its externals.conf, the page's dependencies and editor settings
 # (the same Angular as @jtools/web's, which the framework's CI builds).
-grep -v -E '^(#|$)' scripts/managed-files.list | while read -r file; do
+grep -v -E '^(#|$)' devkit/managed-files.list | while read -r file; do
   mkdir -p "$dir/$(dirname "$file")"
-  cp -p "$file" "$dir/$file"
+  cp -p "devkit/$file" "$dir/$file"
 done
-cp externals.conf "$dir/"
+cp devkit/externals.conf "$dir/"
 for file in package.json package-lock.json tsconfig.spec.json .editorconfig .prettierrc .gitignore; do
-  cp "web/$file" "$dir/frontend/$file"
+  cp "libraries/web/$file" "$dir/frontend/$file"
 done
 sed -i "s/\"name\": \"jtools-web\"/\"name\": \"$id\"/" "$dir/frontend/package.json" "$dir/frontend/package-lock.json"
 

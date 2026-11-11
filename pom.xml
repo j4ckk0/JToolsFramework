@@ -8,7 +8,7 @@
     <groupId>org.jtools.framework</groupId>
     <artifactId>jtools-parent</artifactId>
     <version>1.1.0</version>
-    <relativePath>parent/pom.xml</relativePath>
+    <relativePath>conventions/parent/pom.xml</relativePath>
   </parent>
 
   <artifactId>jtools-framework</artifactId>
@@ -17,23 +17,20 @@
   <name>JToolsFramework</name>
   <description>What the org.jtools projects share — a Java server holding the business, an Angular page as its view, the program stopping once its last page is closed, self-contained distributions — as a parent pom, libraries, the page's TypeScript, the scripts and a project template.</description>
 
-  <!-- The modules, each depending only on those above it:
-         parent     jtools-parent, the build conventions every project inherits
-         support    JSON, the installation: the JDK and nothing else
-         server     WebServer, PageWatch: a local web application's server
-         launcher   WebApp: the program around the server
-         desktop    FileDialogs: the native file dialogs (a program without them does not carry them)
-         dist       the distributions' build (jlink runtimes, the archives) and launchers
-         web        @jtools/web: the page's side, as TypeScript sources
-       One version for all, said in every pom and as jtools.version in parent/pom.xml: scripts/install.sh checks they
-       agree. The project template (templates/webapp) and the scripts are not modules: scripts/new-project.sh copies them. -->
+  <!-- The parts, a folder each, named for what a developer does with it (doc/design/DESIGN-1.2.md):
+         conventions/  what a project's build inherits: jtools-parent, jtools-bom, jtools-dist
+         libraries/    what a program's code calls: jtools-support, -server, -app, -desktop, -web
+         devkit/       what a project carries — its scripts, its externals — and the starter: jtools-devkit
+         examples/     the smallest programs, built and tested with the rest, never published
+       One version for all, said in every pom and as jtools.version in conventions/parent/pom.xml:
+       scripts/check-versions.sh checks they agree. -->
   <modules>
-    <module>parent</module>
-    <module>support</module>
-    <module>server</module>
-    <module>launcher</module>
-    <module>desktop</module>
-    <module>dist</module>
-    <module>web</module>
+    <module>conventions/parent</module>
+    <module>libraries/support</module>
+    <module>libraries/server</module>
+    <module>libraries/app</module>
+    <module>libraries/desktop</module>
+    <module>conventions/dist</module>
+    <module>libraries/web</module>
   </modules>
 </project>
