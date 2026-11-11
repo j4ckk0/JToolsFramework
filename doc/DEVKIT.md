@@ -23,7 +23,7 @@ Each has its `.bat` twin in `scripts\windows\` — `setup.bat`, `build.bat`, `ci
 Plain `.bat` files, Windows 10's own `curl` and `tar`: no Git Bash, no PowerShell. The shell scripts also run in Git
 Bash, where they take the Windows tools.
 
-**A project made before 1.4** has its scripts in `scripts/` alone: name 1.5.0 in its `jtools.conf` and its pom, then
+**A project made before 1.4** has its scripts in `scripts/` alone: name 1.5.1 in its `jtools.conf` and its pom, then
 `scripts/jtools sync` (or `scripts\jtools sync`) moves them — the devkit's own into `linux/` and `windows/`, the
 project's `*.local.sh` and `*.local.bat` beside them —, and puts the new `jtools` and `jtools.bat` in place: remove the
 old two by hand, the sync may be running from one of them. `sync --check` lists what is still to move.

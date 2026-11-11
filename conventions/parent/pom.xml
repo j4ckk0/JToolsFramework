@@ -18,7 +18,7 @@
        doc/CONVENTIONS.md in JToolsFramework says it in full. -->
   <groupId>org.jtools.framework</groupId>
   <artifactId>jtools-parent</artifactId>
-  <version>1.5.0</version>
+  <version>1.5.1</version>
   <packaging>pom</packaging>
 
   <name>JToolsFramework parent</name>
@@ -64,7 +64,7 @@
 
   <properties>
     <!-- the framework's version, for the projects' dependencies on its modules: always this pom's own <version> -->
-    <jtools.version>1.5.0</jtools.version>
+    <jtools.version>1.5.1</jtools.version>
     <maven.compiler.release>25</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <junit.version>5.12.2</junit.version>

@@ -28,18 +28,18 @@ One archive, the framework and its installer — no clone, nothing built:
 
 ```bash
 mkdir jtools-start && cd jtools-start
-curl -fsSLO https://github.com/j4ckk0/JToolsFramework/releases/download/v1.5.0/jtools-1.5.0.tar.gz
-tar xzf jtools-1.5.0.tar.gz
-jtools-1.5.0/install.sh --no-project
+curl -fsSLO https://github.com/j4ckk0/JToolsFramework/releases/download/v1.5.1/jtools-1.5.1.tar.gz
+tar xzf jtools-1.5.1.tar.gz
+jtools-1.5.1/install.sh --no-project
 jtools --help
 ```
 
-*You should see* `== JToolsFramework 1.5.0 in …/.m2/repository`, `== jtools in …/.local/bin`, then `jtools`'s commands:
+*You should see* `== JToolsFramework 1.5.1 in …/.m2/repository`, `== jtools in …/.local/bin`, then `jtools`'s commands:
 `sync`, `version`, `new`. *If `jtools` is not found*: `~/.local/bin` is not on your `PATH` — the installer says the
 line to add to `~/.bashrc`; until then, `~/.local/bin/jtools`.
 
-*On Windows*: download `jtools-1.5.0.zip` from the [release](https://github.com/j4ckk0/JToolsFramework/releases/tag/v1.5.0), extract it (right-click ▸ *Extract All*), then
-`jtools-1.5.0\install.bat --no-project` in a command prompt. It offers to add `%USERPROFILE%\.local\bin` to your
+*On Windows*: download `jtools-1.5.1.zip` from the [release](https://github.com/j4ckk0/JToolsFramework/releases/tag/v1.5.1), extract it (right-click ▸ *Extract All*), then
+`jtools-1.5.1\install.bat --no-project` in a command prompt. It offers to add `%USERPROFILE%\.local\bin` to your
 `PATH`; `jtools --help` then works in the windows you open next. Double-clicked, `install.bat` asks the project's name
 and folder instead.
 
@@ -76,7 +76,7 @@ jtools new Bookshelf
 *You should see*, after a minute or two the first time (the downloads):
 
 ```
-== Bookshelf (bookshelf, port 8090) in …/jtools-start/Bookshelf, from JToolsFramework 1.5.0
+== Bookshelf (bookshelf, port 8090) in …/jtools-start/Bookshelf, from JToolsFramework 1.5.1
 == a git repository, its first commit made
 == external/jdk deployed
 == external/maven deployed
@@ -206,7 +206,7 @@ Java runtime trimmed to what the program needs: unpack, run, nothing to install.
 scripts/linux/jtools sync
 ```
 
-*You should see* `… is in line with JToolsFramework 1.5.0`. A new version of the framework: `JTOOLS_VERSION` in
+*You should see* `… is in line with JToolsFramework 1.5.1`. A new version of the framework: `JTOOLS_VERSION` in
 `jtools.conf` and the parent's `<version>` in `pom.xml`, then `scripts/linux/jtools sync` (the scripts) and `scripts/linux/ci.sh`
 (every test) — and commit.
 
@@ -214,7 +214,7 @@ scripts/linux/jtools sync
 
 | What you see | What to do |
 |---|---|
-| `jtools: download failed: … (JTOOLS_VERSION=1.5.0: is there such a version?)` | the framework is neither in `~/.m2` nor on Maven Central: step 1's `install.sh` |
+| `jtools: download failed: … (JTOOLS_VERSION=1.5.1: is there such a version?)` | the framework is neither in `~/.m2` nor on Maven Central: step 1's `install.sh` |
 | a download that never ends, or is refused, behind a company's proxy | a mirror: `MIRROR=` in `externals.local.conf`, its token beside it ([DEVKIT.md](DEVKIT.md)) |
 | `external/ is not set up: missing …` | `scripts/linux/setup.sh`, which the scripts offer to run |
 | `Port 8090 is in use: is Bookshelf already running?` | it is — open the page it names, or `scripts/linux/stop.sh`; or `--port` |

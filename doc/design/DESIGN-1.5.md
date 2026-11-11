@@ -45,3 +45,10 @@ with an archive of its own. It checks that the Maven argument reached the build 
 `-Dkey=value` beside it went through whole; that the option's archive of this version is kept and the previous
 version's removed; and that a missing declared archive fails `package`. And that `BUILD_GOALS=clean`, set in the
 environment, wins over the trial project's `jtools.conf`.
+
+## 5. 1.5.1: one licence header per package-info.java
+
+The four libraries' `package-info.java` carried their licence header twice — at the top, and a copy after the
+`package` line —, so the licence plugin, finding two start markers, warned on every build (and on 1.5.0's upload to
+Maven Central) and left those files alone. 1.5.1 removes the copy; the plugin reads them again, and adds nothing back.
+Nothing else changes: a comment, in four files.
