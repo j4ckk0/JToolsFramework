@@ -66,9 +66,6 @@ import org.jtools.framework.support.Json;
 public final class WebApp {
 
     private static final Logger LOG = Logger.getLogger(WebApp.class.getName());
-    static final Catalogue APP_CATALOGUE = Catalogue.load(WebApp.class, "org.jtools.framework.app.texts", Locale.ENGLISH, Locale.FRENCH);
-    /** What the log says of a failure: English, whoever runs the program (a log is read by whoever helps, and searched). */
-    static final Texts ENGLISH = APP_CATALOGUE.of(Locale.ENGLISH);
 
     /** The framework's own endpoints. */
     public static final String SETTINGS = WebServer.API + "/settings", ABOUT = WebServer.API + "/about", QUIT = WebServer.API + "/quit",
@@ -76,7 +73,6 @@ public final class WebApp {
     private static final String J_AUTO_STOP = "autoStop", J_PORT = "port", J_DEFAULT_PORT = "defaultPort", J_CURRENT_PORT = "currentPort",
             J_NAME = "name", J_VERSION = "version", J_JAVA_VERSION = "javaVersion", J_LANGUAGE = "language", J_LOG_FILE = "logFile",
             J_OK = "ok", J_FILE = "file";
-    static final String INI_EXTENSION = ".ini";
     private static final int EXIT_USAGE = 2, EXIT_CANNOT_START = 3, QUIT_WAIT_SECONDS = 1;
 
     private final String name;
@@ -202,13 +198,13 @@ public final class WebApp {
         // the program's own class: its jar is the one whose folder holds the .ini and whose manifest says the version
         Class<?> program = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass();
         Logging.configure();
-        Texts console = APP_CATALOGUE.of(Locale.getDefault());
+        Texts console = AppTexts.CATALOGUE.of(Locale.getDefault());
         Properties ini;
         LaunchOptions options;
         try {
-            ini = Installation.ini(Installation.home(program).resolve(id + INI_EXTENSION));
+            ini = Installation.ini(Installation.home(program).resolve(id + LaunchOptions.INI_EXTENSION));
         } catch (IOException e) {
-            fail(console, EXIT_USAGE, "error.ini", id + INI_EXTENSION, e.getMessage());
+            fail(console, EXIT_USAGE, "error.ini", id + LaunchOptions.INI_EXTENSION, e.getMessage());
             return;
         }
         try {
@@ -299,7 +295,7 @@ public final class WebApp {
         server.get(SETTINGS, ex -> settings(server, settings))
               .post(SETTINGS, ex -> {
                   Map<String, Object> asked = ex.jsonObject();
-                  Texts say = APP_CATALOGUE.of(ex.language());
+                  Texts say = AppTexts.CATALOGUE.of(ex.language());
                   if (asked.containsKey(J_AUTO_STOP) && !(asked.get(J_AUTO_STOP) instanceof Boolean)) throw new WebServer.Refusal(400, say.t("settings.autoStop"));
                   if (asked.containsKey(J_PORT) && !(asked.get(J_PORT) instanceof Number n && isPortOrUnset(n))) throw new WebServer.Refusal(400, say.t("settings.port"));
                   if (settingsFields != null) settingsFields.write(asked, ex);   // the program's own refusals before anything is kept
@@ -344,7 +340,7 @@ public final class WebApp {
     }
 
     private static Object openLog(Exchange ex) throws IOException {
-        Texts say = APP_CATALOGUE.of(ex.language());
+        Texts say = AppTexts.CATALOGUE.of(ex.language());
         if (!ex.fromThisComputer()) throw new WebServer.Refusal(403, say.t("log.notHere"));
         Path file = Logging.file();
         if (file == null || !Files.isRegularFile(file)) throw new WebServer.Refusal(409, say.t("log.none"));
@@ -370,12 +366,12 @@ public final class WebApp {
 
     /** The console's texts: in the language --lang named, else the machine's. */
     private Texts console(LaunchOptions options) {
-        return APP_CATALOGUE.of(options.lang() != null ? options.lang() : Locale.getDefault());
+        return AppTexts.CATALOGUE.of(options.lang() != null ? options.lang() : Locale.getDefault());
     }
 
     /** A failure said with one of jtools-app's texts: English in the log, the console's language to the person. */
     private void fail(Texts console, int code, String key, Object... args) {
-        fail(ENGLISH.t(key, args), console.t(key, args), code);
+        fail(AppTexts.ENGLISH.t(key, args), console.t(key, args), code);
     }
 
     /**

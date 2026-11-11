@@ -43,6 +43,8 @@ public record LaunchOptions(int port, String host, boolean browser, boolean keep
     public static final String OPT_KEEP_RUNNING = "--keep-running";
     /** The installation's settings a run reads from the {@code .ini}. */
     public static final String INI_PORT = "port", INI_HOST = "host", INI_LOG_LEVEL = "log.level", INI_LOG_FOLDER = "log.folder";
+    /** The {@code .ini}'s name is the program's id and this. */
+    static final String INI_EXTENSION = ".ini";
     /** This computer only: the page and its API are nobody else's. */
     public static final String DEFAULT_HOST = "127.0.0.1";
 }

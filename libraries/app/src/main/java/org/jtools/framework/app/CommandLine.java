@@ -61,7 +61,7 @@ final class CommandLine {
         private final transient Object[] args;
 
         UsageException(String key, Object... args) {
-            super(WebApp.ENGLISH.t(key, args));
+            super(AppTexts.ENGLISH.t(key, args));
             this.key = key;
             this.args = args;
         }
@@ -107,7 +107,7 @@ final class CommandLine {
      * host and log, then the defaults. The program's own options run as they are read.
      */
     LaunchOptions read(String[] args, Properties ini, OptionalInt userPort, Program program) throws UsageException {
-        String iniName = program.id() + WebApp.INI_EXTENSION;
+        String iniName = program.id() + INI_EXTENSION;
         int port = program.defaultPort();
         String iniPort = ini.getProperty(INI_PORT);
         if (iniPort != null && !iniPort.isBlank()) port = port(iniPort.trim(), iniName + " " + INI_PORT);
@@ -154,7 +154,7 @@ final class CommandLine {
         extraOptions.forEach((option, extra) -> line.append(" [").append(option).append(extra.valueName() == null ? "" : " " + extra.valueName()).append(']'));
         if (operands != null) line.append(' ').append(operandsUsage);
         StringBuilder usage = new StringBuilder(say.t("usage", id, line)).append(System.lineSeparator());
-        line(usage, OPT_PORT + " N", say.t("option.port", id + WebApp.INI_EXTENSION, program.defaultPort()));
+        line(usage, OPT_PORT + " N", say.t("option.port", id + INI_EXTENSION, program.defaultPort()));
         line(usage, OPT_HOST + " H", say.t("option.host", DEFAULT_HOST));
         line(usage, OPT_NO_BROWSER, say.t("option.noBrowser"));
         line(usage, OPT_KEEP_ALIVE, say.t("option.keepAlive", program.name()));
@@ -176,7 +176,7 @@ final class CommandLine {
     }
 
     private static String languages() {
-        return WebApp.APP_CATALOGUE.languages().stream().map(Locale::getLanguage).collect(Collectors.joining(", "));
+        return AppTexts.CATALOGUE.languages().stream().map(Locale::getLanguage).collect(Collectors.joining(", "));
     }
 
     private static void line(StringBuilder usage, String option, String help) {
@@ -207,7 +207,7 @@ final class CommandLine {
     }
 
     private static Locale language(String text, String what) throws UsageException {
-        for (Locale language : WebApp.APP_CATALOGUE.languages()) if (language.getLanguage().equalsIgnoreCase(text)) return language;
+        for (Locale language : AppTexts.CATALOGUE.languages()) if (language.getLanguage().equalsIgnoreCase(text)) return language;
         throw new UsageException("error.badLanguage", what + " " + text, languages());
     }
 }

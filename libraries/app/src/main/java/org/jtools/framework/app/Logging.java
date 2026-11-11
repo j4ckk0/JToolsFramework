@@ -56,8 +56,8 @@ final class Logging {
     /** The program's logging.properties, else the framework's — unless the JVM was given its own. */
     static void configure() {
         if (System.getProperty(LOGGING_CONFIG_FILE) != null || System.getProperty(LOGGING_CONFIG_CLASS) != null) return;
-        InputStream config = WebApp.class.getResourceAsStream(APP_LOGGING);
-        if (config == null) config = WebApp.class.getResourceAsStream(DEFAULT_LOGGING);
+        InputStream config = Logging.class.getResourceAsStream(APP_LOGGING);
+        if (config == null) config = Logging.class.getResourceAsStream(DEFAULT_LOGGING);
         try (InputStream in = config) {
             if (in != null) LogManager.getLogManager().readConfiguration(in);
         } catch (IOException e) {
