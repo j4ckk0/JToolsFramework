@@ -58,4 +58,9 @@ an unknown Maven phase; and the empty `MIRROR=` line of `externals.conf` named a
 then downloaded the devkit from — on Linux too, for a project whose files came with CRLF. 1.3.1's shell scripts take
 the carriage return off every `KEY=VALUE` line they read. The framework's CI checks it: its trial project's settings
 are rewritten with CRLF before the project's own CI runs; and the workflow `delivery` runs the shell scripts in Git Bash
-on the project the `.bat` scripts made on Windows. Maven Central's first release is then 1.3.1.
+on the project the `.bat` scripts made on Windows.
+
+**git is optional** from 1.3.1: without it, `jtools new` — and so the installers — makes the project without a
+repository, and says so, where 1.3.0 refused to go on; only `--bare`, which asks for one, still wants git. Nothing else
+of a project needs it: its scripts build, run and package with the tools they download. Maven Central's first release
+is then 1.3.1.

@@ -112,10 +112,16 @@ for /f "delims=0123456789" %%x in ("%PORT%") do set "NOT_DIGITS=%%x"
 if defined NOT_DIGITS goto :badport
 if %PORT% LSS 1024 goto :badport
 if %PORT% GTR 65535 goto :badport
-if "%GIT%"=="1" where git >nul 2>&1 || (
-  echo git not found: install Git for Windows - https://git-scm.com/download/win - or make the project with --no-git 1>&2
+rem git is optional: without it, the project is made without a repository - unless --bare asked for one
+if "%GIT%"=="0" goto :header
+where git >nul 2>&1 && goto :header
+if defined BARE (
+  echo git not found: --bare wants it - Git for Windows, https://git-scm.com/download/win 1>&2
   exit /b 1
 )
+echo == git not found: the project is made without a repository - git init in it, once Git for Windows is installed
+set "GIT=0"
+:header
 
 echo == %NAME% (%ID%, port %PORT%) in %DIR%, from JToolsFramework %VERSION%
 

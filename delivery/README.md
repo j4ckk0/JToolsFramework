@@ -16,8 +16,8 @@ On Windows: extract `jtools-__VERSION__.zip`, and double-click `install.bat` —
 environment — a JDK, Maven and Node.js of its own, in its `external/` folder — downloaded, and a first build.
 `./install.sh --help` lists its options; `jtools new --help`, the project's.
 
-**What you need**: Linux, with `bash`, `curl`, `unzip`, `tar` and `git`; or Windows 10 or later, with Git for Windows
-for the project's repository. And the internet
+**What you need**: Linux, with `bash`, `curl`, `unzip` and `tar`; or Windows 10 or later. git is optional: with it (on
+Windows, Git for Windows), the project starts in a git repository. And the internet
 the first time: the project's tools (about 450 MB) and the libraries its build uses (Maven plugins, npm packages)
 are downloaded — the framework itself is in this archive.
 

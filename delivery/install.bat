@@ -10,8 +10,8 @@ rem   install.bat Bookshelf --port 8094 ...         any other option of jtools n
 rem   install.bat --no-project                      the framework and jtools alone
 rem
 rem The framework goes into Maven's local repository (%USERPROFILE%\.m2\repository, and M2_REPO's too), jtools
-rem into %USERPROFILE%\.local\bin (JTOOLS_BIN says another). Windows 10 or later; a project's repository needs git (Git
-rem for Windows), jtools new --no-git makes one without.
+rem into %USERPROFILE%\.local\bin (JTOOLS_BIN says another). Windows 10 or later; git is optional: with it (Git for
+rem Windows), the project starts in a git repository.
 setlocal EnableExtensions DisableDelayedExpansion
 set "HERE=%~dp0"
 set "HERE=%HERE:~0,-1%"

@@ -6,17 +6,18 @@ don't.
 
 ## 0. What you need
 
-Linux, with `bash`, `curl`, `unzip`, `tar` and `git`; or Windows 10 or later, with
-[Git for Windows](https://git-scm.com/download/win) for the project's repository — Windows has the rest (`curl`,
-`tar`). **Nothing else** — no Java, Maven nor Node.js to install: a project downloads its own into its `external/`
-folder, the first time, about 450 MB.
+Linux, with `bash`, `curl`, `unzip` and `tar`; or Windows 10 or later, which has what it needs (`curl`, `tar`).
+**git is optional**: with it — on Windows, [Git for Windows](https://git-scm.com/download/win) — the project starts in a
+git repository, whose pre-push hook runs its CI before every push; without it, the project is made all the same, and
+`git init` in it, later, gives it one. **Nothing else** — no Java, Maven nor Node.js to install: a project downloads
+its own into its `external/` folder, the first time, about 450 MB.
 
 ```bash
-for tool in bash curl unzip tar git; do command -v $tool >/dev/null || echo "missing: $tool"; done
+for tool in bash curl unzip tar; do command -v $tool >/dev/null || echo "missing: $tool"; done
 ```
 
 *You should see*: nothing. A `missing:` line names what to install first, with your system's package manager. On
-Windows, `where git` in a command prompt says whether Git is there.
+Windows, nothing to check.
 
 **On Windows**, every command below has its `.bat` twin, typed in a command prompt: `install.bat` for `install.sh`,
 `jtools` (`jtools.bat`) for `jtools`, `scripts\run.bat` for `scripts/run.sh`, and so on.

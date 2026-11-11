@@ -51,6 +51,11 @@ jobs:
         run: scripts/ci.sh && scripts/package.sh && scripts/jtools sync --check && ls -l releases/
       - name: A project's files as Linux makes them, for Windows to compare
         run: ~/.local/bin/jtools new Demo --dir "$RUNNER_TEMP/fresh" --port 18096 --no-git --no-build
+      - name: Without git, a project without a repository
+        run: |
+          mkdir nogit && for f in /usr/bin/*; do [ "${f##*/}" = git ] || ln -s "$f" nogit/; done
+          env -i PATH="$PWD/nogit" HOME="$HOME" "$HOME/.local/bin/jtools" new NoGit --dir "$RUNNER_TEMP/nogit" --no-build
+          [ ! -e "$RUNNER_TEMP/nogit/.git" ] && [ -f "$RUNNER_TEMP/nogit/pom.xml" ]
       - uses: actions/upload-artifact@v4
         with:
           name: made-on-linux
@@ -103,6 +108,12 @@ jobs:
           if ($LASTEXITCODE -ne 0) { $e = ((Get-Content step.log -Tail 60) -join "`n").Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A'); Write-Output "::error title=jtools new::$e"; exit 1 }
           & 'C:\Program Files\Git\usr\bin\diff.exe' -r --strip-trailing-cr made-on-linux "$env:RUNNER_TEMP\fresh" 2>&1 | Tee-Object -FilePath step.log
           if ($LASTEXITCODE -ne 0) { $e = ((Get-Content step.log -TotalCount 80) -join "`n").Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A'); Write-Output "::error title=differs from Linux's::$e"; exit 1 }
+      - name: Without git, a project without a repository
+        run: |
+          $ErrorActionPreference = 'Continue'
+          $env:Path = (($env:Path -split ';') | Where-Object { $_ -notmatch '\\Git\\' }) -join ';'
+          cmd /c "`"$env:USERPROFILE\.local\bin\jtools.bat`" new NoGit --dir `"$env:RUNNER_TEMP\nogit`" --no-build" 2>&1 | Tee-Object -FilePath step.log
+          if ($LASTEXITCODE -ne 0 -or (Test-Path "$env:RUNNER_TEMP\nogit\.git") -or -not (Test-Path "$env:RUNNER_TEMP\nogit\pom.xml")) { $e = ((Get-Content step.log -Tail 40) -join "`n").Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A'); Write-Output "::error title=jtools new without git::$e"; exit 1 }
       - name: Git Bash's shell scripts, on Windows too, on a project the .bat scripts made (its files CRLF)
         shell: bash
         working-directory: ${{ runner.temp }}/demo

@@ -61,6 +61,12 @@ fi
 
 port=${port:-$DEFAULT_PORT}
 [[ $port =~ ^[0-9]+$ ]] && [ "$port" -ge 1024 ] && [ "$port" -le 65535 ] || { echo "$port: a port from 1024 to 65535" >&2; exit 2; }
+# git is optional: without it, the project is made without a repository - unless --bare asked for one
+if $git && ! command -v git >/dev/null; then
+  [ -z "$bare" ] || { echo "git not found: --bare wants it" >&2; exit 1; }
+  echo "== git not found: the project is made without a repository (git init in it, once git is installed)"
+  git=false
+fi
 
 echo "== $name ($id, port $port) in $dir, from JToolsFramework $version"
 

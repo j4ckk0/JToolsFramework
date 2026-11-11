@@ -10,8 +10,8 @@
 #   ./install.sh --no-project                      the framework and jtools alone
 #
 # The framework goes into Maven's local repository (~/.m2/repository, and M2_REPO's too), jtools into
-# ~/.local/bin (JTOOLS_BIN says another). Needs bash, curl, unzip, tar and git: on Windows, Git for Windows — whose Git
-# Bash install.bat runs this with, when double-clicked.
+# ~/.local/bin (JTOOLS_BIN says another). Needs bash, curl, unzip and tar; git is optional: with it, the project starts
+# in a git repository. On Windows, install.bat does the same.
 #
 set -euo pipefail
 here="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
@@ -22,7 +22,7 @@ case "${1:-}" in
 esac
 
 missing=""
-for tool in curl unzip tar git; do command -v "$tool" >/dev/null || missing="$missing $tool"; done
+for tool in curl unzip tar; do command -v "$tool" >/dev/null || missing="$missing $tool"; done
 [ -z "$missing" ] || { echo "install.sh: missing:$missing — install them first, with your system's package manager" >&2; exit 1; }
 
 # the framework's artifacts: added beside what the repository holds, this version's replaced when already there — in
@@ -45,23 +45,9 @@ mkdir -p "$bin"
 cp "$here/jtools" "$bin/jtools"
 chmod +x "$bin/jtools"
 echo "== jtools in $bin"
-case "$(uname -s)" in
-  MINGW*|MSYS*|CYGWIN*)
-    # jtools from cmd and PowerShell too: Git's own bash.exe, which puts Git Bash's tools on its PATH
-    git_root=$(cygpath -w /); git_root=${git_root%\\}
-    printf '@echo off\r\nsetlocal\r\nset "JTOOLS_SCRIPT=%%~dp0jtools"\r\n"%s\\bin\\bash.exe" "%%JTOOLS_SCRIPT:\\=/%%" %%*\r\n' "$git_root" > "$bin/jtools.cmd"
-    echo "== jtools.cmd in $bin: jtools from cmd and PowerShell too"
-    case ":$PATH:" in
-      *":$bin:"*) ;;
-      *) echo "   $(cygpath -w "$bin") is not on your PATH: add it, from PowerShell:"
-         echo "   [Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + ';$(cygpath -w "$bin")', 'User')"
-         echo "   then open a new window" ;;
-    esac ;;
-  *)
-    case ":$PATH:" in
-      *":$bin:"*) ;;
-      *) echo "   $bin is not on your PATH: add it, in ~/.bashrc:  export PATH=\"$bin:\$PATH\"" ;;
-    esac ;;
+case ":$PATH:" in
+  *":$bin:"*) ;;
+  *) echo "   $bin is not on your PATH: add it, in ~/.bashrc:  export PATH=\"$bin:\$PATH\"" ;;
 esac
 
 # The project: named on the command line, else asked at a terminal. By default beside this folder, never inside it.
