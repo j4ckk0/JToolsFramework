@@ -34,11 +34,18 @@ program needs. Nothing to install to run it.
 
 ### The development environment
 
-The scripts every project carries — `setup`, `build`, `ci`, `run`, `stop`, `package` and `jtools` — in `.sh` for Linux
-and in `.bat` for Windows, which needs no Git Bash. `setup` downloads the project's own JDK, Maven and Node.js into its
-`external/` folder, the ones for the computer it runs on, at the versions its `externals.conf` names: nothing is taken
-from your machine, so the project builds the same everywhere. `scripts/linux/jtools sync` keeps the scripts up to date with
-the framework.
+The scripts every project carries, in one folder for each system — a developer uses those of their own:
+
+```
+scripts/
+├── linux/     setup.sh  build.sh  ci.sh  run.sh  stop.sh  package.sh  jtools
+└── windows/   setup.bat build.bat ci.bat run.bat stop.bat package.bat jtools.bat
+```
+
+The Windows ones are plain `.bat` files: no Git Bash, no PowerShell. `setup` downloads the project's own JDK, Maven
+and Node.js into its `external/` folder — the ones for the computer it runs on, at the versions its `externals.conf`
+names: nothing is taken from your machine, so the project builds the same everywhere. `jtools sync` keeps the scripts
+up to date with the framework; for a project made before 1.4, it also moves them into these two folders.
 
 ### The project template
 
@@ -77,8 +84,7 @@ and `tar` Windows 10 comes with. Download `jtools-1.4.0.zip` from the
 [release](https://github.com/j4ckk0/JToolsFramework/releases/tag/v1.4.0), extract it (right-click ▸ *Extract All*),
 and double-click `jtools-1.4.0\install.bat`: it asks the project's name and folder, and offers to put `jtools` on
 your `PATH`. From a command prompt, `jtools-1.4.0\install.bat Bookshelf --dir C:\work\bookshelf` says them at once.
-Each command below has its `.bat` twin: `scripts\windows\run.bat`, `scripts\windows\build.bat`, `scripts\windows\package.bat`,
-`scripts\windows\jtools sync`.
+The steps below give each command for both systems.
 
 It puts the framework into your local Maven repository (`~/.m2`) and `jtools` into `~/.local/bin`, then makes the
 project: its files in that folder, its development environment — a JDK, Maven and Node.js of its own, in its
@@ -94,18 +100,15 @@ bookshelf/
 └── scripts/    linux/ and windows/: setup, build, ci, run, stop, package — and jtools
 ```
 
-**3. Run it**: `cd ~/work/bookshelf && scripts/linux/run.sh` — the page opens in your browser; close it, and 15 seconds later the
-program stops (`--keep-alive` keeps it serving).
+In the project's folder, then:
 
-**4. Add a feature**, one layer at a time: a method in `core` decides, an endpoint in `api` translates it to JSON, a method
-in `api.service.ts` and a view in `frontend` show it. `scripts/linux/run.sh` rebuilds when a source is newer.
-
-**5. Test it**: `scripts/linux/build.sh` — every Java test and the page's.
-
-**6. Ship it**: `scripts/linux/package.sh` — `releases/bookshelf-0.1.0-linux.tar.gz`, `-macos.tar.gz` and `-windows.zip`,
-each with its launchers and a trimmed Java runtime: unpack, run, nothing to install.
-
-**7. Keep it up to date**: `scripts/linux/jtools sync` refreshes the scripts at the framework version `jtools.conf` names.
+| Step | Linux | Windows |
+|---|---|---|
+| **3. Run it** — the page opens in your browser; close it, and 15 seconds later the program stops (`--keep-alive` keeps it serving) | `scripts/linux/run.sh` | `scripts\windows\run.bat` |
+| **4. Add a feature**, one layer at a time: a method in `core` decides, an endpoint in `api` translates it to JSON, a method in `api.service.ts` and a view in `frontend` show it — `run` rebuilds when a file changed | | |
+| **5. Test it** — every Java test and the page's | `scripts/linux/build.sh` | `scripts\windows\build.bat` |
+| **6. Ship it** — `releases/bookshelf-0.1.0-linux.tar.gz`, `-macos.tar.gz` and `-windows.zip`, each with its launchers and a trimmed Java runtime: unpack, run, nothing to install | `scripts/linux/package.sh` | `scripts\windows\package.bat` |
+| **7. Keep it up to date** — the scripts refreshed at the framework version `jtools.conf` names | `scripts/linux/jtools sync` | `scripts\windows\jtools sync` |
 
 The internet is needed the first time: the project's tools and the libraries its build uses (Maven plugins, npm
 packages) are downloaded; the framework itself is in the archive. To change the framework too, clone it instead:
@@ -220,10 +223,10 @@ curl 'http://127.0.0.1:8089/api/hello?name=script'   # {"message":"Hello, script
 **Developing the framework itself**:
 
 ```bash
-scripts/linux/setup.sh       # the externals: JDK 25, Maven, Node.js, each platform's jmods (once)
-scripts/install.sh     # versions agree, build, test, install into ~/.m2
-scripts/linux/ci.sh          # the same quietly, then: the framework's scripts equal the devkit's, and a project made by a lone
-                       # scripts/linux/jtools from the installed devkit passes its own CI
+scripts/linux/setup.sh   # the externals: JDK 25, Maven, Node.js, each platform's jmods (once)
+scripts/install.sh       # versions agree, build, test, install into ~/.m2
+scripts/linux/ci.sh      # the same quietly, then: the framework's scripts equal the devkit's, and a project made by a
+                         # lone scripts/linux/jtools from the installed devkit passes its own CI
 ```
 
 `git config core.hooksPath .githooks` runs `scripts/linux/ci.sh` before every push. A project developed together with the
