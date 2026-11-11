@@ -39,3 +39,15 @@ write the same request: the same notes, the same JSON string.
 The workflow `delivery` releases its trial project on Linux and on Windows: a local release, whose checksums are
 checked against the archives; a GitHub one's request, read as JSON and compared with the notes — a changelog section
 of quotes, a backslash, `%`, `&`, `<`, `|`, `^`, `!`, a tab, indented lines and accents; and a token GitHub refuses.
+
+## 4. 1.6.1: what Maven Central's 1.6.0 lacks
+
+Maven Central's 1.6.0 — the tag `v1.6.0` is its commit — was uploaded before its `release.bat` worked, and Central
+neither removes nor replaces a version. Its `release.bat` stops at once: the lines that read the version, copied from
+`package.bat`, stopped short of their `:versioned` label; and past that it would find no changelog section, its search
+for the non-blank lines, `findstr /r "[^ ]"`, being read as two words — a space in a plain `findstr` search string means
+"or", so it takes `/c:`. Everything else of 1.6.0 is 1.6.1's. 1.6.1 is the first version whose `release.bat` works; a
+project on 1.6.0 takes it with `JTOOLS_VERSION=1.6.1` and `jtools sync`.
+
+The workflow's release step on Windows ends with `exit 0`: GitHub ends a PowerShell step with the exit code of its last
+command, which there is the deliberately refused token's.
