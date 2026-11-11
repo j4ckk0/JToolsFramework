@@ -12,9 +12,9 @@ everything else of the build is the parent's. A generated project has all of it 
 </parent>
 <properties>
   <revision>0.1.0</revision>
-  <jtools.app.id>sensormonitor</jtools.app.id>                                    <!-- its jar, .ini, launchers, releases -->
-  <jtools.app.name>SensorMonitor</jtools.app.name>                                <!-- as people read it; its .exe -->
-  <jtools.app.mainClass>org.jtools.sensormonitor.app.Launcher</jtools.app.mainClass>
+  <jtools.app.id>bookshelf</jtools.app.id>                                        <!-- its jar, .ini, launchers, releases -->
+  <jtools.app.name>Bookshelf</jtools.app.name>                                    <!-- as people read it; its .exe -->
+  <jtools.app.mainClass>org.jtools.bookshelf.app.Launcher</jtools.app.mainClass>
   <jtools.app.port>8090</jtools.app.port>                                         <!-- what its .ini says -->
   <jtools.app.windowsVersion>0.1.0.0</jtools.app.windowsVersion>                  <!-- the version in four parts -->
 </properties>

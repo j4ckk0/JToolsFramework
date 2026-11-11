@@ -5,7 +5,7 @@ development environment (`devkit/`) and a project template (`starter/`). `README
 reading path — GETTING-STARTED, CONCEPTS, LIBRARIES, CONVENTIONS, DEVKIT, ADOPTING —; `doc/design/` why it is as it is.
 
 **It stands on its own**: nothing in it names or links a program built on it — no project's name, path or port, in
-code, comments, tests, poms or docs. An example is a generic one (`SensorMonitor`, `examples/hello`).
+code, comments, tests, poms or docs. An example is a generic one (`Bookshelf`, `examples/hello`).
 
 ## Where things are
 

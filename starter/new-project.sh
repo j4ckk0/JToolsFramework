@@ -5,11 +5,11 @@
 # its externals.conf and a port; then, unless told otherwise, a git repository with its first commit, its externals and
 # a first build. Run through scripts/jtools new (anywhere), or from a clone of JToolsFramework.
 #
-#   jtools new SensorMonitor                         # ./SensorMonitor, on port 8090, a git repository, built
-#   jtools new SensorMonitor --port 8094             # the port of its .ini
-#   jtools new SensorMonitor --id sensors            # the program's id (default: the name in lower case)
-#   jtools new SensorMonitor --dir ~/work/monitor    # elsewhere
-#   jtools new SensorMonitor --bare ~/git-bare/SensorMonitor.git   # and a bare repository, pushed to once built
+#   jtools new Bookshelf                             # ./Bookshelf, on port 8090, a git repository, built
+#   jtools new Bookshelf --port 8094                 # the port of its .ini
+#   jtools new Bookshelf --id shelf                  # the program's id (default: the name in lower case)
+#   jtools new Bookshelf --dir ~/work/shelf          # elsewhere
+#   jtools new Bookshelf --bare ~/git-bare/Bookshelf.git           # and a bare repository, pushed to once built
 #   jtools new Demo --no-git --no-build              # the files alone (a try, the framework's CI)
 #
 # The name is the Java class of the business (core) and the program's name: CamelCase, a letter first.

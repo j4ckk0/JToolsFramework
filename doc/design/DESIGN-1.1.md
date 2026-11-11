@@ -176,7 +176,7 @@ public interface SettingsFields {
     void read(Map<String, Object> answer);                                  // GET: its fields into the answer
     void write(Map<String, Object> asked, Exchange exchange) throws Exception;  // POST: validate and keep its own; a Refusal on a bad one
 }
-WebApp.named("SensorMonitor").settingsFields(new MonitorSettings())...
+WebApp.named("Bookshelf").settingsFields(new ShelfSettings())...
 ```
 
 ### 3.2 `/api/quit`, `/api/about`, `/api/log/open`

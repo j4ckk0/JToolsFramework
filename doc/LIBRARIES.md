@@ -20,7 +20,7 @@ the same in short, and what is public only because another library or the JDK ne
 
 ```java
 public static void main(String[] args) {
-    WebApp.named("SensorMonitor").defaultPort(8090)           // its id is "sensormonitor": its jar, .ini, ~/.sensormonitor
+    WebApp.named("Bookshelf").defaultPort(8090)               // its id is "bookshelf": its jar, .ini, ~/.bookshelf
           .pageRoot("web")                                  // the page's classpath folder (static/ by default, an Angular build's)
           .option("--data", "DIR", "the folder of the data", dir -> data = Path.of(dir))
           .fileOperand("[file.xml]", "a file to open", file -> initial = file)
@@ -57,11 +57,11 @@ Public for a technical reason: `LaunchOptions` (the options' and the `.ini`'s na
 `org.jtools.framework.server`. **Start from `WebServer`**; a program built with jtools-app gets it in `routes`.
 
 ```java
-server.get("/api/sensors", ex -> sensors.list())                     // a List, a Map: JSON
-      .post("/api/sensors", ex -> sensors.add(ex.jsonObject()))      // the body as a JSON object; malformed: 400
+server.get("/api/books", ex -> books.list())                         // a List, a Map: JSON
+      .post("/api/books", ex -> books.add(ex.jsonObject()))          // the body as a JSON object; malformed: 400
       .get("/api/store/", ex -> store.read(ex.rest()))               // a prefix route: ex.rest() is what follows
       .get("/api/report", ex -> Answer.xml(report.xml()))           // anything else: an Answer
-      .refuse(UnknownSensorException.class, 404)                     // an exception of the domain, mapped to a status
+      .refuse(UnknownBookException.class, 404)                       // an exception of the domain, mapped to a status
       .handle("/mcp", rawHandler)                                    // a plain JDK handler, the checks still applied
       .filter(languageFilter);                                       // a JDK Filter around every request
 ```
@@ -95,7 +95,7 @@ Public for a technical reason: `Http` (the content types an `Answer` names: `Htt
 
 ```java
 Catalogue catalogue = Catalogue.load(MyApp.class, "i18n.messages", Locale.ENGLISH, Locale.FRENCH);
-catalogue.of(ex.language()).tn("sensors.count", n);   // sensors.count.one / sensors.count.other
+catalogue.of(ex.language()).tn("books.count", n);   // books.count.one / books.count.other
 ```
 
 - **`Installation`**: the folder of the program's jar, its version (the manifest's), its `.ini`.
@@ -108,7 +108,7 @@ display: a route then answers 409, and the page offers the browser's own. A libr
 a program opts into.
 
 ```java
-List<Path> chosen = FileDialogs.chooseFilesToOpen("Open readings", true, new FileDialogs.Filter("Readings", List.of("*.csv")));
+List<Path> chosen = FileDialogs.chooseFilesToOpen("Open a book list", true, new FileDialogs.Filter("Book lists", List.of("*.csv")));
 ```
 
 ## jtools-web — the Angular page's side

@@ -28,7 +28,7 @@ above it in the root pom's list:
 | `app` | the program: `Launcher`, its one jar embedding everything, the distributions | api, frontend, `jtools-app` |
 
 Naming, as `jtools new` makes it: groupId `org.jtools`, artifactIds `<id>-<module>` (the program's jar is plain `<id>`), packages
-`org.jtools.<id>.<module>`, the program's id in lower case (`sensormonitor`), its name in CamelCase (`SensorMonitor`).
+`org.jtools.<id>.<module>`, the program's id in lower case (`bookshelf`), its name in CamelCase (`Bookshelf`).
 
 ## 3. The page's presence, and the stop
 

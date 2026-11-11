@@ -170,7 +170,7 @@ public final class WebServer implements AutoCloseable {
 
     /**
      * Answers a route's exception of that class (or of a subclass) with that status and its message —
-     * {@code refuse(UnknownSensorException.class, 404)}. The most specific mapping wins; {@link IllegalArgumentException} is
+     * {@code refuse(UnknownBookException.class, 404)}. The most specific mapping wins; {@link IllegalArgumentException} is
      * 400 already. An exception mapped to nothing is a 500.
      */
     public WebServer refuse(Class<? extends Throwable> exception, int status) {

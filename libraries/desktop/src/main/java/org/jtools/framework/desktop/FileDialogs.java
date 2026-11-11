@@ -281,7 +281,7 @@ public final class FileDialogs {
                 return List.of(command, "--title", title, "--getexistingdirectory", dir);
             }
 
-            /** {@code Readings (*.csv *.tsv)} */
+            /** {@code Book lists (*.csv *.tsv)} */
             private static String qtFilter(Filter f) {
                 return f.description() + " (" + String.join(" ", f.globs()) + ")";
             }
@@ -305,7 +305,7 @@ public final class FileDialogs {
                 return List.of(command, "--file-selection", "--directory", "--title=" + title, "--filename=" + dir + File.separator);
             }
 
-            /** {@code --file-filter=Readings | *.csv *.tsv} */
+            /** {@code --file-filter=Book lists | *.csv *.tsv} */
             private static String gtkFilter(Filter f) {
                 return "--file-filter=" + f.description() + " | " + String.join(" ", f.globs());
             }
