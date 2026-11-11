@@ -112,28 +112,28 @@ class WebAppTest {
         Path[] opened = new Path[1];
         WebApp withFile = WebApp.named("Demo").fileOperand("[file.xsd]", "the schema to open", file -> opened[0] = file);
         assertEquals(List.of(schema.toString()), withFile.options(new String[] {schema.toString()}, new Properties(), NO_USER_PORT).operands());
-        assertThrows(WebApp.UsageException.class, () -> withFile.options(new String[] {dir.resolve("missing.xsd").toString()}, new Properties(), NO_USER_PORT));
-        assertThrows(WebApp.UsageException.class, () -> withFile.options(new String[] {dir.toString()}, new Properties(), NO_USER_PORT), "a folder is not a file");
-        assertThrows(WebApp.UsageException.class, () -> withFile.options(new String[] {schema.toString(), schema.toString()}, new Properties(), NO_USER_PORT));
+        assertThrows(CommandLine.UsageException.class, () -> withFile.options(new String[] {dir.resolve("missing.xsd").toString()}, new Properties(), NO_USER_PORT));
+        assertThrows(CommandLine.UsageException.class, () -> withFile.options(new String[] {dir.toString()}, new Properties(), NO_USER_PORT), "a folder is not a file");
+        assertThrows(CommandLine.UsageException.class, () -> withFile.options(new String[] {schema.toString(), schema.toString()}, new Properties(), NO_USER_PORT));
     }
 
     @Test
     void refusesWhatItCannotRun() {
         Properties none = new Properties();
-        assertThrows(WebApp.UsageException.class, () -> app.options(new String[] {"--unknown"}, none, NO_USER_PORT));
-        assertThrows(WebApp.UsageException.class, () -> app.options(new String[] {"file.xml"}, none, NO_USER_PORT), "no operands declared");
-        assertThrows(WebApp.UsageException.class, () -> app.options(new String[] {"--port"}, none, NO_USER_PORT));
-        assertThrows(WebApp.UsageException.class, () -> app.options(new String[] {"--port", "http"}, none, NO_USER_PORT));
-        assertThrows(WebApp.UsageException.class, () -> app.options(new String[] {"--log-level", "loud"}, none, NO_USER_PORT));
-        assertThrows(WebApp.UsageException.class, () -> app.options(new String[] {"--lang", "de"}, none, NO_USER_PORT));
-        assertThrows(WebApp.UsageException.class, () -> app.options(new String[0], ini(LaunchOptions.INI_PORT, "eighty"), NO_USER_PORT));
+        assertThrows(CommandLine.UsageException.class, () -> app.options(new String[] {"--unknown"}, none, NO_USER_PORT));
+        assertThrows(CommandLine.UsageException.class, () -> app.options(new String[] {"file.xml"}, none, NO_USER_PORT), "no operands declared");
+        assertThrows(CommandLine.UsageException.class, () -> app.options(new String[] {"--port"}, none, NO_USER_PORT));
+        assertThrows(CommandLine.UsageException.class, () -> app.options(new String[] {"--port", "http"}, none, NO_USER_PORT));
+        assertThrows(CommandLine.UsageException.class, () -> app.options(new String[] {"--log-level", "loud"}, none, NO_USER_PORT));
+        assertThrows(CommandLine.UsageException.class, () -> app.options(new String[] {"--lang", "de"}, none, NO_USER_PORT));
+        assertThrows(CommandLine.UsageException.class, () -> app.options(new String[0], ini(LaunchOptions.INI_PORT, "eighty"), NO_USER_PORT));
     }
 
     /** A command line refused is said twice: in English, what the log keeps; in the person's language, what they read. */
     @Test
     void refusesInEnglishForTheLogAndInTheirLanguageForThePerson() {
         var texts = org.jtools.framework.support.Catalogue.load(WebApp.class, "org.jtools.framework.app.texts", Locale.ENGLISH, Locale.FRENCH);
-        WebApp.UsageException refused = assertThrows(WebApp.UsageException.class, () -> app.options(new String[] {"--bogus"}, new Properties(), NO_USER_PORT));
+        CommandLine.UsageException refused = assertThrows(CommandLine.UsageException.class, () -> app.options(new String[] {"--bogus"}, new Properties(), NO_USER_PORT));
         assertEquals("unknown option: --bogus", refused.getMessage());
         assertEquals("option inconnue : --bogus", refused.in(texts.of(Locale.FRENCH)));
     }

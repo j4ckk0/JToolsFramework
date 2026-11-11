@@ -20,16 +20,12 @@ package org.jtools.framework.app;
  * #L%
  */
 
-import static org.jtools.framework.app.LaunchOptions.*;
-
 import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import java.net.BindException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -39,7 +35,6 @@ import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.swing.JOptionPane;
 
@@ -71,9 +66,9 @@ import org.jtools.framework.support.Json;
 public final class WebApp {
 
     private static final Logger LOG = Logger.getLogger(WebApp.class.getName());
-    private static final Catalogue APP_CATALOGUE = Catalogue.load(WebApp.class, "org.jtools.framework.app.texts", Locale.ENGLISH, Locale.FRENCH);
+    static final Catalogue APP_CATALOGUE = Catalogue.load(WebApp.class, "org.jtools.framework.app.texts", Locale.ENGLISH, Locale.FRENCH);
     /** What the log says of a failure: English, whoever runs the program (a log is read by whoever helps, and searched). */
-    private static final Texts ENGLISH = APP_CATALOGUE.of(Locale.ENGLISH);
+    static final Texts ENGLISH = APP_CATALOGUE.of(Locale.ENGLISH);
 
     /** The framework's own routes. */
     public static final String SETTINGS = WebServer.API + "/settings", ABOUT = WebServer.API + "/about", QUIT = WebServer.API + "/quit",
@@ -81,8 +76,8 @@ public final class WebApp {
     private static final String J_AUTO_STOP = "autoStop", J_PORT = "port", J_DEFAULT_PORT = "defaultPort", J_CURRENT_PORT = "currentPort",
             J_NAME = "name", J_VERSION = "version", J_JAVA_VERSION = "javaVersion", J_LANGUAGE = "language", J_LOG_FILE = "logFile",
             J_OK = "ok", J_FILE = "file";
-    private static final String INI_EXTENSION = ".ini";
-    private static final int EXIT_USAGE = 2, EXIT_CANNOT_START = 3, PORT_MAX = 65535, QUIT_WAIT_SECONDS = 1;
+    static final String INI_EXTENSION = ".ini";
+    private static final int EXIT_USAGE = 2, EXIT_CANNOT_START = 3, QUIT_WAIT_SECONDS = 1;
 
     private final String name;
     private String id;
@@ -94,34 +89,9 @@ public final class WebApp {
     private Runnable onStop = () -> {};
     private SettingsFields settingsFields;
     private Consumer<Map<String, Object>> aboutFields = about -> {};
-    /** The program's own options, by name: the value they take (null for a flag), their help, what they do. */
-    private final Map<String, ExtraOption> extraOptions = new LinkedHashMap<>();
-    private String operandsUsage, operandsHelp;
-    private Consumer<List<String>> operands;
-    private boolean oneFile;
+    private final CommandLine commandLine = new CommandLine();
     private IntConsumer exit = System::exit;
     private Locale language = Locale.getDefault();
-
-    private record ExtraOption(String valueName, String help, Consumer<String> action) {}
-
-    /**
-     * A command line that cannot be run, kept as a text key and its arguments so that it is said twice: in English as its
-     * message, what the log keeps, and in the person's language ({@link #in}), what they read.
-     */
-    static final class UsageException extends Exception {
-        private final String key;
-        private final transient Object[] args;
-
-        UsageException(String key, Object... args) {
-            super(ENGLISH.t(key, args));
-            this.key = key;
-            this.args = args;
-        }
-
-        String in(Texts say) {
-            return say.t(key, args);
-        }
-    }
 
     private WebApp(String name) {
         this.name = name;
@@ -188,29 +158,25 @@ public final class WebApp {
 
     /** An option of the program's own taking a value: {@code --data DIR}. Its help: a key of the program's texts, or the text itself. */
     public WebApp option(String option, String valueName, String help, Consumer<String> action) {
-        extraOptions.put(option, new ExtraOption(valueName, help, action));
+        commandLine.option(option, valueName, help, action);
         return this;
     }
 
     /** An option of the program's own taking no value: {@code --offline}. */
     public WebApp flag(String option, String help, Runnable action) {
-        extraOptions.put(option, new ExtraOption(null, help, value -> action.run()));
+        commandLine.flag(option, help, action);
         return this;
     }
 
     /** What the command line holds besides the options, handed over before the server starts; without this or {@link #fileOperand}, any is refused. */
     public WebApp operands(String usage, String help, Consumer<List<String>> action) {
-        this.operandsUsage = usage;
-        this.operandsHelp = help;
-        this.operands = action;
-        this.oneFile = false;
+        commandLine.operands(usage, help, action);
         return this;
     }
 
     /** One optional file to open, refused when it is not a regular file. */
     public WebApp fileOperand(String usage, String help, Consumer<Path> action) {
-        operands(usage, help, files -> { if (!files.isEmpty()) action.accept(Path.of(files.get(0))); });
-        this.oneFile = true;
+        commandLine.fileOperand(usage, help, action);
         return this;
     }
 
@@ -247,7 +213,7 @@ public final class WebApp {
         }
         try {
             options = options(args, ini, UserSettings.of(id).port());
-        } catch (UsageException e) {
+        } catch (CommandLine.UsageException e) {
             fail(e.getMessage(), e.in(console) + System.lineSeparator() + usage(console), EXIT_USAGE);
             return;
         }
@@ -259,7 +225,7 @@ public final class WebApp {
         }
         Logging.level(options.logLevel());
         Logging.file(id, options.logFile(), options.logFolder());
-        if (operands != null) operands.accept(options.operands());
+        commandLine.handOver(options.operands());
 
         WebServer server;
         try {
@@ -294,11 +260,11 @@ public final class WebApp {
         LaunchOptions options;
         try {
             options = options(args, new Properties(), UserSettings.of(id).port());
-        } catch (UsageException e) {
+        } catch (CommandLine.UsageException e) {
             throw new IllegalArgumentException(e.getMessage(), e);
         }
         language = options.lang() != null ? options.lang() : Locale.getDefault();
-        if (operands != null) operands.accept(options.operands());
+        commandLine.handOver(options.operands());
         exit = code -> {};
         return startServer(options, program);
     }
@@ -374,7 +340,7 @@ public final class WebApp {
 
     private static boolean isPortOrUnset(Number n) {
         double d = n.doubleValue();
-        return d == Math.rint(d) && d >= UserSettings.PORT_UNSET && d <= PORT_MAX;
+        return d == Math.rint(d) && d >= UserSettings.PORT_UNSET && d <= CommandLine.PORT_MAX;
     }
 
     private static Object openLog(Exchange ex) throws IOException {
@@ -388,116 +354,23 @@ public final class WebApp {
 
     // ---- the command line -----------------------------------------------------------------------------------
 
-    /**
-     * The options of a run: the command line's first, then the user's port (the Settings menu), then the .ini's port,
-     * host and log, then the defaults. The program's own options run as they are read.
-     */
-    LaunchOptions options(String[] args, Properties ini, OptionalInt userPort) throws UsageException {
-        int port = defaultPort;
-        String iniPort = ini.getProperty(INI_PORT);
-        if (iniPort != null && !iniPort.isBlank()) port = port(iniPort.trim(), id + INI_EXTENSION + " " + INI_PORT);
-        if (userPort.isPresent()) port = userPort.getAsInt();
-        String host = ini.getProperty(INI_HOST, DEFAULT_HOST).trim();
-        String iniLevel = ini.getProperty(INI_LOG_LEVEL);
-        Level logLevel = iniLevel == null || iniLevel.isBlank() ? Level.INFO : level(iniLevel.trim(), id + INI_EXTENSION + " " + INI_LOG_LEVEL);
-        String logFolder = ini.getProperty(INI_LOG_FOLDER);
-        boolean browser = true, keepAlive = false, help = false;
-        Path logFile = null;
-        Locale lang = null;
-        List<String> rest = new ArrayList<>();
-        for (int i = 0; i < args.length; i++) {
-            String arg = args[i];
-            switch (arg) {
-                case OPT_PORT -> port = port(value(args, ++i, arg), arg);
-                case OPT_HOST -> host = value(args, ++i, arg);
-                case OPT_NO_BROWSER -> { browser = false; keepAlive = true; }
-                case OPT_KEEP_ALIVE, OPT_KEEP_RUNNING -> keepAlive = true;
-                case OPT_LOG_LEVEL -> logLevel = level(value(args, ++i, arg), arg);
-                case OPT_VERBOSE -> logLevel = Level.FINE;
-                case OPT_LOG_FILE -> logFile = Path.of(value(args, ++i, arg));
-                case OPT_LANG -> lang = language(value(args, ++i, arg), arg);
-                case OPT_HELP, OPT_HELP_SHORT -> help = true;
-                default -> {
-                    ExtraOption extra = extraOptions.get(arg);
-                    if (extra != null) extra.action().accept(extra.valueName() == null ? null : value(args, ++i, arg));
-                    else if (arg.startsWith("-") || operands == null) throw new UsageException("error.unknownOption", arg);
-                    else rest.add(arg);
-                }
-            }
-        }
-        if (oneFile && !help) {
-            if (rest.size() > 1) throw new UsageException("error.oneOperand", operandsUsage);
-            if (rest.size() == 1 && !Files.isRegularFile(Path.of(rest.get(0)))) throw new UsageException("error.notAFile", rest.get(0));
-        }
-        return new LaunchOptions(port, host, browser, keepAlive, logLevel, logFile, logFolder, lang, help, List.copyOf(rest));
+    /** The options of a run, read by its {@link CommandLine} with this program's defaults. */
+    LaunchOptions options(String[] args, Properties ini, OptionalInt userPort) throws CommandLine.UsageException {
+        return commandLine.read(args, ini, userPort, program());
+    }
+
+    /** The help --help prints, in the console's language. */
+    String usage(Texts say) {
+        return commandLine.usage(say, program());
+    }
+
+    private CommandLine.Program program() {
+        return new CommandLine.Program(name, id, defaultPort, catalogue);
     }
 
     /** The console's texts: in the language --lang named, else the machine's. */
     private Texts console(LaunchOptions options) {
         return APP_CATALOGUE.of(options.lang() != null ? options.lang() : Locale.getDefault());
-    }
-
-    /** The help --help prints, in the console's language: the framework's options, then the program's own. */
-    String usage(Texts say) {
-        StringBuilder line = new StringBuilder("[--port N] [--host H] [--no-browser] [--keep-alive] [--log-level LEVEL] [--log-file FILE] [--lang LANG]");
-        extraOptions.forEach((option, extra) -> line.append(" [").append(option).append(extra.valueName() == null ? "" : " " + extra.valueName()).append(']'));
-        if (operands != null) line.append(' ').append(operandsUsage);
-        StringBuilder usage = new StringBuilder(say.t("usage", id, line)).append(System.lineSeparator());
-        line(usage, OPT_PORT + " N", say.t("option.port", id + INI_EXTENSION, defaultPort));
-        line(usage, OPT_HOST + " H", say.t("option.host", DEFAULT_HOST));
-        line(usage, OPT_NO_BROWSER, say.t("option.noBrowser"));
-        line(usage, OPT_KEEP_ALIVE, say.t("option.keepAlive", name));
-        line(usage, OPT_LOG_LEVEL + " LEVEL", say.t("option.logLevel"));
-        line(usage, OPT_VERBOSE, say.t("option.verbose"));
-        line(usage, OPT_LOG_FILE + " FILE", say.t("option.logFile", id));
-        line(usage, OPT_LANG + " LANG", say.t("option.lang", languages()));
-        extraOptions.forEach((option, extra) -> line(usage, option + (extra.valueName() == null ? "" : " " + extra.valueName()), programText(say, extra.help())));
-        if (operands != null) line(usage, operandsUsage, programText(say, operandsHelp));
-        line(usage, OPT_HELP, say.t("option.help"));
-        return usage.toString().stripTrailing();
-    }
-
-    /** The help of a program's option: a key of its texts, in the console's language, or the text as it was given. */
-    private String programText(Texts say, String help) {
-        if (catalogue == null) return help;
-        Texts programSay = catalogue.of(say.locale());
-        return programSay.has(help) ? programSay.t(help) : help;
-    }
-
-    private static String languages() {
-        return APP_CATALOGUE.languages().stream().map(Locale::getLanguage).collect(Collectors.joining(", "));
-    }
-
-    private static void line(StringBuilder usage, String option, String help) {
-        usage.append(String.format("  %-20s %s%n", option, help));
-    }
-
-    private static String value(String[] args, int i, String option) throws UsageException {
-        if (i >= args.length) throw new UsageException("error.valueExpected", option);
-        return args[i];
-    }
-
-    private static int port(String text, String what) throws UsageException {
-        try {
-            int port = Integer.parseInt(text);
-            if (port < 0 || port > PORT_MAX) throw new NumberFormatException();
-            return port;
-        } catch (NumberFormatException e) {
-            throw new UsageException("error.notAPort", what, text);
-        }
-    }
-
-    private static Level level(String text, String what) throws UsageException {
-        try {
-            return Level.parse(text.toUpperCase(Locale.ROOT));
-        } catch (IllegalArgumentException e) {
-            throw new UsageException("error.notALevel", what, text);
-        }
-    }
-
-    private static Locale language(String text, String what) throws UsageException {
-        for (Locale language : APP_CATALOGUE.languages()) if (language.getLanguage().equalsIgnoreCase(text)) return language;
-        throw new UsageException("error.badLanguage", what + " " + text, languages());
     }
 
     /** A failure said with one of jtools-app's texts: English in the log, the console's language to the person. */

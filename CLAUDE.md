@@ -14,7 +14,7 @@ code, comments, tests, poms or docs. An example is a generic one (`SensorMonitor
 | `conventions/parent/pom.xml` | jtools-parent: properties `jtools.app.*`, `jtools.app.skip`, profiles `jtools-frontend` (an `angular.json` switches it on), `dist`, `publish`; imports jtools-bom |
 | `conventions/bom/pom.xml` | jtools-bom: the artifacts' versions; no parent (jtools-parent imports it), its own Central metadata and publish profile |
 | `conventions/dist/src/main/resources/jtools-dist/` | `build.xml` (jdeps, jlink, the archives) and the launchers, `${jtools.app.*}` left for the project's build |
-| `libraries/{support,server,app,desktop}/` | `Json`, `Catalogue`, `Texts`, `Installation`; `WebServer`, `Exchange`, `Answer`, `PageWatch`, `Http`; `WebApp`, `DesktopOpener` (package-private), `UserSettings`, `SettingsFields`, `LaunchOptions`, `LogFormatter`; `FileDialogs` — the JDK only; a `package-info.java` each |
+| `libraries/{support,server,app,desktop}/` | `Json`, `Catalogue`, `Texts`, `Installation`; `WebServer`, `Exchange`, `Answer`, `PageWatch`, `Http`; `WebApp`, `CommandLine` and `DesktopOpener` (package-private), `UserSettings`, `SettingsFields`, `LaunchOptions`, `LogFormatter`; `FileDialogs` — the JDK only; a `package-info.java` each |
 | `libraries/web/src/lib/` | `@jtools/web` (shipped as sources in `jtools-web.jar`); `src/main.ts` is a harness, not shipped |
 | `devkit/` | what a project carries — `managed-files.list`, `scripts/`, `.githooks/`, `.gitattributes`, `externals.conf` — plus `scripts/jtools` (the stub, never managed) and `jtools-sync.sh`; `pom.xml` packs it with the starter as jtools-devkit |
 | `starter/` | `new-project.sh` and `template/` (`__APP_NAME__`, `__APP_ID__`, `__APP_PORT__`, `__JTOOLS_VERSION__` in contents and paths) |
