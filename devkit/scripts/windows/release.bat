@@ -109,7 +109,7 @@ if not defined START (
 if not defined END set "END=999999"
 set "FIRST="
 set "LAST="
-for /f "delims=:" %%n in ('findstr /n /r "[^ ]" CHANGELOG.md') do (
+for /f "delims=:" %%n in ('findstr /n /r /c:"[^ ]" CHANGELOG.md') do (
   if %%n GTR %START% if %%n LSS %END% (
     if not defined FIRST set "FIRST=%%n"
     set "LAST=%%n"
