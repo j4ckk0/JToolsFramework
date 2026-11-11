@@ -9,7 +9,7 @@
 #   ./install.sh Bookshelf --port 8094 …           any other option of jtools new (jtools new --help)
 #   ./install.sh --no-project                      the framework and jtools alone
 #
-# The framework goes into the local Maven repository (~/.m2/repository; M2_REPO says another), jtools into
+# The framework goes into Maven's local repository (~/.m2/repository, and M2_REPO's too), jtools into
 # ~/.local/bin (JTOOLS_BIN says another). Needs bash, curl, unzip, tar and git: on Windows, Git for Windows — whose Git
 # Bash install.bat runs this with, when double-clicked.
 #
@@ -25,16 +25,20 @@ missing=""
 for tool in curl unzip tar git; do command -v "$tool" >/dev/null || missing="$missing $tool"; done
 [ -z "$missing" ] || { echo "install.sh: missing:$missing — install them first, with your system's package manager" >&2; exit 1; }
 
-# the framework's artifacts: added beside what the repository holds, this version's replaced when already there
-m2=${M2_REPO:-$HOME/.m2/repository}
-for artifact in "$here"/repository/org/jtools/framework/*/"$version"; do
-  name=$(basename "$(dirname "$artifact")")
-  target="$m2/org/jtools/framework/$name/$version"
-  [ -d "$target" ] && echo "== $name $version was in $m2 already: replaced"
-  mkdir -p "$target"
-  cp "$artifact"/* "$target/"
+# the framework's artifacts: added beside what the repository holds, this version's replaced when already there — in
+# Maven's own local repository, and in M2_REPO's when it names another (where jtools looks for its devkit)
+repositories=("$HOME/.m2/repository")
+[ -n "${M2_REPO:-}" ] && [ "$M2_REPO" != "$HOME/.m2/repository" ] && repositories+=("$M2_REPO")
+for m2 in "${repositories[@]}"; do
+  for artifact in "$here"/repository/org/jtools/framework/*/"$version"; do
+    name=$(basename "$(dirname "$artifact")")
+    target="$m2/org/jtools/framework/$name/$version"
+    [ -d "$target" ] && echo "== $name $version was in $m2 already: replaced"
+    mkdir -p "$target"
+    cp "$artifact"/* "$target/"
+  done
+  echo "== JToolsFramework $version in $m2"
 done
-echo "== JToolsFramework $version in $m2"
 
 bin=${JTOOLS_BIN:-$HOME/.local/bin}
 mkdir -p "$bin"

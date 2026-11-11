@@ -76,6 +76,10 @@ jobs:
         run: git config --global user.name "JToolsFramework CI"; git config --global user.email "ci@example.invalid"
       # Each step runs the .bat scripts in cmd, as a developer would; when one fails, its output's end becomes the
       # step's error annotation, which GitHub's API shows to anyone (a job's log needs the repository's admin).
+      - name: The machine's Maven settings, should a build not find the framework
+        run: |
+          Write-Output "M2_REPO=$env:M2_REPO MAVEN_OPTS=$env:MAVEN_OPTS USERPROFILE=$env:USERPROFILE HOME=$env:HOME"
+          foreach ($f in "$env:USERPROFILE\.m2\settings.xml", "$env:ProgramData\m2\settings.xml") { if (Test-Path $f) { Write-Output "== $f"; Get-Content $f } }
       - name: Install, and make a project (install.bat)
         run: |
           $ErrorActionPreference = 'Continue'

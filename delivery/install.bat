@@ -9,7 +9,7 @@ rem   install.bat Bookshelf --dir C:\work\shelf     the project in C:\work\shelf
 rem   install.bat Bookshelf --port 8094 ...         any other option of jtools new (jtools new --help)
 rem   install.bat --no-project                      the framework and jtools alone
 rem
-rem The framework goes into the local Maven repository (%USERPROFILE%\.m2\repository; M2_REPO says another), jtools
+rem The framework goes into Maven's local repository (%USERPROFILE%\.m2\repository, and M2_REPO's too), jtools
 rem into %USERPROFILE%\.local\bin (JTOOLS_BIN says another). Windows 10 or later; a project's repository needs git (Git
 rem for Windows), jtools new --no-git makes one without.
 setlocal EnableExtensions DisableDelayedExpansion
@@ -23,11 +23,17 @@ rem no argument: a double-click - it asks, and waits for a key at the end
 set "ASK=0"
 if "%~1"=="" set "ASK=1"
 
-rem the framework's artifacts: added beside what the repository holds, this version's replaced when already there
-set "REPOSITORY=%M2_REPO%"
-if not defined REPOSITORY set "REPOSITORY=%USERPROFILE%\.m2\repository"
+rem the framework's artifacts: added beside what the repository holds, this version's replaced when already there - in
+rem Maven's own local repository, and in M2_REPO's when it names another (where jtools looks for its devkit)
+set "REPOSITORY=%USERPROFILE%\.m2\repository"
 for /d %%a in ("%HERE%\repository\org\jtools\framework\*") do call :artifact "%%~nxa"
 echo == JToolsFramework %VERSION% in %REPOSITORY%
+if not defined M2_REPO goto :jtools
+if /i "%M2_REPO%"=="%REPOSITORY%" goto :jtools
+set "REPOSITORY=%M2_REPO%"
+for /d %%a in ("%HERE%\repository\org\jtools\framework\*") do call :artifact "%%~nxa"
+echo == JToolsFramework %VERSION% in %REPOSITORY% too ^(M2_REPO^)
+:jtools
 
 rem jtools: jtools.bat for cmd and PowerShell, jtools for Git Bash
 set "BIN=%JTOOLS_BIN%"
