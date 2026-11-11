@@ -16,11 +16,12 @@ code, comments, tests, poms or docs. An example is a generic one (`Bookshelf`, `
 | `conventions/dist/src/main/resources/jtools-dist/` | `build.xml` (jdeps, jlink, the archives) and the launchers, `${jtools.app.*}` left for the project's build |
 | `libraries/{support,server,app,desktop}/` | `Json`, `Catalogue`, `Texts`, `Installation`; `WebServer`, `Exchange`, `Answer`, `PageWatch`, `Http`; `WebApp`, `CommandLine` and `DesktopOpener` (package-private), `UserSettings`, `SettingsFields`, `LaunchOptions`, `LogFormatter`; `FileDialogs` — the JDK only; a `package-info.java` each |
 | `libraries/web/src/lib/` | `@jtools/web` (shipped as sources in `jtools-web.jar`); `src/main.ts` is a harness, not shipped |
-| `devkit/` | what a project carries — `managed-files.list`, `scripts/`, `.githooks/`, `.gitattributes`, `externals.conf` — plus `scripts/jtools` (the stub, never managed) and `jtools-sync.sh`; `pom.xml` packs it with the starter as jtools-devkit |
+| `devkit/` | what a project carries — `managed-files.list`, `scripts/`, `.githooks/`, `.gitattributes`, `externals.conf` — plus `scripts/jtools` and `scripts/jtools.bat` (the stubs, never managed) and `jtools-sync.sh` / `.bat`; the starter has `new-project.sh` / `.bat`: every Windows twin is .bat only, kept in step with its shell script; `pom.xml` packs it with the starter as jtools-devkit |
 | `starter/` | `new-project.sh` and `template/` (`__APP_NAME__`, `__APP_ID__`, `__APP_PORT__`, `__JTOOLS_VERSION__` in contents and paths) |
 | `examples/hello/` | the smallest program; in the reactor, never published |
+| `.github/workflows/delivery.yml` | at every push: the delivery built, then installed on Linux and on Windows, a project made, built, packaged, synced; Windows' project compared with Linux's |
 | `.github/workflows/release.yml` | on a pushed tag, on GitHub's machines: `scripts/delivery.sh`, then the tag's release with the delivery attached (or *Run workflow* for an older tag) |
-| `delivery/` | the delivery's `install.sh` and README; `scripts/delivery.sh` packs them with the nine artifacts and the stub into `releases/delivery/jtools-<version>.tar.gz` |
+| `delivery/` | the delivery's `install.sh` and `install.bat` (Windows, .bat only) and README; `scripts/delivery.sh` packs them with the nine artifacts and the stub into `releases/delivery/jtools-<version>.tar.gz` |
 | `scripts/` | the framework's own (`install.sh`, `check-versions.sh`, `ci.local.sh`, `delivery.sh`) and copies of the devkit's, `JTOOLS_HOME=.` |
 
 ## Commands
