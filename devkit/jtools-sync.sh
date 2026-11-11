@@ -42,8 +42,9 @@ else echo "   the project's pom names jtools-parent ${used:-(none)}, the devkit 
 
 echo "== the externals (externals.conf: the project's to change)"
 while IFS='=' read -r key value; do
+  key=${key%$'\r'} value=${value%$'\r'}   # a file written on Windows (CRLF) reads the same
   case "$key" in ''|\#*|MIRROR*) continue ;; esac
-  theirs=$(sed -n "s|^$key=||p" "$project/externals.conf")
+  theirs=$(sed -n "s|^$key=||p" "$project/externals.conf" | tr -d '\r')
   [ "$theirs" = "$value" ] || { echo "   $key: ${theirs:-(absent)} -> $value"; differs=1; }
 done < "$devkit/externals.conf"
 

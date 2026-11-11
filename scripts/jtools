@@ -24,7 +24,7 @@
 set -euo pipefail
 
 # what `new` makes outside a project when JTOOLS_VERSION says nothing: this file's own version (scripts/check-versions.sh)
-JTOOLS_DEFAULT_VERSION=1.3.0
+JTOOLS_DEFAULT_VERSION=1.3.1
 CENTRAL=https://repo1.maven.org/maven2/org/jtools/framework/jtools-devkit
 
 die() { echo "jtools: $*" >&2; exit 1; }
@@ -47,6 +47,7 @@ project=
 read_conf() {
   [ -f "$1" ] || return 0
   while IFS='=' read -r key value; do
+    key=${key%$'\r'} value=${value%$'\r'}   # a file written on Windows (CRLF) reads the same
     case "$key" in ''|\#*) continue ;; esac
     [ -n "${!key:-}" ] || printf -v "$key" '%s' "$value"
   done < "$1"

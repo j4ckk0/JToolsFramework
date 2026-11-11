@@ -64,7 +64,7 @@ project of its own.
 
 4. Nothing is released until **Publish** is pressed on <https://central.sonatype.com> (`autoPublish` is off), so a
    mistake costs nothing: drop the deployment there, fix, upload again.
-5. Then tag the version (`git tag v1.3.0 && git push origin v1.3.0`) — doc/GETTING-STARTED.md downloads
+5. Then tag the version (`git tag v1.3.1 && git push origin v1.3.1`) — doc/GETTING-STARTED.md downloads
    `scripts/jtools` from that tag — and, in the projects, name the new version as their parent's and as
    `JTOOLS_VERSION` (`scripts/jtools sync` reports the ones behind).
 6. The delivery, on the tag's GitHub release — which README.md and GETTING-STARTED.md download it from: pushing the tag

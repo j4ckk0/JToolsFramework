@@ -14,6 +14,7 @@ cd "$(dirname "$(readlink -f "$0")")/.."   # the project root
 
 APP_ID= APP_NAME=
 while IFS='=' read -r key value; do
+  key=${key%$'\r'} value=${value%$'\r'}   # a file written on Windows (CRLF) reads the same
   case "$key" in APP_ID|APP_NAME) printf -v "$key" '%s' "$value" ;; esac
 done < jtools.conf
 [ -n "$APP_ID" ] || { echo "jtools.conf names no program (APP_ID): there is nothing to stop in this project" >&2; exit 1; }

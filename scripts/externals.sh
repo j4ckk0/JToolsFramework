@@ -18,6 +18,7 @@ ext="$PWD/external"
 APP_ID= APP_NAME= APP_MODULE=app BUILD_GOALS="clean package"
 [ -f jtools.conf ] || { echo "no jtools.conf in $PWD: not a project of JToolsFramework's" >&2; exit 1; }
 while IFS='=' read -r key value; do
+  key=${key%$'\r'} value=${value%$'\r'}   # a file written on Windows (CRLF) reads the same
   case "$key" in ''|\#*) continue ;; esac
   printf -v "$key" '%s' "$value"
 done < jtools.conf
@@ -36,7 +37,7 @@ wants() { grep -q "^$1=" externals.conf; }
 
 # The URL an external was deployed from (external/.<name>.url, which setup writes): one externals.conf no longer names
 # — a new version — is as good as missing.
-url_of() { sed -n "s|^$1=||p" externals.conf | head -1; }
+url_of() { sed -n "s|^$1=||p" externals.conf | head -1 | tr -d '\r'; }
 current() { [ "$(cat "$ext/.$1.url" 2>/dev/null)" = "$(url_of "$2")" ]; }
 
 # What setup deploys and is not there, or is of another version than externals.conf's; empty when all is.

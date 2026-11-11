@@ -103,9 +103,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { $e = ((Get-Content step.log -Tail 60) -join "`n").Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A'); Write-Output "::error title=jtools new::$e"; exit 1 }
           & 'C:\Program Files\Git\usr\bin\diff.exe' -r --strip-trailing-cr made-on-linux "$env:RUNNER_TEMP\fresh" 2>&1 | Tee-Object -FilePath step.log
           if ($LASTEXITCODE -ne 0) { $e = ((Get-Content step.log -TotalCount 80) -join "`n").Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A'); Write-Output "::error title=differs from Linux's::$e"; exit 1 }
-      - name: Git Bash's shell scripts, on Windows too
-        continue-on-error: true
+      - name: Git Bash's shell scripts, on Windows too, on a project the .bat scripts made (its files CRLF)
         shell: bash
         working-directory: ${{ runner.temp }}/demo
         run: |
-          scripts/build.sh -q > "$RUNNER_TEMP/bash.log" 2>&1 || { e=$(tail -60 "$RUNNER_TEMP/bash.log" | sed 's/%/%25/g' | tr -d '\r' | sed ':a;N;$!ba;s/\n/%0A/g'); echo "::warning title=scripts/build.sh in Git Bash::$e"; exit 1; }
+          scripts/build.sh -q > "$RUNNER_TEMP/bash.log" 2>&1 || { e=$(tail -60 "$RUNNER_TEMP/bash.log" | sed 's/%/%25/g' | tr -d '\r' | sed ':a;N;$!ba;s/\n/%0A/g'); echo "::error title=scripts/build.sh in Git Bash::$e"; exit 1; }

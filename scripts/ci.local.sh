@@ -5,7 +5,8 @@
 #   - the framework's own copies of the managed files are the devkit's (scripts/jtools sync --check, JTOOLS_HOME=.);
 #   - a developer's way in works: scripts/jtools alone, outside any project, makes a project from the devkit just
 #     installed in ~/.m2 (unpacked into tmp/ci/cache, not the user's ~/.cache); that project is in line with its devkit
-#     (its own scripts/jtools sync --check), and passes its own CI — its Java and page tests, npm ci.
+#     (its own scripts/jtools sync --check), and passes its own CI — its Java and page tests, npm ci —, its jtools.conf
+#     and externals.conf written with Windows' line endings, as a project made on Windows has them.
 # The project borrows the framework's external/ (a link): nothing is downloaded.
 #
 set -euo pipefail
@@ -23,6 +24,8 @@ export JTOOLS_CACHE="$PWD/tmp/ci/cache"
 (cd tmp/ci && env -u JTOOLS_HOME JTOOLS_VERSION="$version" ./jtools new CiTrial --port 18099 --no-git --no-build >/dev/null)
 trial=tmp/ci/CiTrial
 ln -s "$PWD/external" "$trial/external"
+# its settings as a project made on Windows has them, CRLF: the shell scripts read them alike
+sed -i 's/$/\r/' "$trial/jtools.conf" "$trial/externals.conf"
 (cd "$trial" && env -u JTOOLS_HOME scripts/jtools sync --check >/dev/null && scripts/ci.sh)
 echo "== scripts/jtools new makes, from the installed devkit, a project in line with it that passes its CI"
 rm -rf tmp/ci

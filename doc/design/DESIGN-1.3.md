@@ -49,3 +49,13 @@ release. 1.2.0 stays as it was published; 1.3.0 carries the new names. Maven Cen
 `jtools-parent` 1.3.0 in its pom and `JTOOLS_VERSION=1.3.0` in its `jtools.conf`, then `scripts/jtools sync`; in its
 code, the renames of the table — `.routes(` → `.endpoints(`, `Route` → `Endpoint`, `server.route(` →
 `server.endpoint(` —, which the compiler points out one by one. Its own test suite is the acceptance.
+
+## 5. 1.3.1: a project's settings written on Windows
+
+A project made on Windows has its `jtools.conf` and `externals.conf` with Windows' line endings (CRLF), which 1.3.0's
+shell scripts read with a carriage return at the end of each value: in Git Bash, `BUILD_GOALS` ended in `package\r`,
+an unknown Maven phase; and the empty `MIRROR=` line of `externals.conf` named a mirror, `\r`, which `scripts/jtools`
+then downloaded the devkit from — on Linux too, for a project whose files came with CRLF. 1.3.1's shell scripts take
+the carriage return off every `KEY=VALUE` line they read. The framework's CI checks it: its trial project's settings
+are rewritten with CRLF before the project's own CI runs; and the workflow `delivery` runs the shell scripts in Git Bash
+on the project the `.bat` scripts made on Windows. Maven Central's first release is then 1.3.1.

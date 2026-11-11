@@ -49,6 +49,7 @@ done
 # local file) wins
 read_conf() {
   while IFS='=' read -r key value; do
+    key=${key%$'\r'} value=${value%$'\r'}   # a file written on Windows (CRLF) reads the same
     case "$key" in ''|\#*) continue ;; esac
     if [ -z "${!key:-}" ]; then printf -v "$key" '%s' "$value"; fi
   done < "$1"
