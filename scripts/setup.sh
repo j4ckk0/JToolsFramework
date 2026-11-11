@@ -56,6 +56,14 @@ read_conf() {
 [ -f "$local_conf" ] && read_conf "$local_conf"
 read_conf "$conf"
 
+# The computer the project is developed on — Linux, or Windows through Git Bash (scripts\setup.bat does the same
+# from cmd): its JDK, Maven and Node.js, and the JDK archive whose jlink links the distributions' runtimes.
+case "$(uname -s)" in
+  Linux) host=LINUX java=bin/java node=bin/node host_archive=jdk-linux.tar.gz ;;
+  MINGW*|MSYS*|CYGWIN*) host=WINDOWS java=bin/java.exe node=node.exe host_archive=jdk-windows.zip ;;
+  *) echo "$(uname -s): a project on JToolsFramework is developed on Linux or on Windows" >&2; exit 1 ;;
+esac
+
 # The authentication of the mirror, as curl arguments (none for the public URLs).
 auth=()
 if [ -n "${MIRROR:-}" ]; then
@@ -104,7 +112,7 @@ deployed_from() { [ "$(cat "$ext/.$1.url" 2>/dev/null)" = "$2" ]; }
 stamp() { printf '%s\n' "$2" > "$ext/.$1.url"; }
 
 # the tools, under their generic names: present when their launcher is (a failed deployment leaves none), from that URL
-for spec in "jdk JDK_LINUX bin/java" "maven MAVEN_LINUX bin/mvn" "gradle GRADLE bin/gradle" "node NODE_LINUX bin/node"; do
+for spec in "jdk JDK_$host $java" "maven MAVEN_$host bin/mvn" "gradle GRADLE bin/gradle" "node NODE_$host $node"; do
   set -- $spec
   [ -n "${!2:-}" ] || continue   # a tool this project does without
   dir=$ext/$1
@@ -118,8 +126,11 @@ done
 # the archives the distributions are made from, under generic names: the host JDK's (its jlink) and each platform's
 # jmods, or that platform's JDK archive when it has no JMODS_* (a JDK up to 23 carries its jmods); hard links to the
 # downloads, copies across file systems
-for spec in "jdk-linux.tar.gz JDK_LINUX" "jmods-linux.tar.gz JMODS_LINUX" "jmods-windows.zip JMODS_WINDOWS" "jmods-macos.tar.gz JMODS_MACOS" \
-            "jdk-windows.zip JDK_WINDOWS JMODS_WINDOWS" "jdk-macos.tar.gz JDK_MACOS JMODS_MACOS"; do
+archives=("$host_archive JDK_$host" "jmods-linux.tar.gz JMODS_LINUX" "jmods-windows.zip JMODS_WINDOWS" "jmods-macos.tar.gz JMODS_MACOS")
+[ "$host" = LINUX ] || archives+=("jdk-linux.tar.gz JDK_LINUX JMODS_LINUX")
+[ "$host" = WINDOWS ] || archives+=("jdk-windows.zip JDK_WINDOWS JMODS_WINDOWS")
+archives+=("jdk-macos.tar.gz JDK_MACOS JMODS_MACOS")
+for spec in "${archives[@]}"; do
   set -- $spec
   [ -n "${!2:-}" ] || continue
   [ -n "${3:-}" ] && [ -n "${!3:-}" ] && continue   # its jmods are named apart: its JDK archive is not needed
@@ -135,7 +146,8 @@ done
 if [ -f scripts/setup.local.sh ]; then . scripts/setup.local.sh; fi
 
 echo "== external/ ready:"
-"$ext/jdk/bin/java" -version 2>&1 | head -1
+"$ext/jdk/$java" -version 2>&1 | head -1
 JAVA_HOME="$PWD/$ext/jdk" "$ext/maven/bin/mvn" -v 2>/dev/null | head -1
 if [ -x "$ext/gradle/bin/gradle" ]; then echo "Gradle: $ext/gradle"; fi
-if [ -x "$ext/node/bin/node" ]; then echo "Node.js $("$ext/node/bin/node" --version), npm $(PATH="$PWD/$ext/node/bin:$PATH" "$ext/node/bin/npm" --version)"; fi
+node_dir=$(dirname "$ext/node/$node")
+if [ -x "$ext/node/$node" ]; then echo "Node.js $("$ext/node/$node" --version), npm $(PATH="$PWD/$node_dir:$PATH" "$node_dir/npm" --version)"; fi

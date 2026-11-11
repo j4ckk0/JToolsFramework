@@ -22,6 +22,13 @@ while IFS='=' read -r key value; do
   printf -v "$key" '%s' "$value"
 done < jtools.conf
 
+# The computer the project is developed on — Linux, or Windows through Git Bash — and its tools' launchers.
+case "$(uname -s)" in
+  Linux) host=LINUX java=bin/java node=bin/node host_archive=jdk-linux.tar.gz ;;
+  MINGW*|MSYS*|CYGWIN*) host=WINDOWS java=bin/java.exe node=node.exe host_archive=jdk-windows.zip ;;
+  *) echo "$(uname -s): a project on JToolsFramework is developed on Linux or on Windows" >&2; exit 1 ;;
+esac
+
 # Whether externals.conf names a tool: what it does not name, this project does without.
 wants() { grep -q "^$1=" externals.conf; }
 
@@ -35,16 +42,17 @@ current() { [ "$(cat "$ext/.$1.url" 2>/dev/null)" = "$(url_of "$2")" ]; }
 # What setup deploys and is not there, or is of another version than externals.conf's; empty when all is.
 missing_externals() {
   local m=
-  wants JDK_LINUX && { [ -x "$ext/jdk/bin/java" ] && current jdk JDK_LINUX || m="$m jdk/"; }
-  wants MAVEN_LINUX && { [ -x "$ext/maven/bin/mvn" ] && current maven MAVEN_LINUX || m="$m maven/"; }
+  wants "JDK_$host" && { [ -x "$ext/jdk/$java" ] && current jdk "JDK_$host" || m="$m jdk/"; }
+  wants "MAVEN_$host" && { [ -x "$ext/maven/bin/mvn" ] && current maven "MAVEN_$host" || m="$m maven/"; }
   wants GRADLE && { [ -x "$ext/gradle/bin/gradle" ] && current gradle GRADLE || m="$m gradle/"; }
-  wants NODE_LINUX && { [ -x "$ext/node/bin/node" ] && current node NODE_LINUX || m="$m node/"; }
-  wants JDK_LINUX && { [ -s "$ext/jdk-linux.tar.gz" ] && current jdk-linux.tar.gz JDK_LINUX || m="$m jdk-linux.tar.gz"; }
+  wants "NODE_$host" && { [ -x "$ext/node/$node" ] && current node "NODE_$host" || m="$m node/"; }
+  wants "JDK_$host" && { [ -s "$ext/$host_archive" ] && current "$host_archive" "JDK_$host" || m="$m $host_archive"; }
   wants JMODS_LINUX && { [ -s "$ext/jmods-linux.tar.gz" ] && current jmods-linux.tar.gz JMODS_LINUX || m="$m jmods-linux.tar.gz"; }
   wants JMODS_WINDOWS && { [ -s "$ext/jmods-windows.zip" ] && current jmods-windows.zip JMODS_WINDOWS || m="$m jmods-windows.zip"; }
   wants JMODS_MACOS && { [ -s "$ext/jmods-macos.tar.gz" ] && current jmods-macos.tar.gz JMODS_MACOS || m="$m jmods-macos.tar.gz"; }
-  # a JDK up to 23 carries its jmods: its archive, for a platform with no JMODS_*
-  wants JDK_WINDOWS && ! wants JMODS_WINDOWS && { [ -s "$ext/jdk-windows.zip" ] && current jdk-windows.zip JDK_WINDOWS || m="$m jdk-windows.zip"; }
+  # a JDK up to 23 carries its jmods: another platform's JDK archive, for a platform with no JMODS_*
+  [ "$host" = LINUX ] || { wants JDK_LINUX && ! wants JMODS_LINUX && { [ -s "$ext/jdk-linux.tar.gz" ] && current jdk-linux.tar.gz JDK_LINUX || m="$m jdk-linux.tar.gz"; }; }
+  [ "$host" = WINDOWS ] || { wants JDK_WINDOWS && ! wants JMODS_WINDOWS && { [ -s "$ext/jdk-windows.zip" ] && current jdk-windows.zip JDK_WINDOWS || m="$m jdk-windows.zip"; }; }
   wants JDK_MACOS && ! wants JMODS_MACOS && { [ -s "$ext/jdk-macos.tar.gz" ] && current jdk-macos.tar.gz JDK_MACOS || m="$m jdk-macos.tar.gz"; }
   if declare -F missing_local_externals >/dev/null; then m="$m$(missing_local_externals)"; fi
   echo "$m"
@@ -66,7 +74,7 @@ fi
 export JAVA_HOME="$ext/jdk"
 export PATH="$ext/jdk/bin:$ext/maven/bin:$PATH"
 [ -d "$ext/gradle/bin" ] && export PATH="$ext/gradle/bin:$PATH"
-[ -d "$ext/node/bin" ] && export PATH="$ext/node/bin:$PATH"
+[ -x "$ext/node/$node" ] && export PATH="$(dirname "$ext/node/$node"):$PATH"
 
 jar=
 [ -n "$APP_ID" ] && jar="$APP_MODULE/target/$APP_ID.jar"
@@ -80,6 +88,7 @@ require_program() {
 # deleting it, with an error saying nothing of the cause. $1 is what the caller is about to do.
 refuse_while_running() {
   [ -n "$APP_ID" ] || return 0
+  command -v pgrep >/dev/null || return 0   # Git Bash has none: Windows' own lock on the jar says it then
   local pids
   # anchored on the process's own java: a shell command line that merely names the jar is not an instance
   pids=$(pgrep -f "^[^[:space:]]*java[^[:space:]]* .*-jar[[:space:]].*$APP_ID\\.jar" || true)
