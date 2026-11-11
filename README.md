@@ -45,7 +45,7 @@ scripts up to date with the framework.
 (`frontend`) and the program (`app`), with a first endpoint, its tests, a git repository and a first build. You start
 from working code, not from a blank folder.
 
-Apache License 2.0. Version 1.2.0; on Maven Central once published (until then, the delivery's `install.sh` — the
+Apache License 2.0. Version 1.3.0; on Maven Central once published (until then, the delivery's `install.sh` — the
 [quick start](#quick-start-a-new-project-step-by-step) — puts it in `~/.m2`). [doc/CONCEPTS.md](doc/CONCEPTS.md) says
 the idea behind it in one page.
 
@@ -56,18 +56,18 @@ no Java, Maven nor Node.js to install: a project downloads its own into its `ext
 450 MB).
 
 **1. Download the delivery** — one archive, the framework and its installer, from the
-[release](https://github.com/j4ckk0/JToolsFramework/releases/tag/v1.2.0):
+[release](https://github.com/j4ckk0/JToolsFramework/releases/tag/v1.3.0):
 
 ```bash
-curl -fsSLO https://github.com/j4ckk0/JToolsFramework/releases/download/v1.2.0/jtools-1.2.0.tar.gz
-tar xzf jtools-1.2.0.tar.gz
+curl -fsSLO https://github.com/j4ckk0/JToolsFramework/releases/download/v1.3.0/jtools-1.3.0.tar.gz
+tar xzf jtools-1.3.0.tar.gz
 ```
 
 **2. Install, and make your project** — `install.sh` asks the project's name and the folder its files go in:
 
 ```bash
-jtools-1.2.0/install.sh                                   # asks; or says it all at once:
-jtools-1.2.0/install.sh Bookshelf --dir ~/work/bookshelf
+jtools-1.3.0/install.sh                                   # asks; or says it all at once:
+jtools-1.3.0/install.sh Bookshelf --dir ~/work/bookshelf
 ```
 
 It puts the framework into your local Maven repository (`~/.m2`) and `jtools` into `~/.local/bin`, then makes the
@@ -231,7 +231,7 @@ framework ([doc/ADOPTING.md](doc/ADOPTING.md)):
 <parent>
   <groupId>org.jtools.framework</groupId>
   <artifactId>jtools-parent</artifactId>
-  <version>1.2.0</version>
+  <version>1.3.0</version>
   <relativePath/>
 </parent>
 <properties>
@@ -269,7 +269,7 @@ conventions (the one jar and the distributions are jtools-parent's):
 
 ```kotlin
 dependencies {
-    implementation(platform("org.jtools.framework:jtools-bom:1.2.0"))
+    implementation(platform("org.jtools.framework:jtools-bom:1.3.0"))
     implementation("org.jtools.framework:jtools-app")
 }
 ```

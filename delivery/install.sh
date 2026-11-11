@@ -24,7 +24,7 @@ missing=""
 for tool in curl unzip tar git; do command -v "$tool" >/dev/null || missing="$missing $tool"; done
 [ -z "$missing" ] || { echo "install.sh: missing:$missing — install them first, with your system's package manager" >&2; exit 1; }
 
-# the framework's artifacts: added beside what the repository holds, its own 1.2.0 replaced when already there
+# the framework's artifacts: added beside what the repository holds, this version's replaced when already there
 m2=${M2_REPO:-$HOME/.m2/repository}
 for artifact in "$here"/repository/org/jtools/framework/*/"$version"; do
   name=$(basename "$(dirname "$artifact")")
