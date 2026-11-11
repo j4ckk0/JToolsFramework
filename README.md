@@ -50,7 +50,7 @@ up to date with the framework; for a project made before 1.4, it also moves them
 ### The project template
 
 `jtools new Bookshelf` makes a complete project that runs at once: the business (`core`), its API (`api`), the page
-(`frontend`) and the program (`app`), with a first endpoint, its tests, a git repository and a first build. You start
+(`frontend`) and the program (`app`), with a first endpoint, its tests and a first build. You start
 from working code, not from a blank folder.
 
 Apache License 2.0. Version 1.4.0; on Maven Central once published (until then, the delivery's `install.sh` — the
@@ -60,9 +60,8 @@ the idea behind it in one page.
 ## Quick start: a new project, step by step
 
 **0. What you need**: Linux, with `bash`, `curl`, `unzip` and `tar`; or Windows 10 or later, which has what it needs.
-**git is optional**: with it — on Windows, [Git for Windows](https://git-scm.com/download/win) — the project starts in a
-git repository, whose pre-push hook runs its CI; without it, the project is made all the same. Nothing else — no Java, Maven nor
-Node.js to install: a project downloads its own into its `external/` folder the first time (about 450 MB).
+Nothing else — no Java, Maven nor Node.js to install: a project downloads its own into its `external/` folder the
+first time (about 450 MB).
 
 **1. Download the delivery** — one archive, the framework and its installer, from the
 [release](https://github.com/j4ckk0/JToolsFramework/releases/tag/v1.4.0):
@@ -88,7 +87,7 @@ The steps below give each command for both systems.
 
 It puts the framework into your local Maven repository (`~/.m2`) and `jtools` into `~/.local/bin`, then makes the
 project: its files in that folder, its development environment — a JDK, Maven and Node.js of its own, in its
-`external/` — downloaded, a git repository, a first build. A minute or two the first time; later projects,
+`external/` — downloaded, and a first build. A minute or two the first time; later projects,
 `jtools new <Name> --dir <folder>`.
 
 ```
