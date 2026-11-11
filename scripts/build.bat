@@ -1,5 +1,5 @@
 @echo off
-rem Managed by JToolsFramework (scripts/jtools-sync.sh refreshes it): change it there, not here.
+rem Managed by JToolsFramework's devkit (scripts/jtools sync refreshes it): change it in its devkit/, not here.
 rem
 rem The build, every test included: mvn with jtools.conf's BUILD_GOALS ("clean package" unless it says otherwise).
 rem

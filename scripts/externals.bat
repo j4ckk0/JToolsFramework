@@ -1,5 +1,5 @@
 @echo off
-rem Managed by JToolsFramework (scripts/jtools-sync.sh refreshes it): change it there, not here.
+rem Managed by JToolsFramework's devkit (scripts/jtools sync refreshes it): change it in its devkit/, not here.
 rem
 rem Called by the scripts, from the project root. Reads jtools.conf — what the scripts know of this project — and
 rem makes sure scripts\setup.bat has been run: every tool externals.conf names is deployed in external\ (offered with

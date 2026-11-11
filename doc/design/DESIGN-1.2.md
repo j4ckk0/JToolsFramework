@@ -1,18 +1,17 @@
 # JToolsFramework 1.2 — design
 
-1.1 does what the org.jtools programs need: XsdViewer and DCSBuilder run on it, on a branch each, their own test
-suites green (140 and 250). 1.2 is about the developer who meets it for the first time and must understand **what it
+1.1 does what a local web application needs: programs run on it, their own test suites green. 1.2 is about the developer who meets it for the first time and must understand **what it
 is and how to use it** — the libraries their code calls, the build their project inherits, the development
 environment their project carries, the way a new project begins. It adds almost no feature: it gives each of those a
-place, a name, a door in the README and a page of documentation. Written in November 2026, after the two migrations;
-§13 will say where the implementation departed from it.
+place, a name, a door in the README and a page of documentation. Written in November 2026;
+§13 says where the implementation departed from it.
 
 ## 0. Decisions first
 
 1. **1.1.0 is never published; the first release on Maven Central is 1.2.0.** The renames below cost nothing before a
    first publication and are impossible after it: what Central publishes stays there for ever, and a
    `jtools-launcher` 1.1.0 would be the first thing a search finds, beside a `jtools-app` nothing explains. 1.1 made
-   the same move for 1.0.0. XsdViewer's and DCSBuilder's branches move to 1.2.0 before they are merged (§11).
+   the same move for 1.0.0. A program built on 1.1 moves to 1.2.0 before its first release on it (§11).
 2. **`jtools-launcher` becomes `jtools-app`, its artifact and its package** (`org.jtools.framework.app`). The module
    is the one a developer depends on — it holds `WebApp`, the program — and "launcher" says the least of it. Half a
    rename (the artifact, not the package) would be worse than none.
@@ -37,16 +36,16 @@ The repository's top level, as a newcomer reads it:
 | `web/` | `@jtools/web`, the Angular side, shipped as TypeScript in a jar | that it is for Angular pages only |
 | `templates/webapp/` | the project `new-project.sh` writes | that it is the way to start |
 | `scripts/` | the framework's own scripts **and** the sixteen files copied into every project (`managed-files.list`), side by side | which are which |
-| `doc/` | PATTERN, BUILD, SCRIPTS, ADOPTING, PORTS, DESIGN-1.1, in the order they were written | where to begin |
+| `doc/` | six pages, in the order they were written | where to begin |
 
-And four things in the way of anyone but the author:
+And four things in the way of a developer meeting it:
 
-- **`new-project.sh` writes into the author's layout**: `../../git/<Name>`, a bare repository in `../../git-bare/`,
-  a port taken from `doc/PORTS.md` — the registry of the author's programs —, a push that runs its CI.
+- **`new-project.sh` writes into one fixed layout**: two folders up from the framework, a bare repository beside,
+  a port taken from a registry of known programs, a push that runs its CI.
 - **Keeping a project's scripts up to date needs a clone of the framework beside it** (`JTOOLS_HOME` in `jtools.conf`)
   and says nothing of which version a project carries.
-- **No example is smaller than the generated project**, four modules and an Angular page; a page in plain JavaScript —
-  XsdViewer's and DCSBuilder's kind — has no example at all.
+- **No example is smaller than the generated project**, four modules and an Angular page; a page in plain JavaScript has no
+  example at all.
 - **The README is behind the code**: it still says the distributions carry a whole JRE and are built for Linux and
   Windows; 1.1 links a runtime with jlink, for macOS too.
 
@@ -82,7 +81,7 @@ JToolsFramework/
 | examples | whoever learns the libraries | read; copy what helps |
 
 **Not `build/`** for the conventions, though it is the word: Gradle writes its output there, and most `.gitignore`
-files — DCSBuilder's among them — drop every folder of that name. **`doc/` stays `doc/`**: it is the family's name.
+files drop every folder of that name. **`doc/` stays `doc/`**.
 
 ## 3. The moves
 
@@ -146,10 +145,10 @@ code. No `module-info`: each library is one package, and the classpath programs 
 - **`jtools-parent`** keeps everything it does; its `dependencyManagement` becomes an import of `jtools-bom`.
 - **`jtools-bom`** is new: the libraries' and `jtools-dist`'s versions, nothing else. For a Gradle build —
   `implementation(platform("org.jtools.framework:jtools-bom:1.2.0"))`, then the libraries without a version — and for a
-  Maven project whose parent is its own. DCSBuilder's Gradle build reads the framework's version from its root pom by
-  hand today; the BOM does not remove that (Gradle still needs the version once) but removes the per-module versions.
+  Maven project whose parent is its own. A Gradle build still names the framework's version once, but no
+  longer once per library.
 - **`jtools-dist`** gains `jtools.app.description`, the Windows `.exe`'s file description, defaulting to
-  `${jtools.app.name}` — DCSBuilder's says what it is ("Data Centric Security: …") and lost it in 1.1.
+  `${jtools.app.name}`: a program may say what it is in more than its name.
 - **The guide says the five properties first** (`jtools.app.id`, `name`, `mainClass`, `port`, `windowsVersion`) and
   `jtools.program.skip` in the program's module, then everything else as reference.
 
@@ -191,31 +190,35 @@ The stub changes nothing it does not manage and commits nothing, as `jtools-sync
 
 ### 6.3 Opt-in
 
-A project with scripts of its own keeps them: XsdViewer and DCSBuilder do, the latter with its `--model` and
-`--gradle` targets and its release checks. The devkit is what a new project gets, and what an existing one may take
-when its scripts have nothing the devkit lacks — doc/ADOPTING.md says, project by project, what that would cost.
+A project with scripts of its own — targets of its own, release checks — keeps them. The devkit is what a new project
+gets, and what an existing one may take when its scripts have nothing the devkit lacks (doc/ADOPTING.md).
 
 ## 7. The starter
 
 - **`jtools new <Name>`** (the stub's third command), or `starter/new-project.sh <Name>` from a clone. By default it
   writes **`./<Name>`**, in the current folder, with the devkit's files, a `jtools.conf` naming the devkit's version, a
   git repository and its first commit; then the externals and a first build unless `--no-build`.
-- **The author's layout becomes options**: `--dir DIR` for another place, `--bare DIR` for a bare repository and a first
-  push (the family's way), `--no-git` for the files alone (a try, the framework's CI).
-- **The port**: `--port N`, else 8090 — no org.jtools program's. `doc/PORTS.md` — the registry of the org.jtools programs —
-  is consulted only when the starter runs from a clone of the framework (the family's projects), never through the
-  stub: another developer's programs are not in it.
+- **One fixed layout becomes options**: `--dir DIR` for another place, `--bare DIR` for a bare repository and a first
+  push, `--no-git` for the files alone (a try, the framework's CI).
+- **The port**: `--port N`, else 8090. No registry: which ports a developer's programs use is theirs to know.
 - **The generated project is the tutorial**: its README walks through it (the business in `core`, its HTTP face in
   `api`, the view in `frontend`, the program in `app`; where a route goes; how to run, test, package), and every file
   has a comment saying what belongs in it. doc/GETTING-STARTED.md (§9) follows the same walk.
 
-## 8. The example
+## 8. The examples
 
-**`examples/hello/`**: one class — a `WebApp` with one route —, one `index.html` in plain JavaScript under
-`pageRoot("web")` (the presence protocol in ten lines), one test starting it with `WebApp.start` and calling the route.
-The page style the generated project does not show, XsdViewer's and DCSBuilder's; the Angular style is shown, and
-built by the CI, through the generated project. A module of the reactor, so that it is built and tested with the rest
-and can never go stale; `skipPublishing`, so that it never reaches Central.
+Very small programs, each one step further, each a class or two, a page in plain JavaScript under `pageRoot("web")`
+and a test starting it with `WebApp.start`:
+
+- **`examples/hello/`** — the hello world: one route, the page's presence in three lines, Quit.
+- **`examples/todo/`** — the server holds the business: a to-do list, its rule (a title is not empty) a refusal the
+  page shows as it is; the page holds no state.
+- **`examples/greeter/`** — the program's own: texts in English and French (`I18n`, the page's language), an option
+  (`--greeting`), a setting kept from one run to the next (`SettingsFields`).
+
+The page style the generated project does not show; the Angular style is shown, and built by the CI, through the
+generated project. Modules of the reactor, so that they are built and tested with the rest and can never go stale;
+`skipPublishing`, so that they never reach Central.
 
 ## 9. The documentation
 
@@ -231,8 +234,8 @@ table of modules goes to the guides.
 | — | `doc/LIBRARIES.md` | new: a section per library — what it gives, the class to start from, a snippet —, the javadoc for the rest |
 | `BUILD.md` | `doc/CONVENTIONS.md` | the five properties first; the parent, the BOM, `-Pdist`, jlink |
 | `SCRIPTS.md` | `doc/DEVKIT.md` | the stub, `jtools.conf`, the managed files, the hooks (`*.local.sh`) |
-| `ADOPTING.md` | `doc/ADOPTING.md` | split in two: moving an existing program onto the framework, step by step (generic); then the family's projects, one by one (what it was) |
-| `PORTS.md` | `doc/PORTS.md` | said to be the org.jtools programs' registry, not a rule for every project |
+| `ADOPTING.md` | `doc/ADOPTING.md` | moving an existing program onto the framework, step by step |
+| `PORTS.md` | — | gone: a registry of known programs is not the framework's |
 | `DESIGN-1.1.md` | `doc/design/DESIGN-1.1.md`, `DESIGN-1.2.md` | where the decisions are kept |
 
 CLAUDE.md and PUBLISHING.md follow the moves; PUBLISHING.md's artifact table gains `jtools-bom` and `jtools-devkit`.
@@ -251,33 +254,28 @@ CLAUDE.md and PUBLISHING.md follow the moves; PUBLISHING.md's artifact table gai
 **Left for 1.3** — functional, so outside the rule, in the order they would pay:
 
 1. **`jtools-page.js`**, the plain-JavaScript twin of `@jtools/web`: presence, `request()` with the page's language,
-   quit, settings, about. XsdViewer and DCSBuilder each carry their own three hundred lines of it. The one candidate that
+   quit, settings, about. A plain-JavaScript page otherwise carries three hundred lines of its own. The one candidate that
    arguably meets the rule — it is what `examples/hello` would use — and the first to pull into 1.2 if it is wanted there.
 2. `jtools-web` on npm, so that an Angular page installs it rather than unpacking it from a jar.
 3. A Maven archetype beside `jtools new`; a Gradle plugin mirroring `jtools-parent`.
 4. The rest of 1.1 §8: a second launch opening the running one, `jtools-testing`, the served-files allow-list.
 
-## 11. What changes for the projects
+## 11. What changes for a program on 1.1
 
-| Project | Change | Acceptance |
-|---|---|---|
-| XsdViewer, branch `jtools-1.1` | `jtools-parent` 1.2.0; `jtools-launcher` → `jtools-app` in `app/pom.xml`; the import in `XsdViewerApplication`, `ApiPath`, `XsdViewerServerTest` | its 140 tests green; the branch renamed `jtools-1.2` |
-| DCSBuilder, branch `jtools-1.1` | the same in `app/pom.xml`, `web/pom.xml`, `web/build.gradle.kts` (or the BOM); the import in `Launcher`, `SettingsApi`, `ApiNames`, `DcsBuilderServerTest` | its 250 tests green in Maven and Gradle |
-| SensorSimulator | none: still on its own copy (its port, 8093, is WhichPaint's); regenerating it with `jtools new` is the easy way | — |
-| a project generated from 1.1 | only the framework's CI trials: none to keep | — |
-
-Neither program takes the devkit (§6.3).
+`jtools-parent` 1.2.0; `jtools-launcher` becomes `jtools-app` in its poms (or the BOM, with Gradle); one import line per
+file that names `org.jtools.framework.launcher`. Its own test suite is the acceptance. A project generated from 1.1 —
+only the framework's CI trials — has nothing to keep. The devkit is opt-in (§6.3).
 
 ## 12. The order of the work
 
 Each step with its tests, the framework's CI — the generated project built, run, packaged — green after each:
 
 1. **The moves** (§3) and the new README: no API change, the same artifacts but one, nothing for a project to do.
-2. **`jtools-app`** (§4.1) and **`jtools-bom`** (§5); `package-info.java` and the API audit (§4.3); the two branches
-   updated (§11), 140 and 250 green.
+2. **`jtools-app`** (§4.1) and **`jtools-bom`** (§5); `package-info.java` and the API audit (§4.3); programs on 1.1
+   moved (§11), their suites green.
 3. **The devkit** (§6): the artifact, the stub, `JTOOLS_VERSION`; the starter's options (§7); the CI generates its trial
    project through the stub, from `~/.m2`.
-4. **`examples/hello`** (§8).
+4. **The examples** (§8).
 5. **The documentation** (§9), each page read against the tree it describes.
 6. **The ride-along fixes** (§10).
 7. **1.2.0 on Maven Central** — by the owner, with their key and token, PUBLISHING.md's routine: the libraries, the
@@ -285,4 +283,26 @@ Each step with its tests, the framework's CI — the generated project built, ru
 
 ## 13. What the implementation changed
 
-Nothing yet: written when 1.2 is implemented.
+- **`jtools-bom` has no parent**: jtools-parent imports it, so a BOM inheriting jtools-parent would be a cycle — and
+  would hand its importers JUnit's version with the framework's. It says Maven Central's metadata again, and has a
+  `publish` profile of its own. Maven resolves the import from the reactor, so the framework builds before anything is
+  installed.
+- **The README came with the documentation** (step 5), not with the moves: it describes where things end up.
+- **The stub is bash only**, like the sync and the starter it runs; on Windows, Git Bash. The managed scripts keep their
+  `.bat`.
+- **`scripts/jtools version`** says the devkit's version and where it came from, not the newest on Central: it would
+  ask the network every time.
+- **`scripts/jtools --help`**, and a mistyped command, fetch nothing: the devkit is fetched for `sync`, `version` and
+  `new` alone.
+- **`jtools-devkit` carries more than the managed files**: `jtools-sync.sh`, the starter, and the six npm files of a new
+  frontend (`package.json`, its lock, `.editorconfig`…), which the template takes from `jtools-web`. The jar's own
+  default excludes would leave `.gitignore` out: `addDefaultExcludes` is off in both the resources and the jar plugin.
+- **`sync` reports a stub that differs** from the devkit's, without replacing it — the one file it may not touch.
+- **The starter makes its first commit before the first build**; `--bare` pushes once built, as before. Its port is
+  8090 unless `--port` says; the registry of known programs left the framework, with `doc/PORTS.md`.
+- **A usage error comes before the log file exists**: it is said on the console — in the person's language — and in the
+  dialog, and logged nowhere; a server that cannot start is logged in English in the file. `UsageException` carries its
+  text's key and arguments.
+- **The framework names no program built on it**: its examples are generic ones (`examples/`), its designs say what it
+  is, not where it came from.
+- **Three examples, not one** (§8): `hello`, `todo`, `greeter` — each a step further, all very small.

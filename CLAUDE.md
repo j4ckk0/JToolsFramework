@@ -1,46 +1,52 @@
 # JToolsFramework — orientation for Claude
 
-The framework of the org.jtools projects: what DCSBuilder, WhichPaint, XsdViewer, MythoStory and SensorSimulator
-share, as a parent pom, Java libraries, the page's TypeScript, the scripts and a project template. `README.md` is the
-map, `doc/PATTERN.md` the conventions, `doc/BUILD.md` the parent pom, `doc/SCRIPTS.md` the scripts,
-`doc/ADOPTING.md` the existing projects, `doc/PORTS.md` the ports.
+A framework for local web applications in Java: libraries (`libraries/`), build conventions (`conventions/`), a
+development environment (`devkit/`) and a project template (`starter/`). `README.md` is the map; `doc/README.md` the
+reading path — GETTING-STARTED, CONCEPTS, LIBRARIES, CONVENTIONS, DEVKIT, ADOPTING —; `doc/design/` why it is as it is.
+
+**It stands on its own**: nothing in it names or links a program built on it — no project's name, path or port, in
+code, comments, tests, poms or docs. An example is a generic one (`SensorMonitor`, `examples/hello`).
 
 ## Where things are
 
 | Path | What |
 |---|---|
-| `parent/pom.xml` | jtools-parent: properties `jtools.app.*`, `jtools.program.skip`, profiles `jtools-frontend` (an `angular.json` switches it on) and `dist` |
-| `support/`, `server/`, `launcher/`, `desktop/` | `Json`, `I18n`, `Catalogue`, `Installation`; `WebServer`, `Exchange`, `Answer`, `PageWatch`, `Http`, `DesktopOpener`; `WebApp`, `UserSettings`, `SettingsFields`, `LaunchOptions`, `LogFormatter`; `FileDialogs` — the JDK only. doc/DESIGN-1.1.md says why each is as it is |
-| `dist/src/main/resources/jtools-dist/` | `build.xml` (jdeps, jlink, the archives) and the launchers, `${jtools.app.*}` left for the project's build |
-| `web/src/lib/` | `@jtools/web` (shipped as sources in `jtools-web.jar`); `web/src/main.ts` is a harness, not shipped |
-| `scripts/` | the managed scripts (`managed-files.list`) — the very files projects get — and the framework's tools |
-| `templates/webapp/` | the generated project; `__APP_NAME__`, `__APP_ID__`, `__APP_PORT__`, `__JTOOLS_VERSION__`, `__JTOOLS_HOME__` in contents and paths |
+| `conventions/parent/pom.xml` | jtools-parent: properties `jtools.app.*`, `jtools.program.skip`, profiles `jtools-frontend` (an `angular.json` switches it on), `dist`, `publish`; imports jtools-bom |
+| `conventions/bom/pom.xml` | jtools-bom: the artifacts' versions; no parent (jtools-parent imports it), its own Central metadata and publish profile |
+| `conventions/dist/src/main/resources/jtools-dist/` | `build.xml` (jdeps, jlink, the archives) and the launchers, `${jtools.app.*}` left for the project's build |
+| `libraries/{support,server,app,desktop}/` | `Json`, `I18n`, `Catalogue`, `Installation`; `WebServer`, `Exchange`, `Answer`, `PageWatch`, `Http`, `DesktopOpener`; `WebApp`, `UserSettings`, `SettingsFields`, `LaunchOptions`, `LogFormatter`; `FileDialogs` — the JDK only; a `package-info.java` each |
+| `libraries/web/src/lib/` | `@jtools/web` (shipped as sources in `jtools-web.jar`); `src/main.ts` is a harness, not shipped |
+| `devkit/` | what a project carries — `managed-files.list`, `scripts/`, `.githooks/`, `.gitattributes`, `externals.conf` — plus `scripts/jtools` (the stub, never managed) and `jtools-sync.sh`; `pom.xml` packs it with the starter as jtools-devkit |
+| `starter/` | `new-project.sh` and `template/` (`__APP_NAME__`, `__APP_ID__`, `__APP_PORT__`, `__JTOOLS_VERSION__` in contents and paths) |
+| `examples/hello/` | the smallest program; in the reactor, never published |
+| `scripts/` | the framework's own (`install.sh`, `check-versions.sh`, `ci.local.sh`) and copies of the devkit's, `JTOOLS_HOME=.` |
 
 ## Commands
 
 ```bash
 scripts/install.sh                  # versions agree, build, test, install into ~/.m2
-scripts/ci.sh                       # quiet install with npm ci, then ci.local.sh: a project from the template and its CI
-scripts/new-project.sh Name [--port N] [--id id] [--dir D] [--no-git] [--no-build]
-scripts/jtools-sync.sh ../../git/Project [--check]
+scripts/ci.sh                       # quiet install with npm ci, then ci.local.sh: scripts/ equal devkit/, and a
+                                    # project made by a lone scripts/jtools from the installed devkit passes its CI
+scripts/jtools sync [--check]       # the framework's own copies of the managed files, from devkit/
+starter/new-project.sh Name [--port N] [--id id] [--dir D] [--bare D] [--no-git] [--no-build]
 . scripts/externals.sh && mvn -Ppublish clean verify -Dgpg.skip   # what Maven Central would get (PUBLISHING.md); never deploy unasked
 ```
 
 ## Conventions
 
-- **Never edit the existing projects** from here unasked; doc/ADOPTING.md says what each could take.
-- **A change to a managed script** is made in `scripts/` here, verified by `scripts/ci.sh` (which runs a generated
-  project's CI), then synced into the projects with `jtools-sync.sh`.
-- **The libraries stay generic**: nothing of any application in `support`, `server`, `launcher`, `web`.
-- **One version** for every module (`scripts/check-versions.sh`); a project names it as its parent's version.
+- **A change to a managed file** is made in `devkit/`, copied into `scripts/` by `scripts/jtools sync`, verified by
+  `scripts/ci.sh`; projects take it with a new version.
+- **The libraries stay generic**: nothing of any application in them.
+- **One version** for every module, jtools-bom and `scripts/jtools` (`scripts/check-versions.sh`).
 - **Apache License 2.0** (`LICENSE`, `NOTICE`): the build writes the header on every Java source of the libraries
-  (`license-maven-plugin`) — a new class gets it at its first build. Never on `templates/webapp`: the projects
-  generated from it are their owners', under their owners' terms.
-- **Template trials** go under `tmp/` or `--dir /tmp/...` with `--no-git` (no port registered, no repository).
-  A trial run of a program: `--port 18000+`, and nothing that opens the desktop's browser — `--no-browser`, or
-  `BROWSER=true` with no `DISPLAY` to test the stop.
+  (`license-maven-plugin`) — a new class gets it at its first build; a `package-info.java` carries it by hand, above
+  its javadoc. Never on `starter/template`: the projects generated from it are their owners', under their terms.
+- **Trials** go under `tmp/` or a scratch folder, with `--no-git`; the stub with `JTOOLS_CACHE` there, never the
+  user's `~/.cache`. A trial run of a program: `--port 18000+`, `--log-file` in the scratch folder, its settings in a
+  node of its own (`-D<id>.preferences=…`, removed after), and nothing that opens the desktop: `--no-browser`,
+  `-Djava.awt.headless=true` for a failure's dialog, and never `POST /api/log/open`.
 
-## Review rules (every org.jtools project; first written for XsdViewer)
+## Review rules
 
 A code review answers one question: can a developer who has never seen this code read it and know where things belong?
 

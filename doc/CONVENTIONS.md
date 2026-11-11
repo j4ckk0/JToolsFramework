@@ -1,24 +1,27 @@
-# The build: jtools-parent
+# The build conventions: jtools-parent, jtools-bom
 
-A project's root pom names `org.jtools.framework:jtools-parent` as its parent and sets the properties of its program;
-everything else of the build is the parent's.
+A project's root pom names `org.jtools.framework:jtools-parent` as its parent and says **five things of its program**;
+everything else of the build is the parent's. A generated project has all of it already (`jtools new`).
 
 ```xml
 <parent>
   <groupId>org.jtools.framework</groupId>
   <artifactId>jtools-parent</artifactId>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
   <relativePath/>
 </parent>
 <properties>
   <revision>0.1.0</revision>
-  <jtools.app.id>sensorsimulator</jtools.app.id>
-  <jtools.app.name>SensorSimulator</jtools.app.name>
-  <jtools.app.mainClass>org.jtools.sensorsimulator.app.Launcher</jtools.app.mainClass>
-  <jtools.app.port>8094</jtools.app.port>
-  <jtools.app.windowsVersion>0.1.0.0</jtools.app.windowsVersion>
+  <jtools.app.id>sensormonitor</jtools.app.id>                                    <!-- its jar, .ini, launchers, releases -->
+  <jtools.app.name>SensorMonitor</jtools.app.name>                                <!-- as people read it; its .exe -->
+  <jtools.app.mainClass>org.jtools.sensormonitor.app.Launcher</jtools.app.mainClass>
+  <jtools.app.port>8090</jtools.app.port>                                         <!-- what its .ini says -->
+  <jtools.app.windowsVersion>0.1.0.0</jtools.app.windowsVersion>                  <!-- the version in four parts -->
 </properties>
 ```
+
+And in the program's module, `<jtools.program.skip>false</jtools.program.skip>`: that module's jar is the program's.
+`jtools.app.description` — what Windows says of the `.exe` — is the name unless said; `jtools.app.copyright` likewise.
 
 ## What every module gets
 
@@ -55,7 +58,7 @@ no package to publish nor any `package-lock.json` integrity to keep — the Mave
      by default: what no class names — files in any encoding, the elliptic curves TLS needs);
   2. a runtime per platform whose JDK is in `external/` (`jdk-linux.tar.gz`, `jdk-windows.zip`, `jdk-macos.tar.gz`,
      which `scripts/setup.sh` deploys — or Temurin's own names, `*jdk*linux*.tar.gz`…, in the folder
-     `jtools.jdk.archives` names: XsdViewer's `jre/`): its `jmods` unpacked, linked by the `jlink` of this machine's platform's
+     `jtools.jdk.archives` names, a `jre/` say): its `jmods` unpacked, linked by the `jlink` of this machine's platform's
      archive — of the archives' version by construction, whatever JDK runs Maven —, else of the JDK running it (`--strip-debug
      --no-man-pages --no-header-files --compress zip-6`) — all of one version, which `externals.conf` says once;
   3. the archives into `releases/`: `<id>-<version>-linux.tar.gz` and `-macos.tar.gz` (`<id>.sh`, the executable bits
@@ -73,18 +76,39 @@ plugins run before its profiles', and the distributions must find the embedded j
 A program's tests start its server as `launch` would with `WebApp.start(args…)` — the arguments, the operands, the
 Settings menu's port, the routes —, and nothing of a process: no `.ini` read, no log, no browser, no exit.
 
-## The framework's libraries
+## jtools-bom: the versions, for a build that does not inherit jtools-parent
 
-| Artifact | Package | What it is |
-|---|---|---|
-| `jtools-support` | `org.jtools.framework.support` | `Json` (Map/List trees ⇄ text, `Json.raw` for JSON already written), `I18n` and `Catalogue` (texts per language, plain `{0}`, plurals, `Accept-Language`), `Installation` (home, version, `.ini`) |
-| `jtools-server` | `org.jtools.framework.server` | `WebServer` (routes under `/api`, exact or prefix, by method; plain handlers; JDK filters; the Host and Origin checks; `{"error"}` refusals and exceptions mapped to statuses; the page with ETags, `index.html` for extension-less paths; the presence routes), `Exchange` (a route's request: body, JSON, query, language), `Answer` (bytes, XML, a status), `PageWatch`, `Http`, `DesktopOpener` |
-| `jtools-launcher` | `org.jtools.framework.launcher` | `WebApp` (the command line and the program's options, the port's order — command line, Settings menu, `.ini`, default —, the log, the server, `/api/settings`, `/api/about`, `/api/quit`, `/api/log/open`, the browser, the stop, the failure dialog, in en/fr), `UserSettings`, `SettingsFields`, `LaunchOptions`, `LogFormatter` |
-| `jtools-desktop` | `org.jtools.framework.desktop` | `FileDialogs`: open, save, choose a folder with the desktop's own dialogs (kdialog, zenity, AWT, Swing) |
-| `jtools-dist` | — | `build.xml` (jdeps, jlink, the archives), `app.sh`, `app.bat`, `app.ini` |
-| `jtools-web` | `@jtools/web` | `PagePresenceService`, `provideJTools()`, `apiErrorMessage()` |
+`org.jtools.framework:jtools-bom` holds the versions of the framework's artifacts and nothing else — jtools-parent
+imports it. A Gradle build, or a Maven project with a parent of its own, imports it and names the libraries without
+a version:
 
-Each jar names an `Automatic-Module-Name` (`org.jtools.framework.support`…), for a project with a `module-info.java`.
+```kotlin
+dependencies {
+    implementation(platform("org.jtools.framework:jtools-bom:1.2.0"))
+    implementation("org.jtools.framework:jtools-app")
+}
+```
+
+```xml
+<dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.jtools.framework</groupId>
+      <artifactId>jtools-bom</artifactId>
+      <version>1.2.0</version>
+      <type>pom</type>
+      <scope>import</scope>
+    </dependency>
+  </dependencies>
+</dependencyManagement>
+```
+
+Such a build has the libraries, not the conventions: the one jar and the distributions are jtools-parent's.
+
+## The libraries
+
+What each gives, and the class to start from: [LIBRARIES.md](LIBRARIES.md). Each jar names an `Automatic-Module-Name`
+(`org.jtools.framework.support`…), for a project with a `module-info.java`.
 
 ## Sharing the framework
 
@@ -95,10 +119,10 @@ it to the Artifactory the externals already use, then name that repository in th
 mvn deploy -DaltDeploymentRepository=jtools::https://<artifactory>/artifactory/libs-release-local
 ```
 
-**Maven Central**, for everyone: the profile `publish` (sources, javadoc, GPG, the Central Portal — the same as
-DocComparator's and XsdViewer's) is jtools-parent's, so the framework's modules publish with it and a published
-project can too. [PUBLISHING.md](../PUBLISHING.md) says what it takes. A project published on GitHub (XsdViewer) can
-depend on the framework once it is there: its CI resolves from Central — doc/ADOPTING.md.
+**Maven Central**, for everyone: the profile `publish` (sources, javadoc, GPG, the Central Portal) is jtools-parent's,
+so the framework's modules publish with it and a project publishing its own artifacts can too.
+[PUBLISHING.md](../PUBLISHING.md) says what it takes. A project whose CI builds on another machine — a hosted CI
+service — resolves the framework from Central once it is published there.
 
 ## The licence
 
@@ -110,9 +134,13 @@ artifactId appended (`child.*.inherit.append.path="false"`).
 
 `license-maven-plugin` puts the Apache header at the top of every Java source, main and test, at `process-sources`:
 it is configured in jtools-parent's `pluginManagement` and a module gets it by naming the plugin — the framework's
-libraries do; a project does not, unless it is published under the same licence (XsdViewer's configuration is the same).
+libraries do; a project does not, unless it is published under the same licence.
 
 ## Not in this version
 
-**Gradle**: three projects carry a Gradle build beside Maven's. The framework is Maven-first; a Gradle convention
-plugin mirroring jtools-parent is the way to bring it, and is not written yet.
+**Gradle conventions**: the framework is Maven-first. A Gradle build gets the libraries' versions from `jtools-bom`;
+the one jar and the distributions — a Gradle plugin mirroring jtools-parent — are not written yet.
+
+---
+
+Next: the scripts a project carries, and how they stay up to date — [DEVKIT.md](DEVKIT.md).

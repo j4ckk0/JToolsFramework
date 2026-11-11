@@ -1,8 +1,7 @@
 # Publishing JToolsFramework: its licence, Maven Central
 
 The framework is published under the Apache License, Version 2.0 (`LICENSE`, `NOTICE`), on GitHub
-(<https://github.com/j4ckk0/JToolsFramework>) and on Maven Central under `org.jtools.framework`, the same way as the
-other jtools projects (XsdViewer, DocComparator).
+(<https://github.com/j4ckk0/JToolsFramework>) and on Maven Central under `org.jtools.framework`.
 
 ## 1. What reaches Maven Central
 
@@ -12,24 +11,26 @@ Every artifact with its pom, the version written out in each (the framework's po
 | Artifact | What it is | Files |
 |---|---|---|
 | `org.jtools.framework:jtools-parent` | the build conventions every project inherits, the coordinates, the licence | the pom |
-| `org.jtools.framework:jtools-support` | `Json`, `Installation` | jar, sources, javadoc |
-| `org.jtools.framework:jtools-server` | `WebServer`, `PageWatch`, `Http`, `DesktopOpener` | jar, sources, javadoc |
-| `org.jtools.framework:jtools-launcher` | `WebApp`, `LaunchOptions` | jar, sources, javadoc |
+| `org.jtools.framework:jtools-bom` | the versions of the framework's artifacts, for a build not inheriting jtools-parent | the pom |
+| `org.jtools.framework:jtools-support` | `Json`, `I18n`, `Catalogue`, `Installation` | jar, sources, javadoc |
+| `org.jtools.framework:jtools-server` | `WebServer`, `Exchange`, `Answer`, `PageWatch`, `Http`, `DesktopOpener` | jar, sources, javadoc |
+| `org.jtools.framework:jtools-app` | `WebApp`, `UserSettings`, `SettingsFields`, `LaunchOptions`, `LogFormatter` | jar, sources, javadoc |
 | `org.jtools.framework:jtools-desktop` | `FileDialogs`: the native file dialogs | jar, sources, javadoc |
 | `org.jtools.framework:jtools-dist` | the distributions' build (jlink runtimes, archives) and launchers | jar, sources; its javadoc jar is a README |
 | `org.jtools.framework:jtools-web` | `@jtools/web`, as TypeScript sources | jar, sources; its javadoc jar is a README |
+| `org.jtools.framework:jtools-devkit` | a project's scripts and the starter, which `scripts/jtools` fetches | jar, sources; its javadoc jar is a README |
 
-`jtools-dist` and `jtools-web` hold no Java, and Maven Central refuses a jar without its javadoc: theirs is one
+`jtools-dist`, `jtools-web` and `jtools-devkit` hold no Java, and Maven Central refuses a jar without its javadoc: theirs is one
 `README.txt` saying where their documentation is (`jtools.javadoc.placeholder.skip` in their poms). The aggregator
-`jtools-framework`, which only lists the modules, is not uploaded (`excludeArtifacts`). Neither is the template nor
-anything of `scripts/`: they reach a project through `new-project.sh` and `jtools-sync.sh`, from a clone.
+`jtools-framework`, which only lists the modules, is not uploaded (`excludeArtifacts`); nor is `examples/hello`
+(`skipPublishing`).
 
 **This is not part of a release**: a version reaches Central only when it is asked for on its own — what Central
 publishes can never be replaced or withdrawn.
 
 ## 2. What it takes, once
 
-All already done for XsdViewer and DocComparator, and shared by every `org.jtools` artifact:
+Shared by every `org.jtools` artifact, and done already:
 
 1. **The namespace `org.jtools`.** Maven Central hands out a groupId only to who owns the domain it reverses, and
    jtools.org is ours: verified on <https://central.sonatype.com> through a DNS TXT record on `jtools.org`.
@@ -46,11 +47,12 @@ All already done for XsdViewer and DocComparator, and shared by every `org.jtool
 
 ## 3. Publishing a version
 
-The profile `publish` is jtools-parent's (doc/BUILD.md): the framework's modules inherit it, and so can a published
+The profile `publish` is jtools-parent's (doc/CONVENTIONS.md); jtools-bom, which inherits nothing, has its own: the framework's modules inherit it, and so can a published
 project of its own.
 
 1. The version, in every pom at once (`scripts/check-versions.sh` says they agree), not a SNAPSHOT; the projects'
-   template follows it (`templates/webapp/pom.xml` names `__JTOOLS_VERSION__`, filled in from `jtools.version`).
+   template follows it (`starter/template/pom.xml` names `__JTOOLS_VERSION__`, filled in from `jtools.version`), and
+   `scripts/jtools` names it as `JTOOLS_DEFAULT_VERSION`.
 2. A dry run, nothing signed nor sent — the jars, sources and javadoc in each module's `target/`:
 
        . scripts/externals.sh && mvn -Ppublish clean verify -Dgpg.skip
@@ -62,10 +64,11 @@ project of its own.
 
 4. Nothing is released until **Publish** is pressed on <https://central.sonatype.com> (`autoPublish` is off), so a
    mistake costs nothing: drop the deployment there, fix, upload again.
-5. Then tag the version (`git tag v1.1.0 && git push origin v1.1.0`) and, in the projects, name the new version as
-   their parent's (`scripts/jtools-sync.sh` reports the ones behind).
+5. Then tag the version (`git tag v1.2.0 && git push origin v1.2.0`) — doc/GETTING-STARTED.md downloads
+   `scripts/jtools` from that tag — and, in the projects, name the new version as their parent's and as
+   `JTOOLS_VERSION` (`scripts/jtools sync` reports the ones behind).
 
-## 4. Learnt with XsdViewer (5 September 2026), true here too
+## 4. Learnt the first time
 
 - `gpg --send-keys` reports success here while the key never leaves: the key-server ports are filtered. Upload over
   HTTPS instead — `gpg --armor --export <id> > pub.asc` then
@@ -84,5 +87,5 @@ These builds use the network (plugins, the upload): the framework does not.
 
 ## 5. Once on Central
 
-The projects no longer need `scripts/install.sh` first: Maven resolves jtools-parent and the libraries from Central.
-XsdViewer's GitHub Actions can then build against it (doc/ADOPTING.md).
+The projects no longer need `scripts/install.sh` first: Maven resolves jtools-parent and the libraries from Central,
+`scripts/jtools` the devkit; a hosted CI builds a project with nothing but Maven.

@@ -55,7 +55,7 @@ class BuiltInRoutesTest {
     private String node;
     private WebServer server;
 
-    /** DCSBuilder's kind of field: the program's own setting, validated and kept by the program. */
+    /** A program's own field: its setting, validated and kept by the program. */
     private final SettingsFields theme = new SettingsFields() {
         private String value = "light";
         @Override public void read(Map<String, Object> answer) { answer.put("theme", value); }

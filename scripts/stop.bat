@@ -1,5 +1,5 @@
 @echo off
-rem Managed by JToolsFramework (scripts/jtools-sync.sh refreshes it): change it there, not here.
+rem Managed by JToolsFramework's devkit (scripts/jtools sync refreshes it): change it in its devkit/, not here.
 rem
 rem Stops the program: its servers running on this machine from <id>.jar (scripts\run.bat, a distribution). Closing
 rem its last page stops one too; this is for the others (--keep-alive, --no-browser). Needs wmic, which Windows 11

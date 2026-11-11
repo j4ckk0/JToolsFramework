@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Managed by JToolsFramework (scripts/jtools-sync.sh refreshes it): change it there, not here.
+# Managed by JToolsFramework's devkit (scripts/jtools sync refreshes it): change it in its devkit/, not here.
 #
 # The project's CI, run locally: the build with every test, quiet, the pages' dependencies installed exactly as
 # their package-lock.json has them (npm ci); then scripts/ci.local.sh, when the project has checks of its own.

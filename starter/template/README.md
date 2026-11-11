@@ -11,6 +11,16 @@ Built on [JToolsFramework](https://github.com/j4ckk0/JToolsFramework) __JTOOLS_V
 its libraries the server and the program (`jtools-app`), `@jtools/web` the page's side, and its devkit the scripts
 (see [Build and run](#build-and-run)).
 
+## First steps
+
+1. **Run it**: `scripts/run.sh` — the page opens; close it, and the program stops.
+2. **Add a feature**: a rule in `core` (`__APP_NAME__.java`), a route in `api` (`__APP_NAME__Api.java`) that asks it, a
+   method in `frontend/src/app/api.service.ts` that calls the route, a view that shows it — JToolsFramework's
+   `doc/GETTING-STARTED.md`, step 5, walks through one; `doc/ARCHITECTURE.md` here says where each kind of code goes.
+3. **Test it**: `scripts/build.sh` — every Java test and the page's.
+4. **Ship it**: `scripts/package.sh` — the Linux, macOS and Windows archives in `releases/`, each with its own Java.
+5. **Keep it up to date**: `scripts/jtools sync`, at the `JTOOLS_VERSION` of `jtools.conf`.
+
 ## Build and run
 
 Everything the build needs comes from `external/` (see [Externals](#externals)): run `scripts/setup.sh` once — the
@@ -18,7 +28,7 @@ other scripts offer to when it has not been run. JToolsFramework comes from Mave
 repository where a clone of it puts it (its `scripts/install.sh`).
 
 ```bash
-scripts/setup.sh                 # the externals: JDK 21, Maven, Node.js, the JREs (once)
+scripts/setup.sh                 # the externals: JDK 21, Maven, Node.js, the JDK archives (once)
 scripts/build.sh                 # mvn clean package: app/target/__APP_ID__.jar, every test (Java and the page's)
 scripts/build.sh -DskipTests     # extra arguments go to mvn
 scripts/ci.sh                    # quiet, the page's dependencies exactly as package-lock.json has them (npm ci)

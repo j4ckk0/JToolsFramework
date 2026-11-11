@@ -8,7 +8,7 @@
 #   scripts/install.sh -DskipTests     # extra arguments are passed to mvn
 #
 # To share the framework with other machines, deploy it to the Artifactory the externals' MIRROR names
-# (doc/BUILD.md, "Sharing the framework").
+# (doc/CONVENTIONS.md, "Sharing the framework").
 #
 set -euo pipefail
 cd "$(dirname "$(readlink -f "$0")")/.."   # the framework's root

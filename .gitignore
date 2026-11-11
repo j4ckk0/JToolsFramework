@@ -11,7 +11,7 @@ node_modules/
 
 # The distributions (scripts/package.*), kept from one build to the next
 /releases/
-# The externals: JDK, Maven, Node.js, the JRE archives (scripts/setup.sh, README: Externals)
+# The externals: JDK, Maven, Node.js, the JDK archives (scripts/setup.sh, doc/DEVKIT.md)
 /external
 # your mirror and its credentials (setup reads it on top of externals.conf)
 /externals.local.conf

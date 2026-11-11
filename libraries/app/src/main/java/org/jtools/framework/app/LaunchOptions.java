@@ -39,7 +39,7 @@ public record LaunchOptions(int port, String host, boolean browser, boolean keep
     public static final String OPT_PORT = "--port", OPT_HOST = "--host", OPT_NO_BROWSER = "--no-browser",
             OPT_KEEP_ALIVE = "--keep-alive", OPT_LOG_LEVEL = "--log-level", OPT_VERBOSE = "--verbose", OPT_LOG_FILE = "--log-file",
             OPT_LANG = "--lang", OPT_HELP = "--help", OPT_HELP_SHORT = "-h";
-    /** The name MythoStory and SensorSimulator first gave to --keep-alive, still understood. */
+    /** --keep-alive's other name, understood too. */
     public static final String OPT_KEEP_RUNNING = "--keep-running";
     /** The installation's settings a run reads from the {@code .ini}. */
     public static final String INI_PORT = "port", INI_HOST = "host", INI_LOG_LEVEL = "log.level", INI_LOG_FOLDER = "log.folder";

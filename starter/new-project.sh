@@ -13,9 +13,6 @@
 #   jtools new Demo --no-git --no-build              # the files alone (a try, the framework's CI)
 #
 # The name is the Java class of the business (core) and the program's name: CamelCase, a letter first.
-# From a clone of JToolsFramework, the port is also one no org.jtools program has (doc/PORTS.md, the family's
-# registry: the next free one by default), and a project with its repository is entered there — commit it in the
-# framework afterwards.
 #
 set -euo pipefail
 starter="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
@@ -59,18 +56,6 @@ if [ -n "$bare" ]; then
   [ ! -e "$bare" ] || { echo "$bare exists: choose another --bare" >&2; exit 1; }
 fi
 
-# The port. From a clone, one no org.jtools program of doc/PORTS.md has, the next free one by default.
-registry=${clone:+$clone/doc/PORTS.md}
-if [ -n "$registry" ]; then
-  ports=$(sed -n 's/^| *\([0-9][0-9]*\) *|.*/\1/p' "$registry")
-  if [ -z "$port" ]; then
-    port=$(( $(sort -n <<< "$ports" | tail -1) + 1 ))
-    while grep -qx "$port" <<< "$ports"; do port=$((port + 1)); done
-  fi
-  if grep -qx "$port" <<< "$ports"; then
-    echo "port $port is taken in doc/PORTS.md ($(grep -E "^\| *$port *\|" "$registry" | cut -d"|" -f3 | xargs | sed "s/ /, /g")): choose another with --port" >&2; exit 1
-  fi
-fi
 port=${port:-$DEFAULT_PORT}
 [[ $port =~ ^[0-9]+$ ]] && [ "$port" -ge 1024 ] && [ "$port" -le 65535 ] || { echo "$port: a port from 1024 to 65535" >&2; exit 2; }
 
@@ -99,19 +84,6 @@ for file in package.json package-lock.json tsconfig.spec.json .editorconfig .pre
   cp "$frontend/$file" "$dir/frontend/$file"
 done
 sed -i "s/\"name\": \"jtools-web\"/\"name\": \"$id\"/" "$dir/frontend/package.json" "$dir/frontend/package-lock.json"
-
-# From a clone, the port entered in the family's registry (kept sorted by port) — by a real project, with its
-# repository; a try is not one.
-if [ -n "$registry" ] && $git; then
-  where=$dir
-  case "$dir" in "$(dirname "$(dirname "$clone")")"/*) where=${dir#"$(dirname "$(dirname "$clone")")"/} ;; esac
-  {
-    sed -n '1,/^|---/p' "$registry"
-    { sed -n '/^|---/,$p' "$registry" | sed 1d | grep '^|'; echo "| $port | $name | $where |"; } | sort -s -t'|' -k2,2n
-    sed -n '/^|---/,$p' "$registry" | sed 1d | grep -v '^|' || true
-  } > "$registry.new" && mv "$registry.new" "$registry"
-  echo "== port $port entered in doc/PORTS.md (commit it in JToolsFramework)"
-fi
 
 cd "$dir"
 if $git; then

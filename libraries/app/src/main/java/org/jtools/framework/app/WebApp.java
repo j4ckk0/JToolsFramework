@@ -62,9 +62,9 @@ import org.jtools.framework.support.Json;
  * cannot be run, 3 for a program that cannot start.
  * <pre>{@code
  * public static void main(String[] args) {
- *     Simulator simulator = new Simulator();
- *     WebApp.named("SensorSimulator").defaultPort(8094)
- *           .routes(server -> SimulatorApi.routes(server, simulator))
+ *     SensorMonitor monitor = new SensorMonitor();
+ *     WebApp.named("SensorMonitor").defaultPort(8090)
+ *           .routes(server -> SensorMonitorApi.routes(server, monitor))
  *           .launch(args);
  * }
  * }</pre>
@@ -139,7 +139,7 @@ public final class WebApp {
         return this;
     }
 
-    /** The port when neither the command line, the Settings menu nor the .ini names one (doc/PORTS.md keeps the programs apart). */
+    /** The port when neither the command line, the Settings menu nor the .ini names one: one of the program's own, so that it runs beside others. */
     public WebApp defaultPort(int port) {
         this.defaultPort = port;
         return this;
@@ -181,7 +181,7 @@ public final class WebApp {
         return this;
     }
 
-    /** The program's own fields of {@code /api/about}: XsdViewer's {@code dialogs}. */
+    /** The program's own fields of {@code /api/about}: whether it can show native file dialogs, say. */
     public WebApp aboutFields(Consumer<Map<String, Object>> fields) {
         this.aboutFields = fields;
         return this;
@@ -223,7 +223,7 @@ public final class WebApp {
 
     /**
      * The language this run speaks where no page asks for one — its console, and what the program says to a client
-     * that names none (DCSBuilder's MCP tools): {@code --lang}'s, else the machine's. Known once the command line is
+     * that names none (a tool endpoint other programs call): {@code --lang}'s, else the machine's. Known once the command line is
      * read, so from {@link #routes} on.
      */
     public Locale language() {

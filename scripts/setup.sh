@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Managed by JToolsFramework (scripts/jtools-sync.sh refreshes it): change it there, not here.
+# Managed by JToolsFramework's devkit (scripts/jtools sync refreshes it): change it in its devkit/, not here.
 #
 # Deploys the project's externals into external/ (not under source control), from externals.conf — each tool only
 # when externals.conf names it:

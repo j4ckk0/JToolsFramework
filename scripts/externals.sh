@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Managed by JToolsFramework (scripts/jtools-sync.sh refreshes it): change it there, not here.
+# Managed by JToolsFramework's devkit (scripts/jtools sync refreshes it): change it in its devkit/, not here.
 #
 # Sourced by the scripts, from the project root. Reads jtools.conf — what the scripts know of this project — and
 # makes sure scripts/setup.sh has been run: every tool externals.conf names is deployed in external/ (offered at a

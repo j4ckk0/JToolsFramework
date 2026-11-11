@@ -1,5 +1,5 @@
 @echo off
-rem Managed by JToolsFramework (scripts/jtools-sync.sh refreshes it): change it there, not here.
+rem Managed by JToolsFramework's devkit (scripts/jtools sync refreshes it): change it in its devkit/, not here.
 rem
 rem Build (if needed) and run the program on Windows: it serves the page and its API, opens the browser on it, and
 rem stops once its last page is closed.

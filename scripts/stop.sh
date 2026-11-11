@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Managed by JToolsFramework (scripts/jtools-sync.sh refreshes it): change it there, not here.
+# Managed by JToolsFramework's devkit (scripts/jtools sync refreshes it): change it in its devkit/, not here.
 #
 # Stops the program: its servers running on this machine — from scripts/run.sh (<id>-run.jar) or from a distribution
 # (<id>.jar). Closing its last page stops one too; this is for the others (--keep-alive, --no-browser). The clean way

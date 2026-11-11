@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Managed by JToolsFramework (scripts/jtools-sync.sh refreshes it): change it there, not here.
+# Managed by JToolsFramework's devkit (scripts/jtools sync refreshes it): change it in its devkit/, not here.
 #
 # Build (if needed) and run the program: it serves the page and its API, opens the browser on it, and stops once
 # its last page is closed.

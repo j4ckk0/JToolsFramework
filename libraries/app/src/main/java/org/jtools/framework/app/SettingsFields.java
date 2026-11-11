@@ -26,7 +26,7 @@ import org.jtools.framework.server.Exchange;
 
 /**
  * The program's own settings in {@code /api/settings}, beside the framework's {@code autoStop} and {@code port}
- * ({@link WebApp#settingsFields}): DCSBuilder's chat model and marking orders.
+ * ({@link WebApp#settingsFields}): a model to chat with, the order a list is shown in — what only the program knows.
  */
 public interface SettingsFields {
 

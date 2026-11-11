@@ -1,5 +1,5 @@
 @echo off
-rem Managed by JToolsFramework (scripts/jtools-sync.sh refreshes it): change it there, not here.
+rem Managed by JToolsFramework's devkit (scripts/jtools sync refreshes it): change it in its devkit/, not here.
 rem
 rem Build the self-contained distributions (jar + a runtime jlink trims to what the program needs + launchers;
 rem <name>.exe without a console), into releases\:

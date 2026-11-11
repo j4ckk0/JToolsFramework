@@ -1,70 +1,71 @@
-# Adopting the framework in an existing project
+# Adopting the framework in an existing program
 
-None of the existing projects has been changed: each moves when its owner decides, one step at a time, its CI run
-after each. The steps, in the order that pays first:
+For a program already written — a Java server and a page — that wants what JToolsFramework gives. A new program needs
+none of this: `jtools new` makes it on the framework from the start ([GETTING-STARTED.md](GETTING-STARTED.md)).
 
-1. **The scripts** — `jtools.conf` at the root, then `scripts/jtools-sync.sh <project>` from the framework: the
-   managed scripts replace the project's copies (read the diff: what the project's own did beyond them goes into
-   `scripts/*.local.sh`). The cheapest step, and the one that ends the drift between copies.
-2. **The parent pom** — `jtools-parent` as the root pom's parent, the `jtools.app.*` properties; the program's module
-   sets `jtools.program.skip` to `false` and loses its shade, launch4j, antrun and assembly configuration (the
-   parent's dist profile links the runtimes with jlink and builds the Linux, macOS and Windows archives); the
-   frontend's pom loses its npm executions. Then `src/assembly/` and `src/dist/` go, but for what the distributions
-   carry of the project's own (`src/dist/files/`).
-3. **The libraries** — `PageWatch`, the HTTP plumbing, the browser, `Json`, the installation, the launcher: replaced
-   by `jtools-server`, `jtools-support`, `jtools-launcher`. The page keeps working as it is: the presence protocol is
-   the same (`/api/alive`, `/api/bye`).
-4. **The page** — an Angular page takes `@jtools/web` (`provideJTools()`) in place of its own presence code.
+## Step by step
 
-What each project can take, and what holds it back:
+Each step stands alone, the program's tests green after it — they are the acceptance; take the steps in this order,
+the cheapest first.
 
-## SensorSimulator — everything, at once
+### 1. The parent pom
 
-It was written yesterday on this pattern, and its `support/` and `server/` modules are where `jtools-support` and
-`jtools-server` come from: it is the template without the framework. Adopting means deleting `support/` and `server/`,
-depending on the framework's, its `Launcher` becoming a `WebApp`, its `app/pom.xml` shrinking to the template's.
-Two changes come with it: **its port, 8093, is WhichPaint's** (doc/PORTS.md: 8094 is free), and it loses its Gradle
-build (the framework is Maven-first). Regenerating it with `scripts/new-project.sh` and moving nothing is as good —
-it has no business yet.
+The root pom's `<parent>` becomes `jtools-parent`, at the framework's version, and loses what the parent says:
+`maven.compiler.release`, the encoding, JUnit's dependency and version, the plugins' versions, the surefire working
+directory. The project's coordinates, modules and its own dependencies stay.
 
-## DCSBuilder — the scripts, the parent, most of the server; the model distributions stay its own
+*Check*: the same tests run, the same jar is made (`unzip -p … META-INF/MANIFEST.MF`).
 
-What its server and launcher need of the framework first, and what then goes: [DESIGN-1.1.md](DESIGN-1.1.md) §7.
+### 2. The server and the program
 
-- Takes: the scripts (its `--model` setup goes into `scripts/setup.local.sh`, the model's checks into
-  `externals.local.sh`), the parent (its eight modules keep their order), `PageWatch`, `Http`, `DesktopOpener`,
-  `Json`, `Installation`, the launcher's command line (`--keep-alive` is the framework's name already).
-- Keeps: its "with model" distributions (llm/ beside the parent's archives, in a profile of its own), its MCP server,
-  its `--data` and `--lang` options (`WebApp.option`), its vanilla-JS page (the presence protocol is the same).
-- Candidates for the framework's next version, found here first: `I18n` (texts in English and French, the page's
-  language from `Accept-Language`), `UserSettings` (the user's choices in `java.util.prefs`, as XsdViewer has too),
-  `StaticFiles` with ETags.
-- Loses: its Gradle build, until the framework has a Gradle convention plugin.
+The program's module depends on `jtools-app`, sets `jtools.program.skip` to `false` and the `jtools.app.*`
+properties ([CONVENTIONS.md](CONVENTIONS.md)), and loses its shade and jar configuration. Then, in the code:
 
-## WhichPaint — the scripts and the server; one module to split first
+1. **The `main`** becomes a `WebApp` ([LIBRARIES.md](LIBRARIES.md)): its name, its default port, the page's folder
+   (`pageRoot("web")` for a page outside `static/`), the program's own options (`option`, `fileOperand`), and
+   `routes(server -> …)`. What the old launcher did — the command line, the `.ini`, the log, the browser, the stop —
+   goes.
+2. **Each route** registers on the `WebServer` with `get` or `post` and returns its answer: a `Map` or `List` tree,
+   `Json.raw(text)` for JSON the program's own writer made, an `Answer` for bytes or XML. A refusal throws
+   `WebServer.Refusal(status, reason)`; the program's exceptions map to statuses with `refuse(MyException.class, 400)`.
+   What the old server did — the static files, `/api/alive`, `/api/bye`, `/api/quit`, `/api/settings`, `/api/about`,
+   the Origin check — goes.
+3. **Settings of the program's own** (beside the stop and the port) become a `SettingsFields`; an `/api/about` field
+   of its own, `aboutFields`.
+4. **The tests** start the program's server as `main` does: `program().start("--port", "0", "--keep-alive")`, the
+   preferences in a node of the test's own (the system property `<id>.preferences`).
 
-A single Maven module (and an Android app): the parent applies as it is, but the pattern's separation —
-business in `core`, the program in `app` — means splitting it first. Its `PageWatch`, `PageRoutes`, `ApiJson`,
-`Options` and `DesktopOpener` are the framework's libraries. Its vanilla-JS page keeps working. Its Android build is
-Gradle's and stays so. **Port 8093** is its own; SensorSimulator is the one to move.
+A library module of the program's, used by other programs, may stay free of the framework: only the modules serving
+the program need it.
 
-## MythoStory — the scripts, the parent's conventions and `@jtools/web`'s ideas; not the server
+*Check*: the program's own tests, adapted only where the protocol changes — `/api/bye` answers 204, every refusal is
+`{"error"}` JSON, a request from another site or naming a foreign host is refused (403). The page keeps working: the
+presence protocol is the same.
 
-Kotlin on Ktor: `WebServer` and `WebApp` are not for it, and its presence speaks another protocol
-(`/api/session`, SSE + `/api/session/{id}/closed`). It can take the scripts (Piper, the voices, the Android SDK and the
-emulator into `scripts/*.local.sh`), the parent's frontend profile (its `frontend/pom.xml` is the same npm build)
-and its dist profile once its desktop module sets `jtools.program.skip`. `@jtools/web` would need its server to speak
-`/api/alive` and `/api/bye` first. It is also the one on Java 17 bytecode (Android): `maven.compiler.release` is a
-property it overrides.
+### 3. The distributions
 
-## XsdViewer — the patterns only, until the framework is on Maven Central
+With `-Pdist`, jtools-parent's profile builds the Linux, macOS and Windows archives with a runtime jlink trims, from the
+JDK archives in `external/` (`jdk-linux.tar.gz`… or Temurin's own names; `jtools.jdk.archives` names another folder).
+The program's assembly descriptors, launch4j configuration and launchers go; what the archives carry of the repository
+is `jtools.dist.include` (`samples/**`), of the module `src/dist/files/`. A flavour of the program's own — archives
+carrying more, a large model or a data set — stays its own profile, made of what the parent's has just made
+(`target/runtime/`, `target/jtools-dist-work/`).
 
-What its server and launcher need of the framework first, and what then goes: [DESIGN-1.1.md](DESIGN-1.1.md) §6.
+*Check*: the archives hold the same files as before (`tar tzf`, `unzip -Z1`) but `jre/`, and the program runs on the
+runtime of one.
 
-Public on GitHub, Apache-2.0, organisation jtools.org, built by GitHub Actions with the runner's Maven (no
-`externals.conf`), JPMS (`core/module-info.java`). The licences agree — the framework is Apache-2.0 too, under the
-same organisation — but its build can only depend on what its CI resolves: the framework must reach Maven Central
-first. The jars name an `Automatic-Module-Name` for its `module-info.java`; jtools-parent's `license-maven-plugin`
-configuration is the one XsdViewer already uses.
-Its `PageWatch`, `AliveHandler`, `ByeHandler`, `BrowserLauncher`, `CommandLineOptions`, `ConfigFile` are the
-framework's libraries, in a finer split (a handler per route); its review rules are the framework's (CLAUDE.md).
+### 4. The scripts (optional)
+
+`jtools.conf` at the root (APP_ID, APP_NAME, APP_MODULE, BUILD_GOALS, `JTOOLS_VERSION`), `scripts/jtools` copied from
+the devkit, then `scripts/jtools sync`: the devkit's scripts replace the project's. What the project's own did beyond
+them goes into `scripts/*.local.sh` ([DEVKIT.md](DEVKIT.md)). A program whose scripts do much of their own keeps them: the
+devkit is a convenience, not a condition.
+
+### 5. The page (an Angular page)
+
+`@jtools/web`'s `provideJTools()` in place of the page's own presence code. A page in plain JavaScript keeps its own:
+the protocol is the same three lines ([examples/hello](../examples/hello)).
+
+---
+
+Next: why the framework is as it is — [design/](design). Back to the start: [GETTING-STARTED.md](GETTING-STARTED.md).

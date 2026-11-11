@@ -7,7 +7,7 @@
          child.project.url.inherit.append.path="false">
   <modelVersion>4.0.0</modelVersion>
 
-  <!-- The parent of every org.jtools project, and of the framework's own modules: the conventions of the build,
+  <!-- The parent of every project on JToolsFramework, and of the framework's own modules: the conventions of the build,
        said once. A project's root pom names it as <parent>, sets the jtools.app.* properties below, and gets:
          - Java 21, UTF-8, JUnit 5, the plugins' versions, the tests run from the root of the repository;
          - in a module holding an angular.json: the page built by npm (install, build, test), its build under
@@ -15,18 +15,18 @@
          - in the module setting jtools.program.skip to false: the program's one jar, embedding every module
            (jtools-embed), and with -Pdist the Linux, macOS and Windows distributions, each with a runtime jlink trims, the
            launchers and the .ini (profile dist; the descriptors come from jtools-dist).
-       doc/BUILD.md in JToolsFramework says it in full. -->
+       doc/CONVENTIONS.md in JToolsFramework says it in full. -->
   <groupId>org.jtools.framework</groupId>
   <artifactId>jtools-parent</artifactId>
   <version>1.2.0</version>
   <packaging>pom</packaging>
 
   <name>JToolsFramework parent</name>
-  <description>The build conventions of the org.jtools projects: a Java server, an Angular page as its view, and self-contained distributions.</description>
+  <description>The build conventions of a project on JToolsFramework: a Java server, an Angular page as its view, and self-contained distributions.</description>
 
-  <!-- What Maven Central requires of every pom it publishes, and shows: the same as XsdViewer's and DocComparator's.
+  <!-- What Maven Central requires of every pom it publishes, and shows.
        A project inheriting jtools-parent inherits these too, as with any parent; one publishing its own artifacts
-       declares its own (doc/BUILD.md, "The licence"). -->
+       declares its own (doc/CONVENTIONS.md, "The licence"). -->
   <url>https://github.com/j4ckk0/JToolsFramework</url>
   <inceptionYear>2026</inceptionYear>
   <organization>
@@ -73,7 +73,7 @@
            jtools.app.id               its jar, .ini, launchers and releases: <id>.jar, <id>.ini, <id>-<version>-linux.tar.gz
            jtools.app.name             its name, as people read it, and its Windows launcher: <name>.exe
            jtools.app.mainClass        the class starting it (most often a call to org.jtools.framework.app.WebApp)
-           jtools.app.port             the port its .ini says (doc/PORTS.md in JToolsFramework keeps them apart)
+           jtools.app.port             the port its .ini says: one of its own, so that it runs beside other programs
            jtools.app.windowsVersion   the version in the four parts an .exe wants: 1.2 is 1.2.0.0
            jtools.app.description      what Windows says of <name>.exe (its file description): its name unless said -->
     <jtools.app.id>app</jtools.app.id>
@@ -198,7 +198,7 @@
           <version>3.6.0</version>
         </plugin>
         <!-- the publish profile's plugins: here so that a module keeping itself off Maven Central names the portal's
-             plugin with no version of its own (<skipPublishing>true</skipPublishing>: XsdViewer's app and examples) -->
+             plugin with no version of its own (<skipPublishing>true</skipPublishing>: a program's own modules, an example) -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
@@ -579,9 +579,8 @@
     <!--
       mvn -Ppublish clean deploy
       What Maven Central gets — each jar with its sources and its javadoc, every file signed — in one bundle uploaded to
-      the Central Portal, published by hand once its checks pass (autoPublish off: a mistake costs nothing). The same
-      profile as DocComparator's and XsdViewer's, here for every project inheriting jtools-parent: the framework's own
-      modules use it, and a published project (XsdViewer) can. PUBLISHING.md says what it takes, once and per version;
+      the Central Portal, published by hand once its checks pass (autoPublish off: a mistake costs nothing). Here for
+      every project inheriting jtools-parent: the framework's own modules use it, and a project publishing its own can. PUBLISHING.md says what it takes, once and per version;
       mvn -Ppublish verify -Dgpg.skip builds the same without signing nor uploading.
       No flatten-maven-plugin: the framework's poms write their versions out; a project with a ${revision} adds it.
     -->
@@ -638,7 +637,7 @@ ${project.description}
 
 This module holds no Java, so no javadoc: this jar is the one Maven Central requires
 beside every jar. The documentation is in the module's own files (its -sources jar) and
-in the framework's doc/BUILD.md: ${project.url}
+in the framework's doc/CONVENTIONS.md: ${project.url}
 </echo>
                   </target>
                 </configuration>

@@ -1,60 +1,90 @@
 # JToolsFramework
 
-What the org.jtools projects — DCSBuilder, WhichPaint, XsdViewer, MythoStory, SensorSimulator — have in common,
-written once instead of copied into each: **a Java server holding the whole business, an Angular page in the browser
-as its view, the program stopping once its last page is closed, self-contained distributions with a JRE inside**.
+For a **local web application in Java**: a server on your computer holds the whole business, a page in the browser is
+its view, and the program stops once its last page is closed — like any program whose window you close. It ships as
+self-contained archives for Linux, macOS and Windows, a Java runtime inside.
 
-## In one minute
+JToolsFramework is four things, each with a door below:
+
+- **a small framework** — the libraries a program's code calls: the server, the routes, the command line, the
+  settings, the log, the stop (`jtools-app`, the JDK and nothing else);
+- **its build conventions** — the parent pom a project inherits: Java 21, the tests, the program's one jar, the
+  distributions with a runtime jlink trims (`jtools-parent`);
+- **a development environment** — the scripts a project carries (setup, build, run, package…), its tools downloaded
+  into the project, never taken from the machine (`jtools-devkit`);
+- **a project template** — the way a new project begins (`jtools new`).
+
+Apache License 2.0. Version 1.2.0; on Maven Central once published (until then, `scripts/install.sh` puts it in
+`~/.m2`). [doc/CONCEPTS.md](doc/CONCEPTS.md) says the idea behind it in one page.
+
+## Start an app
 
 ```bash
-scripts/setup.sh                          # the externals: JDK 21, Maven, Node.js, the JREs (once)
-scripts/install.sh                        # build, test and install the framework into ~/.m2
-scripts/new-project.sh SensorMonitor      # a new project in ../../git/SensorMonitor, on the next free port, its
-                                          # bare repository in ../../git-bare/SensorMonitor.git, built, committed, pushed
-cd ../../git/SensorMonitor && scripts/run.sh   # the page in the browser; close it and the program stops
+jtools new SensorMonitor        # ./SensorMonitor: four modules, its scripts, a git repository, built
+cd SensorMonitor
+scripts/run.sh                  # the page in the browser; close it, and the program stops
 ```
 
-The generated project is four modules — `core` (the business), `api` (its HTTP face), `frontend` (the Angular view),
-`app` (the program) — whose poms say only what is theirs; its `Launcher` is a few lines.
+`jtools` is one script, the devkit's [`scripts/jtools`](devkit/scripts/jtools): download it, or take it from a clone of
+this repository. [doc/GETTING-STARTED.md](doc/GETTING-STARTED.md) walks through the generated project — where the
+business goes, a feature added from core to the page, tested, packaged — in ten minutes.
 
-## What is in it
+## Use the libraries
 
-| | What | Where it came from |
+A program depends on **`jtools-app`**, which brings `jtools-server` and `jtools-support`:
+
+```java
+public static void main(String[] args) {
+    WebApp.named("Hello").defaultPort(8089).pageRoot("web")
+          .routes(server -> server.get("/api/hello", ex -> Map.of("message", "Hello, " + ex.query("name", "world"))))
+          .launch(args);
+}
+```
+
+That is a whole program: `--port`, `--help`, its `.ini`, the log, the Settings menu, Quit and the stop come with it.
+[examples/hello](examples/hello) is that program with its page in plain JavaScript; [doc/LIBRARIES.md](doc/LIBRARIES.md)
+says what each library gives — `jtools-desktop` for native file dialogs, `jtools-web` for an Angular page.
+
+## Build, run and ship it
+
+A project's root pom names **`jtools-parent`** as its parent and says five things of its program — `jtools.app.id`,
+`name`, `mainClass`, `port`, `windowsVersion`:
+
+```xml
+<parent>
+  <groupId>org.jtools.framework</groupId>
+  <artifactId>jtools-parent</artifactId>
+  <version>1.2.0</version>
+  <relativePath/>
+</parent>
+```
+
+The build then makes the program's one jar, and with `-Pdist` its distributions ([doc/CONVENTIONS.md](doc/CONVENTIONS.md));
+a Gradle build takes `jtools-bom`'s versions instead. The project's scripts — `setup`, `build`, `ci`, `run`, `stop`,
+`package`, in `.sh` and `.bat` — are the devkit's, kept up to date by `scripts/jtools sync` at the version
+`jtools.conf` names ([doc/DEVKIT.md](doc/DEVKIT.md)).
+
+## What is where
+
+| Folder | What | Published as |
 |---|---|---|
-| `parent/` | **jtools-parent**: Java 21, JUnit 5, the plugins; the page built by npm in any module with an `angular.json`; the program's one jar; with `-Pdist` the Linux and Windows distributions, each with its JRE, `.exe`, launchers and `.ini` ([doc/BUILD.md](doc/BUILD.md)) | the poms of DCSBuilder, MythoStory, WhichPaint |
-| `support/` | **jtools-support**: `Json` (`Json.raw` for JSON already written), `I18n` (texts in each language, `Accept-Language`), `Installation` | DCSBuilder, SensorSimulator |
-| `server/` | **jtools-server**: `WebServer` — routes exact or by prefix, plain handlers, JDK filters, the Host and Origin checks, `{"error"}` refusals, the page with ETags, the presence — `Exchange`, `Answer`, `PageWatch` (the stop), `DesktopOpener` | the four `PageWatch`es, the three servers |
-| `launcher/` | **jtools-launcher**: `WebApp` — `--port --host --no-browser --keep-alive --log-level --verbose --log-file --lang --help` and the program's own options, the port's order (command line, Settings menu, `.ini`), the log (`~/.<id>/logs`, in English), `/api/settings`, `/api/about`, `/api/quit`, `/api/log/open`, the failure dialog of an `.exe` — `UserSettings` | the four launchers |
-| `desktop/` | **jtools-desktop**: `FileDialogs`, the native dialogs (kdialog, zenity, AWT, Swing) | XsdViewer |
-| `dist/` | **jtools-dist**: `build.xml` — jdeps, jlink, the Linux, macOS and Windows archives — `app.sh`, `app.bat`, `app.ini` | the five `src/assembly` and `src/dist`, XsdViewer's `runtimes.xml` |
-| `web/` | **@jtools/web**: `provideJTools()`, `PagePresenceService`, `apiErrorMessage()` — TypeScript, compiled with the project's page | SensorSimulator, MythoStory |
-| `scripts/` | the managed scripts every project gets — `setup build ci run stop package` (`.sh`, `.bat`) — and the framework's tools: `install`, `new-project`, `jtools-sync` ([doc/SCRIPTS.md](doc/SCRIPTS.md)) | the five `scripts/` folders, which had drifted apart |
-| `templates/webapp/` | the project `new-project.sh` writes | SensorSimulator |
-| `doc/` | [PATTERN.md](doc/PATTERN.md) (the conventions, and why), [BUILD.md](doc/BUILD.md), [SCRIPTS.md](doc/SCRIPTS.md), [ADOPTING.md](doc/ADOPTING.md) (what each existing project can take), [PORTS.md](doc/PORTS.md) (the registry); [PUBLISHING.md](PUBLISHING.md) (Maven Central); [DESIGN-1.1.md](doc/DESIGN-1.1.md) (what 1.1 takes from XsdViewer and DCSBuilder) | |
+| [`libraries/`](libraries) | `support`, `server`, `app`, `desktop`: the Java libraries; `web`: `@jtools/web`, for an Angular page | `jtools-support`, `-server`, `-app`, `-desktop`, `-web` |
+| [`conventions/`](conventions) | `parent`: the build; `bom`: the versions alone; `dist`: the distributions' build (jdeps, jlink, the archives) and launchers | `jtools-parent`, `jtools-bom`, `jtools-dist` |
+| [`devkit/`](devkit) | what a project carries: its scripts, its pre-push hook, `.gitattributes`, the default `externals.conf`; `scripts/jtools` | `jtools-devkit`, with the starter |
+| [`starter/`](starter) | the template and `new-project.sh`, which `jtools new` runs | in `jtools-devkit` |
+| [`examples/`](examples) | `hello`, the smallest program | never: built and tested with the rest |
+| [`doc/`](doc) | [GETTING-STARTED](doc/GETTING-STARTED.md), [CONCEPTS](doc/CONCEPTS.md), [LIBRARIES](doc/LIBRARIES.md), [CONVENTIONS](doc/CONVENTIONS.md), [DEVKIT](doc/DEVKIT.md), [ADOPTING](doc/ADOPTING.md) (moving an existing program onto it), [design/](doc/design) (why it is as it is) | — |
+| `scripts/` | the framework's own — `install`, `check-versions`, `ci.local` — and the devkit's, which the framework carries like any project | — |
 
-## Decisions of this version
-
-- **One distribution channel, Maven**: the framework is in `~/.m2` (`scripts/install.sh`); another machine gets it
-  from the Artifactory the externals' `MIRROR` already names ([doc/BUILD.md](doc/BUILD.md)). `@jtools/web` travels in
-  a Maven jar, as sources — no npm package to publish.
-- **The scripts are copied into each project, not fetched**: a clone plus `scripts/setup.sh` is enough, as always.
-  `jtools-sync.sh` keeps the copies equal to the framework's; the framework's CI regenerates a project from the
-  template and runs that project's CI, so the template never rots.
-- **One name for each thing that had several**: `--keep-alive` (`--keep-running` still understood), a 15 s grace,
-  a 5 s ping, `--no-browser` keeping the program running — what three of the five projects did.
-- **Maven-first**: no Gradle convention plugin yet; a project wanting Gradle keeps its own build beside.
-- **Apache License 2.0**, like XsdViewer and DocComparator: [LICENSE](LICENSE), [NOTICE](NOTICE), the licence and
-  the project's metadata in jtools-parent (what Maven Central requires), the Apache header on every Java source
-  (`license-maven-plugin`, as in the published jtools projects). It is to be published on GitHub
-  (<https://github.com/j4ckk0/JToolsFramework>) and Maven Central; until then the projects find it in `~/.m2`.
-
-## Build and run
+## Developing the framework
 
 ```bash
-scripts/setup.sh       # the externals (externals.conf: the reference new projects copy)
-scripts/install.sh     # check the versions, build, test, install into ~/.m2
-scripts/ci.sh          # the same quietly, with npm ci, then a project generated from the template and its CI
+scripts/setup.sh       # the externals: JDK 21, Maven, Node.js, the JDK archives (once)
+scripts/install.sh     # versions agree, build, test, install into ~/.m2
+scripts/ci.sh          # the same quietly, then: the framework's scripts equal the devkit's, and a project made by a lone
+                       # scripts/jtools from the installed devkit passes its own CI
 ```
 
-`git config core.hooksPath .githooks` runs `scripts/ci.sh` before every push. The `.bat` scripts are the projects'
-(Windows developers); the framework's own tools are Linux scripts.
+`git config core.hooksPath .githooks` runs `scripts/ci.sh` before every push. A project developed together with the
+framework names the clone in its `jtools.conf` (`JTOOLS_HOME`): its `scripts/jtools` then takes the devkit from the
+working tree. Publishing to Maven Central: [PUBLISHING.md](PUBLISHING.md).

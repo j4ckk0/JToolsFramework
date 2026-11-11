@@ -46,8 +46,8 @@ class FileDialogsTest {
                 FileDialogs.DesktopDialog.KDIALOG.openCommand("Open", "/home/me", true, SCHEMAS));
         assertEquals(List.of("kdialog", "--title", "Open", "--getopenfilename", "/home/me", "XML Schema files (*.xsd *.wsdl)"),
                 FileDialogs.DesktopDialog.KDIALOG.openCommand("Open", "/home/me", false, SCHEMAS));
-        assertEquals(List.of("kdialog", "--title", "Save", "--getsavefilename", "/home/me/ws.xsdviewer.json", "XML Schema files (*.xsd *.wsdl)"),
-                FileDialogs.DesktopDialog.KDIALOG.saveCommand("Save", "/home/me", "ws.xsdviewer.json", SCHEMAS));
+        assertEquals(List.of("kdialog", "--title", "Save", "--getsavefilename", "/home/me/notes.workspace.json", "XML Schema files (*.xsd *.wsdl)"),
+                FileDialogs.DesktopDialog.KDIALOG.saveCommand("Save", "/home/me", "notes.workspace.json", SCHEMAS));
         assertEquals(List.of("kdialog", "--title", "Folder", "--getexistingdirectory", "/home/me"),
                 FileDialogs.DesktopDialog.KDIALOG.folderCommand("Folder", "/home/me"));
     }
@@ -56,8 +56,8 @@ class FileDialogsTest {
     void zenityCommands() {
         assertEquals(List.of("zenity", "--file-selection", "--title=Open", "--filename=/home/me/", "--file-filter=XML Schema files | *.xsd *.wsdl", "--multiple", "--separator=\n"),
                 FileDialogs.DesktopDialog.ZENITY.openCommand("Open", "/home/me", true, SCHEMAS));
-        assertEquals(List.of("zenity", "--file-selection", "--save", "--confirm-overwrite", "--title=Save", "--filename=/home/me/ws.xsdviewer.json", "--file-filter=XML Schema files | *.xsd *.wsdl"),
-                FileDialogs.DesktopDialog.ZENITY.saveCommand("Save", "/home/me", "ws.xsdviewer.json", SCHEMAS));
+        assertEquals(List.of("zenity", "--file-selection", "--save", "--confirm-overwrite", "--title=Save", "--filename=/home/me/notes.workspace.json", "--file-filter=XML Schema files | *.xsd *.wsdl"),
+                FileDialogs.DesktopDialog.ZENITY.saveCommand("Save", "/home/me", "notes.workspace.json", SCHEMAS));
         assertEquals(List.of("zenity", "--file-selection", "--directory", "--title=Folder", "--filename=/home/me/"),
                 FileDialogs.DesktopDialog.ZENITY.folderCommand("Folder", "/home/me"));
     }

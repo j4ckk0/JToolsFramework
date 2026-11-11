@@ -22,7 +22,7 @@ business; an Angular page is its view only. It serves `http://127.0.0.1:__APP_PO
 ## Commands
 
 ```bash
-scripts/setup.sh [--force]     # externals into external/ (JDK 21, Maven, Node 24, JREs)
+scripts/setup.sh [--force]     # externals into external/ (JDK 21, Maven, Node 24, the JDK archives)
 scripts/build.sh [-DskipTests] # clean build, every test (JUnit + vitest)
 scripts/ci.sh                  # quiet, npm ci; the pre-push hook runs it
 scripts/run.sh [--rebuild] [--port N] [--no-browser] [--keep-alive]
@@ -37,8 +37,7 @@ scripts/package.sh             # releases/__APP_ID__-<version>-{linux.tar.gz,win
   refreshes them at the `JTOOLS_VERSION` of `jtools.conf`. Project-only extras go in `scripts/*.local.sh`.
 - **Versions** are set once: the program's in the root `pom.xml` (`<revision>`, `jtools.app.windowsVersion`), the
   framework's as the parent's version, the externals' in `externals.conf`.
-- **Port** __APP_PORT__: `Launcher.DEFAULT_PORT`, `jtools.app.port`, `frontend/proxy.conf.json` (LauncherTest checks),
-  and JToolsFramework's `doc/PORTS.md`.
+- **Port** __APP_PORT__: `Launcher.DEFAULT_PORT`, `jtools.app.port`, `frontend/proxy.conf.json` (LauncherTest checks).
 - **Style**: comments and docs in plain explanatory prose stating intent. Commit messages: a feature title in plain
   English.
 - `tmp/` is gitignored scratch space. Test servers use port 0 or 18000+.

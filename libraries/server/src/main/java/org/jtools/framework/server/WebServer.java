@@ -153,7 +153,7 @@ public final class WebServer implements AutoCloseable {
     }
 
     /**
-     * Mounts a plain JDK handler on a path, anywhere but the page's root — DCSBuilder's {@code /mcp}. The checks and the
+     * Mounts a plain JDK handler on a path, anywhere but the page's root — a tool endpoint speaking its own protocol, {@code /mcp} say. The checks and the
      * filters still run; the answers are the handler's own.
      */
     public WebServer handle(String path, HttpHandler handler) {
@@ -214,7 +214,7 @@ public final class WebServer implements AutoCloseable {
     /**
      * The address it listens on, as the program was told ({@code --host}): {@code 127.0.0.1} by default, a wildcard
      * ({@code 0.0.0.0}) when it serves the network; null before {@link #start}. For a route with a rule of its own on
-     * the {@code Host} it accepts — DCSBuilder's MCP, which answers this computer only even then.
+     * the {@code Host} it accepts — a tool endpoint answering this computer only, even then.
      */
     public String host() {
         return host;

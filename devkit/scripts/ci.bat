@@ -1,5 +1,5 @@
 @echo off
-rem Managed by JToolsFramework (scripts/jtools-sync.sh refreshes it): change it there, not here.
+rem Managed by JToolsFramework's devkit (scripts/jtools sync refreshes it): change it in its devkit/, not here.
 rem
 rem The project's CI, run locally: the build with every test, quiet, the pages' dependencies installed exactly as
 rem their package-lock.json has them (npm ci); then scripts\ci.local.bat, when the project has checks of its own.
