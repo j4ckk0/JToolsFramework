@@ -9,9 +9,8 @@
 #   ./install.sh Bookshelf --port 8094 …           any other option of jtools new (jtools new --help)
 #   ./install.sh --no-project                      the framework and jtools alone
 #
-# The framework goes into Maven's local repository (~/.m2/repository, and M2_REPO's too), jtools into
-# ~/.local/bin (JTOOLS_BIN says another). Needs bash, curl, unzip and tar; git is optional: with it, the project starts
-# in a git repository. On Windows, install.bat does the same.
+# The framework goes into Maven's local repository (~/.m2/repository, and M2_REPO's too), jtools into ~/.local/bin
+# (JTOOLS_BIN says another). Needs bash, curl, unzip and tar; git, optional, starts the project in a repository.
 #
 set -euo pipefail
 here="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"

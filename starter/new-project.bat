@@ -133,8 +133,8 @@ chcp 65001 >nul
 for /f "delims=" %%f in ('dir /s /b /a-d "%TEMPLATE%"') do call :template "%%f"
 chcp %CODEPAGE% >nul
 
-rem What the devkit owns: the managed files, scripts\windows\jtools, the default externals.conf; the page's dependencies and
-rem editor settings (the same Angular as @jtools/web's, which the framework's CI builds).
+rem What the devkit owns: the managed files, the two stubs (scripts\linux\jtools, scripts\windows\jtools.bat), the default
+rem externals.conf; the page's dependencies and editor settings (the same Angular as @jtools/web's, which the framework's CI builds).
 for /f "usebackq eol=# delims=" %%f in ("%DEVKIT%\managed-files.list") do call :devkit "%%f"
 for %%s in (scripts\linux\jtools scripts\windows\jtools.bat) do copy /y "%DEVKIT%\%%s" "%DIR%\%%s" >nul
 copy /y "%DEVKIT%\externals.conf" "%DIR%\externals.conf" >nul

@@ -80,8 +80,8 @@ substitute() {
   substitute < "$starter/template/$file" > "$target"
 done
 
-# What the devkit owns: the managed files, scripts/linux/jtools, the default externals.conf; the page's dependencies and
-# editor settings (the same Angular as @jtools/web's, which the framework's CI builds).
+# What the devkit owns: the managed files, the two stubs (scripts/linux/jtools, scripts/windows/jtools.bat), the default
+# externals.conf; the page's dependencies and editor settings (the same Angular as @jtools/web's, which the framework's CI builds).
 grep -v -E '^(#|$)' "$devkit/managed-files.list" | while read -r file; do
   mkdir -p "$dir/$(dirname "$file")"
   cp -p "$devkit/$file" "$dir/$file"

@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 #
-# Builds the delivery: releases/delivery/jtools-<version>.tar.gz and .zip (the same, for Windows), what a developer
-# downloads to start without a clone —
-# the framework's artifacts as a Maven repository (the nine jtools-bom names, with jtools-parent and jtools-bom), the
-# stub scripts/linux/jtools (jtools.bat on Windows), and delivery/install.sh (install.bat), which installs them and makes a first
-# project.
-# Every test runs first.
+# Builds the delivery, what a developer downloads to start without a clone: releases/delivery/jtools-<version>.tar.gz,
+# and .zip, the same, for Windows. It holds the framework's nine artifacts as a Maven repository (jtools-bom's seven,
+# jtools-parent and jtools-bom), the stubs (scripts/linux/jtools, scripts/windows/jtools.bat) and the installers
+# (delivery/install.sh and install.bat), which install them and make a first project. Every test runs first.
 #
 #   scripts/delivery.sh                 the delivery of the tagged version (v<version> must hold what is built)
 #   scripts/delivery.sh --untagged      a try, before the tag
