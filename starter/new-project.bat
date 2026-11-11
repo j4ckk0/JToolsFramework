@@ -2,7 +2,7 @@
 rem Creates a new project on JToolsFramework, from the template beside this script - new-project.sh's twin, for
 rem Windows: a Java server holding the business (core, api), an Angular page as its view (frontend), the program and
 rem its distributions (app), the devkit's scripts, its externals.conf and a port; then, unless told otherwise, a git
-rem repository with its first commit, its externals and a first build. Run through scripts\jtools new (anywhere).
+rem repository with its first commit, its externals and a first build. Run through scripts\windows\jtools new (anywhere).
 rem The name is the Java class of the business (core) and the program's name: CamelCase, a letter first.
 setlocal EnableExtensions DisableDelayedExpansion
 set "STARTER=%~dp0"
@@ -133,10 +133,10 @@ chcp 65001 >nul
 for /f "delims=" %%f in ('dir /s /b /a-d "%TEMPLATE%"') do call :template "%%f"
 chcp %CODEPAGE% >nul
 
-rem What the devkit owns: the managed files, scripts\jtools, the default externals.conf; the page's dependencies and
+rem What the devkit owns: the managed files, scripts\windows\jtools, the default externals.conf; the page's dependencies and
 rem editor settings (the same Angular as @jtools/web's, which the framework's CI builds).
 for /f "usebackq eol=# delims=" %%f in ("%DEVKIT%\managed-files.list") do call :devkit "%%f"
-for %%s in (jtools jtools.bat) do copy /y "%DEVKIT%\scripts\%%s" "%DIR%\scripts\%%s" >nul
+for %%s in (scripts\linux\jtools scripts\windows\jtools.bat) do copy /y "%DEVKIT%\%%s" "%DIR%\%%s" >nul
 copy /y "%DEVKIT%\externals.conf" "%DIR%\externals.conf" >nul
 for %%f in (package.json package-lock.json tsconfig.spec.json .editorconfig .prettierrc .gitignore) do copy /y "%FRONTEND%\%%f" "%DIR%\frontend\%%f" >nul
 for %%f in (package.json package-lock.json) do (
@@ -156,8 +156,8 @@ echo == a git repository, its first commit made
 if "%BUILD%"=="0" goto :bare
 rem the externals, from the clone's downloads when it has them: nothing downloaded twice
 if defined CLONE if exist "%CLONE%\external\downloads\" set "JTOOLS_DOWNLOADS=%CLONE%\external\downloads"
-call scripts\setup.bat || exit /b 1
-call scripts\build.bat -q || exit /b 1
+call scripts\windows\setup.bat || exit /b 1
+call scripts\windows\build.bat -q || exit /b 1
 echo == built: app\target\%ID%.jar
 :bare
 if not defined BARE goto :ready
@@ -165,14 +165,14 @@ for %%d in ("%BARE%") do if not exist "%%~dpd" mkdir "%%~dpd"
 git init -q --bare -b master "%BARE%" || exit /b 1
 git remote add origin "%BARE%" || exit /b 1
 if "%BUILD%"=="0" (
-  echo == %BARE% created; push once built: scripts\build.bat, then git push -u origin master
+  echo == %BARE% created; push once built: scripts\windows\build.bat, then git push -u origin master
   goto :ready
 )
-rem the pre-push hook runs scripts/ci.sh: the first push is the first CI
+rem the pre-push hook runs scripts/linux/ci.sh: the first push is the first CI
 git push -q -u origin master || exit /b 1
 echo == pushed to %BARE%
 :ready
-echo == %NAME% ready in %DIR%: scripts\run.bat starts it
+echo == %NAME% ready in %DIR%: scripts\windows\run.bat starts it
 exit /b 0
 
 :badport

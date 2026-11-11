@@ -1,0 +1,25 @@
+# 1.3's scripts/ is 1.4's scripts/linux/ and scripts/windows/: jtools sync moves a project's files, one
+# "old new" pair a line. The devkit's own copies: the old one removed, the new one put in place by the refresh.
+# The project's own extras (*.local.*): moved, never overwritten. The stubs (jtools, jtools.bat): the new one put
+# in place, the old one left for the developer to remove - it may be the one running the sync.
+scripts/externals.sh scripts/linux/externals.sh
+scripts/setup.sh scripts/linux/setup.sh
+scripts/build.sh scripts/linux/build.sh
+scripts/ci.sh scripts/linux/ci.sh
+scripts/run.sh scripts/linux/run.sh
+scripts/stop.sh scripts/linux/stop.sh
+scripts/package.sh scripts/linux/package.sh
+scripts/externals.bat scripts/windows/externals.bat
+scripts/setup.bat scripts/windows/setup.bat
+scripts/build.bat scripts/windows/build.bat
+scripts/ci.bat scripts/windows/ci.bat
+scripts/run.bat scripts/windows/run.bat
+scripts/stop.bat scripts/windows/stop.bat
+scripts/package.bat scripts/windows/package.bat
+scripts/setup.local.sh scripts/linux/setup.local.sh
+scripts/externals.local.sh scripts/linux/externals.local.sh
+scripts/ci.local.sh scripts/linux/ci.local.sh
+scripts/setup.local.bat scripts/windows/setup.local.bat
+scripts/ci.local.bat scripts/windows/ci.local.bat
+scripts/jtools scripts/linux/jtools
+scripts/jtools.bat scripts/windows/jtools.bat

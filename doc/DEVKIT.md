@@ -3,38 +3,45 @@
 A project on JToolsFramework builds, runs and packages with the same scripts as every other — `setup`, `build`, `ci`,
 `run`, `stop`, `package`, in `.sh` and `.bat` —, its pre-push hook and its `.gitattributes`. They are the
 **devkit's**, published as `org.jtools.framework:jtools-devkit`: a project carries a copy and never edits it;
-`scripts/jtools sync` refreshes the copy at the version the project names. What they know of a project is in its
-`jtools.conf`, its tools in its `externals.conf`, its own extras in `scripts/*.local.sh`.
+`scripts/linux/jtools sync` refreshes the copy at the version the project names. What they know of a project is in its
+`jtools.conf`, its tools in its `externals.conf`, its own extras in `scripts/linux/*.local.sh`.
 
 ## The scripts
 
 | Script | What it does |
 |---|---|
-| `scripts/setup.sh` | downloads the externals `externals.conf` names into `external/` — the JDK, Maven, Node.js, each platform's jmods the distributions' runtimes are linked from —, once, and again for what `externals.conf` names at another version; `--force` downloads everything again. The other scripts offer to run it when something is missing |
-| `scripts/build.sh` | a clean build with every test (`BUILD_GOALS`); extra arguments go to Maven (`-DskipTests`) |
-| `scripts/ci.sh` | the same, quiet, the page's dependencies installed exactly (`npm ci`), then `scripts/ci.local.sh` when there is one: what `.githooks/pre-push` runs before every push (`git config core.hooksPath .githooks`, which `jtools new` sets) |
-| `scripts/run.sh` | builds when a source is newer than the jar, then runs a copy of it (so that a build can replace the jar meanwhile) with the arguments given: `scripts/run.sh --no-browser --port 9090`; `--rebuild` forces the build |
-| `scripts/stop.sh` | stops the program running from this project |
-| `scripts/package.sh` | `mvn package -Pdist`: the Linux, macOS and Windows archives into `releases/`; the previous versions' removed |
-| `scripts/jtools` | the devkit itself: `sync`, `sync --check`, `version`, `new` (below) — the one script the devkit never refreshes |
+| `scripts/linux/setup.sh` | downloads the externals `externals.conf` names into `external/` — the JDK, Maven, Node.js, each platform's jmods the distributions' runtimes are linked from —, once, and again for what `externals.conf` names at another version; `--force` downloads everything again. The other scripts offer to run it when something is missing |
+| `scripts/linux/build.sh` | a clean build with every test (`BUILD_GOALS`); extra arguments go to Maven (`-DskipTests`) |
+| `scripts/linux/ci.sh` | the same, quiet, the page's dependencies installed exactly (`npm ci`), then `scripts/linux/ci.local.sh` when there is one: what `.githooks/pre-push` runs before every push (`git config core.hooksPath .githooks`, which `jtools new` sets) |
+| `scripts/linux/run.sh` | builds when a source is newer than the jar, then runs a copy of it (so that a build can replace the jar meanwhile) with the arguments given: `scripts/linux/run.sh --no-browser --port 9090`; `--rebuild` forces the build |
+| `scripts/linux/stop.sh` | stops the program running from this project |
+| `scripts/linux/package.sh` | `mvn package -Pdist`: the Linux, macOS and Windows archives into `releases/`; the previous versions' removed |
+| `scripts/linux/jtools` | the devkit itself: `sync`, `sync --check`, `version`, `new` (below) — the one script the devkit never refreshes |
 
-Each in `.bat` for Windows, `jtools` too: `scripts\jtools.bat` — `scripts\jtools sync`, `jtools new` in a command
-prompt. The shell scripts also run in Git Bash, where they take the Windows tools.
+Each has its `.bat` twin in `scripts\windows\` — `setup.bat`, `build.bat`, `ci.bat`, `run.bat`, `stop.bat`,
+`package.bat`, `jtools.bat` —, typed in a command prompt: `scripts\windows\run.bat`, `scripts\windows\jtools sync`.
+Plain `.bat` files, Windows 10's own `curl` and `tar`: no Git Bash, no PowerShell. The shell scripts also run in Git
+Bash, where they take the Windows tools.
 
-## scripts/jtools
+**A project made before 1.4** has its scripts in `scripts/` alone: name 1.4.0 in its `jtools.conf` and its pom, then
+`scripts/jtools sync` (or `scripts\jtools sync`) moves them — the devkit's own into `linux/` and `windows/`, the
+project's `*.local.sh` and `*.local.bat` beside them —, and puts the new `jtools` and `jtools.bat` in place: remove the
+old two by hand, the sync may be running from one of them. `sync --check` lists what is still to move.
+
+## scripts/linux/jtools
 
 ```bash
-scripts/jtools sync            # the managed files at JTOOLS_VERSION; what else differs said, not changed
-scripts/jtools sync --check    # the same, changing nothing; exit 1 when anything differs (a project's CI may run it)
-scripts/jtools version         # the devkit this project names, and where it was found
+scripts/linux/jtools sync            # the managed files at JTOOLS_VERSION; what else differs said, not changed
+scripts/linux/jtools sync --check    # the same, changing nothing; exit 1 when anything differs (a project's CI may run it)
+scripts/linux/jtools version         # the devkit this project names, and where it was found
 jtools new <Name> [--dir DIR] [--id ID] [--port N] [--bare DIR] [--no-git] [--no-build]   # a new project, from anywhere
 ```
 
 `sync` refreshes the files `managed-files.list` names (the scripts, `.githooks/pre-push`, `.gitattributes`), and says
 — without changing them, they are the project's to decide — where the project's pom names another `jtools-parent`
 than the devkit's version, where its `externals.conf` names other versions than the devkit's default, and when its
-own `scripts/jtools` differs from the devkit's (copy it by hand to take it). It commits nothing: read the diff, run
-`scripts/ci.sh`, commit.
+own `scripts/linux/jtools` differs from the devkit's (copy it by hand to take it). It commits nothing: read the diff, run
+`scripts/linux/ci.sh`, commit.
 
 **Where the devkit comes from**, in this order — the Maven Wrapper's way:
 
@@ -59,7 +66,7 @@ and again when `~/.m2` holds a newer jar of that version. It needs `curl` and `u
 | `APP_NAME` | — | its name, as messages say it, and its `.exe` |
 | `APP_MODULE` | `app` | the module building the program's jar |
 | `BUILD_GOALS` | `clean package` | what `build`, `ci`, `run` (with `-DskipTests`) and `package` (with `-Pdist`) run |
-| `JTOOLS_VERSION` | — | the devkit `scripts/jtools` takes the managed files from |
+| `JTOOLS_VERSION` | — | the devkit `scripts/linux/jtools` takes the managed files from |
 | `JTOOLS_HOME` | — | a clone of JToolsFramework to take them from instead (relative to the project, or absolute) |
 
 ## externals.conf
@@ -74,7 +81,7 @@ All are hard links to the downloads. A project without a page drops `NODE_*`; on
 archives then).
 
 The versions live there and nowhere else; `jtools new` copies the devkit's, `sync` reports where they differ. **A new
-version is a line changed there, then `scripts/setup.sh`**: each external remembers the URL it was deployed from
+version is a line changed there, then `scripts/linux/setup.sh`**: each external remembers the URL it was deployed from
 (`external/.<name>.url`), and one deployed from another URL is deployed again — the other scripts say it is out of
 date until then.
 `JTOOLS_DOWNLOADS=<dir>` in the environment shares one downloads folder between projects.
@@ -85,26 +92,26 @@ everything is fetched as `<MIRROR>/<file name>`, the devkit too. Its authenticat
 `MIRROR_USER` and `MIRROR_PASSWORD`. Keep them out of `externals.conf`: put them in `externals.local.conf` beside it
 (same syntax, ignored by git) or in the environment, which wins over the local file, which wins over `externals.conf`.
 
-## A project's own extras: scripts/*.local.sh
+## A project's own extras: scripts/linux/*.local.sh
 
 Not managed, sourced or run by the managed scripts when present:
 
 | File | When | What it may do |
 |---|---|---|
-| `scripts/setup.local.sh` | at the end of `setup.sh`, sourced | deploy externals of its own with `fetch URL` and `deploy FILE DIR` (`$force` set, the options `setup.sh` does not know in `$local_args`) — a language model, a speech engine, an Android SDK |
-| `scripts/externals.local.sh` | at the start of `externals.sh`, sourced | define `missing_local_externals` (prints what of its extras is missing), export what its tools need |
-| `scripts/ci.local.sh` | after the build in `ci.sh` | checks of its own |
+| `scripts/linux/setup.local.sh` | at the end of `setup.sh`, sourced | deploy externals of its own with `fetch URL` and `deploy FILE DIR` (`$force` set, the options `setup.sh` does not know in `$local_args`) — a language model, a speech engine, an Android SDK |
+| `scripts/linux/externals.local.sh` | at the start of `externals.sh`, sourced | define `missing_local_externals` (prints what of its extras is missing), export what its tools need |
+| `scripts/linux/ci.local.sh` | after the build in `ci.sh` | checks of its own |
 
-On Windows: `scripts\setup.local.bat` and `scripts\ci.local.bat`, called with the same arguments.
+On Windows: `scripts\windows\setup.local.bat` and `scripts\windows\ci.local.bat`, called with the same arguments.
 
 ## Changing a managed file
 
 In JToolsFramework, never in a project: the source is the framework's `devkit/`; its CI runs a project made by a lone
-`scripts/jtools` from the devkit just installed, and checks that the framework's own copies are the devkit's. A new
-version of the framework carries the change; a project takes it with `JTOOLS_VERSION` and `scripts/jtools sync`.
+`scripts/linux/jtools` from the devkit just installed, and checks that the framework's own copies are the devkit's. A new
+version of the framework carries the change; a project takes it with `JTOOLS_VERSION` and `scripts/linux/jtools sync`.
 
-The framework's own tools, in its `scripts/`: `install.sh` (the versions agree, build, test, install into `~/.m2`),
-`check-versions.sh` (every pom and `scripts/jtools` name one version), `ci.local.sh` (the checks above).
+The framework's own tools, in its `scripts/` (its own `ci.local.sh` in `scripts/linux/`, as a project's): `install.sh` (the versions agree, build, test, install into `~/.m2`),
+`check-versions.sh` (every pom and `scripts/linux/jtools` name one version), `ci.local.sh` (the checks above).
 
 ---
 

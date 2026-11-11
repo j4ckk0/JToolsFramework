@@ -18,7 +18,7 @@
        doc/CONVENTIONS.md in JToolsFramework says it in full. -->
   <groupId>org.jtools.framework</groupId>
   <artifactId>jtools-parent</artifactId>
-  <version>1.3.1</version>
+  <version>1.4.0</version>
   <packaging>pom</packaging>
 
   <name>JToolsFramework parent</name>
@@ -64,7 +64,7 @@
 
   <properties>
     <!-- the framework's version, for the projects' dependencies on its modules: always this pom's own <version> -->
-    <jtools.version>1.3.1</jtools.version>
+    <jtools.version>1.4.0</jtools.version>
     <maven.compiler.release>25</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <junit.version>5.12.2</junit.version>
@@ -90,7 +90,7 @@
     <jtools.app.skip>true</jtools.app.skip>
     <jtools.page.skip>false</jtools.page.skip>
     <jtools.weblib.skip>false</jtools.weblib.skip>
-    <!-- the way npm installs the page's dependencies: "install", or "ci" for exactly package-lock.json (scripts/ci.sh) -->
+    <!-- the way npm installs the page's dependencies: "install", or "ci" for exactly package-lock.json (scripts/linux/ci.sh) -->
     <npm.install>install</npm.install>
     <!-- profile publish: a jar module holding no Java sets it to false (and maven.javadoc.skip to true) to publish a
          javadoc jar of one README instead, the javadoc Maven Central requires of every jar -->
@@ -454,7 +454,7 @@
         releases/<id>-<version>-windows.zip    <name>.exe (no console), <id>.bat (console), the same, jre\
       plus whatever the module keeps in src/dist/files/. Each jre/ is a runtime jlink trims to the modules the program
       needs (jdeps on its jar, and jtools.dist.modules.extra), linked from that platform's jmods in external/
-      (jmods-linux.tar.gz, jmods-windows.zip, jmods-macos.tar.gz: scripts/setup.sh); a platform whose jmods are not
+      (jmods-linux.tar.gz, jmods-windows.zip, jmods-macos.tar.gz: scripts/linux/setup.sh); a platform whose jmods are not
       there is not built. jtools-dist's build.xml does it, once the program's jar is made.
     -->
     <profile>

@@ -3,7 +3,7 @@
 # Creates a new project on JToolsFramework, from the template beside this script: a Java server holding the business
 # (core, api), an Angular page as its view (frontend), the program and its distributions (app), the devkit's scripts,
 # its externals.conf and a port; then, unless told otherwise, a git repository with its first commit, its externals and
-# a first build. Run through scripts/jtools new (anywhere), or from a clone of JToolsFramework.
+# a first build. Run through scripts/linux/jtools new (anywhere), or from a clone of JToolsFramework.
 #
 #   jtools new Bookshelf                             # ./Bookshelf, on port 8090, a git repository, built
 #   jtools new Bookshelf --port 8094                 # the port of its .ini
@@ -80,14 +80,14 @@ substitute() {
   substitute < "$starter/template/$file" > "$target"
 done
 
-# What the devkit owns: the managed files, scripts/jtools, the default externals.conf; the page's dependencies and
+# What the devkit owns: the managed files, scripts/linux/jtools, the default externals.conf; the page's dependencies and
 # editor settings (the same Angular as @jtools/web's, which the framework's CI builds).
 grep -v -E '^(#|$)' "$devkit/managed-files.list" | while read -r file; do
   mkdir -p "$dir/$(dirname "$file")"
   cp -p "$devkit/$file" "$dir/$file"
 done
-for stub in jtools jtools.bat; do cp -p "$devkit/scripts/$stub" "$dir/scripts/$stub"; done   # Linux's, Windows'
-chmod +x "$dir"/scripts/*.sh "$dir/scripts/jtools" "$dir/.githooks/pre-push"
+for stub in scripts/linux/jtools scripts/windows/jtools.bat; do cp -p "$devkit/$stub" "$dir/$stub"; done
+chmod +x "$dir"/scripts/linux/*.sh "$dir/scripts/linux/jtools" "$dir/.githooks/pre-push"
 cp "$devkit/externals.conf" "$dir/"
 for file in package.json package-lock.json tsconfig.spec.json .editorconfig .prettierrc .gitignore; do
   cp "$frontend/$file" "$dir/frontend/$file"
@@ -108,8 +108,8 @@ fi
 if $build; then
   # the externals, from the clone's downloads when it has them: nothing downloaded twice
   [ -n "$clone" ] && [ -d "$clone/external/downloads" ] && export JTOOLS_DOWNLOADS="$clone/external/downloads"
-  scripts/setup.sh
-  scripts/build.sh -q
+  scripts/linux/setup.sh
+  scripts/linux/build.sh -q
   echo "== built: app/target/$id.jar"
 fi
 if [ -n "$bare" ]; then
@@ -117,10 +117,10 @@ if [ -n "$bare" ]; then
   git init -q --bare -b master "$bare"
   git remote add origin "$bare"
   if $build; then
-    git push -q -u origin master   # the pre-push hook runs scripts/ci.sh: the first push is the first CI
+    git push -q -u origin master   # the pre-push hook runs scripts/linux/ci.sh: the first push is the first CI
     echo "== pushed to $bare"
   else
-    echo "== $bare created; push once built: scripts/build.sh && git push -u origin master"
+    echo "== $bare created; push once built: scripts/linux/build.sh && git push -u origin master"
   fi
 fi
-echo "== $name ready in $dir: scripts/run.sh starts it"
+echo "== $name ready in $dir: scripts/linux/run.sh starts it"

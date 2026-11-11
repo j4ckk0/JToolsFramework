@@ -20,7 +20,7 @@ for tool in bash curl unzip tar; do command -v $tool >/dev/null || echo "missing
 Windows, nothing to check.
 
 **On Windows**, every command below has its `.bat` twin, typed in a command prompt: `install.bat` for `install.sh`,
-`jtools` (`jtools.bat`) for `jtools`, `scripts\run.bat` for `scripts/run.sh`, and so on.
+`jtools` (`jtools.bat`) for `jtools`, `scripts\windows\run.bat` for `scripts/linux/run.sh`, and so on.
 
 ## 1. Install JToolsFramework
 
@@ -28,18 +28,18 @@ One archive, the framework and its installer — no clone, nothing built:
 
 ```bash
 mkdir jtools-start && cd jtools-start
-curl -fsSLO https://github.com/j4ckk0/JToolsFramework/releases/download/v1.3.1/jtools-1.3.1.tar.gz
-tar xzf jtools-1.3.1.tar.gz
-jtools-1.3.1/install.sh --no-project
+curl -fsSLO https://github.com/j4ckk0/JToolsFramework/releases/download/v1.4.0/jtools-1.4.0.tar.gz
+tar xzf jtools-1.4.0.tar.gz
+jtools-1.4.0/install.sh --no-project
 jtools --help
 ```
 
-*You should see* `== JToolsFramework 1.3.1 in …/.m2/repository`, `== jtools in …/.local/bin`, then `jtools`'s commands:
+*You should see* `== JToolsFramework 1.4.0 in …/.m2/repository`, `== jtools in …/.local/bin`, then `jtools`'s commands:
 `sync`, `version`, `new`. *If `jtools` is not found*: `~/.local/bin` is not on your `PATH` — the installer says the
 line to add to `~/.bashrc`; until then, `~/.local/bin/jtools`.
 
-*On Windows*: download `jtools-1.3.1.zip` from the [release](https://github.com/j4ckk0/JToolsFramework/releases/tag/v1.3.1), extract it (right-click ▸ *Extract All*), then
-`jtools-1.3.1\install.bat --no-project` in a command prompt. It offers to add `%USERPROFILE%\.local\bin` to your
+*On Windows*: download `jtools-1.4.0.zip` from the [release](https://github.com/j4ckk0/JToolsFramework/releases/tag/v1.4.0), extract it (right-click ▸ *Extract All*), then
+`jtools-1.4.0\install.bat --no-project` in a command prompt. It offers to add `%USERPROFILE%\.local\bin` to your
 `PATH`; `jtools --help` then works in the windows you open next. Double-clicked, `install.bat` asks the project's name
 and folder instead.
 
@@ -50,8 +50,8 @@ in (`install.sh Bookshelf --dir ~/work/bookshelf` says them).
 
 ```bash
 git clone https://github.com/j4ckk0/JToolsFramework.git
-(cd JToolsFramework && scripts/setup.sh && scripts/install.sh)   # the framework built, tested, installed into ~/.m2
-alias jtools=$PWD/JToolsFramework/devkit/scripts/jtools
+(cd JToolsFramework && scripts/linux/setup.sh && scripts/install.sh)   # the framework built, tested, installed into ~/.m2
+alias jtools=$PWD/JToolsFramework/devkit/scripts/linux/jtools
 export JTOOLS_DOWNLOADS=$PWD/JToolsFramework/external/downloads   # your project takes the clone's downloads: 450 MB once, not twice
 ```
 
@@ -76,14 +76,14 @@ jtools new Bookshelf
 *You should see*, after a minute or two the first time (the downloads):
 
 ```
-== Bookshelf (bookshelf, port 8090) in …/jtools-start/Bookshelf, from JToolsFramework 1.3.1
+== Bookshelf (bookshelf, port 8090) in …/jtools-start/Bookshelf, from JToolsFramework 1.4.0
 == a git repository, its first commit made
 == external/jdk deployed
 == external/maven deployed
 == external/node deployed
 …
 == built: app/target/bookshelf.jar
-== Bookshelf ready in …/jtools-start/Bookshelf: scripts/run.sh starts it
+== Bookshelf ready in …/jtools-start/Bookshelf: scripts/linux/run.sh starts it
 ```
 
 `--port N` for another port than 8090, `--dir DIR` for another folder, `--no-build` to build later: `jtools new --help`.
@@ -98,14 +98,14 @@ Bookshelf/
 ├── app/        the program: Launcher.java, a WebApp serving the API; its one jar and its distributions
 ├── pom.xml     the modules and five jtools.app.* properties; everything else is jtools-parent's
 ├── jtools.conf, externals.conf     what the scripts know of the project, the externals' versions
-└── scripts/    setup, build, ci, run, stop, package (the devkit's) and jtools
+└── scripts/    linux/ and windows/: setup, build, ci, run, stop, package (the devkit's), and jtools
 ```
 
 ## 4. Run it
 
 ```bash
 cd Bookshelf
-scripts/run.sh
+scripts/linux/run.sh
 ```
 
 *You should see* the page in your browser, and on the console:
@@ -114,10 +114,10 @@ scripts/run.sh
 … INFO    org.jtools.framework.app.WebApp - Bookshelf 0.1.0 is ready on http://127.0.0.1:8090/; it stops when its last page is closed (or Ctrl+C); log: ~/.bookshelf/logs/bookshelf.0.log
 ```
 
-Close the page: 15 seconds later the program stops. `scripts/run.sh --keep-alive` keeps it serving (`scripts/stop.sh`
-stops it then); `scripts/run.sh --help` lists every option.
+Close the page: 15 seconds later the program stops. `scripts/linux/run.sh --keep-alive` keeps it serving (`scripts/linux/stop.sh`
+stops it then); `scripts/linux/run.sh --help` lists every option.
 
-*If "port 8090 is in use"*: another program has it — `scripts/run.sh --port 8091`, or the Settings menu's port.
+*If "port 8090 is in use"*: another program has it — `scripts/linux/run.sh --port 8091`, or the Settings menu's port.
 
 ## 5. Add a feature, from the business to the page
 
@@ -170,12 +170,12 @@ export class Home {
 }
 ```
 
-`scripts/run.sh` again: *you should see* "3 books" on the page — `scripts/run.sh` rebuilds when a source is newer.
+`scripts/linux/run.sh` again: *you should see* "3 books" on the page — `scripts/linux/run.sh` rebuilds when a source is newer.
 
 ## 6. Test it
 
 ```bash
-scripts/build.sh
+scripts/linux/build.sh
 ```
 
 *You should see* `BUILD SUCCESS`, the Java tests of `core`, `api` and `app`, and the page's (vitest) passed. The
@@ -186,7 +186,7 @@ over HTTP. The whole program starts the same way, as `main` would but never exit
 ## 7. Ship it
 
 ```bash
-scripts/package.sh
+scripts/linux/package.sh
 ```
 
 *You should see*, a minute later, in `releases/`:
@@ -203,22 +203,22 @@ Java runtime trimmed to what the program needs: unpack, run, nothing to install.
 ## 8. Keep up to date
 
 ```bash
-scripts/jtools sync
+scripts/linux/jtools sync
 ```
 
-*You should see* `… is in line with JToolsFramework 1.3.1`. A new version of the framework: `JTOOLS_VERSION` in
-`jtools.conf` and the parent's `<version>` in `pom.xml`, then `scripts/jtools sync` (the scripts) and `scripts/ci.sh`
+*You should see* `… is in line with JToolsFramework 1.4.0`. A new version of the framework: `JTOOLS_VERSION` in
+`jtools.conf` and the parent's `<version>` in `pom.xml`, then `scripts/linux/jtools sync` (the scripts) and `scripts/linux/ci.sh`
 (every test) — and commit.
 
 ## If something goes wrong
 
 | What you see | What to do |
 |---|---|
-| `jtools: download failed: … (JTOOLS_VERSION=1.3.1: is there such a version?)` | the framework is neither in `~/.m2` nor on Maven Central: step 1's `install.sh` |
+| `jtools: download failed: … (JTOOLS_VERSION=1.4.0: is there such a version?)` | the framework is neither in `~/.m2` nor on Maven Central: step 1's `install.sh` |
 | a download that never ends, or is refused, behind a company's proxy | a mirror: `MIRROR=` in `externals.local.conf`, its token beside it ([DEVKIT.md](DEVKIT.md)) |
-| `external/ is not set up: missing …` | `scripts/setup.sh`, which the scripts offer to run |
-| `Port 8090 is in use: is Bookshelf already running?` | it is — open the page it names, or `scripts/stop.sh`; or `--port` |
-| a build refused because the program is running | quit it from its page, or `scripts/stop.sh` |
+| `external/ is not set up: missing …` | `scripts/linux/setup.sh`, which the scripts offer to run |
+| `Port 8090 is in use: is Bookshelf already running?` | it is — open the page it names, or `scripts/linux/stop.sh`; or `--port` |
+| a build refused because the program is running | quit it from its page, or `scripts/linux/stop.sh` |
 
 ## Next
 

@@ -2,11 +2,11 @@
 #
 # Brings a project in line with the devkit this script belongs to: refreshes the files the devkit owns in it
 # (managed-files.list: the scripts, the pre-push hook, .gitattributes) and says what else differs — the framework version
-# its pom names, the externals' versions, its scripts/jtools — without changing those, which are the project's to decide.
-# Commits nothing: read the diff in the project, run its CI, commit there. Run by the project's scripts/jtools:
+# its pom names, the externals' versions, its scripts/linux/jtools — without changing those, which are the project's to decide.
+# Commits nothing: read the diff in the project, run its CI, commit there. Run by the project's scripts/linux/jtools:
 #
-#   scripts/jtools sync            refresh the managed files, report the rest
-#   scripts/jtools sync --check    report only; exit 1 when anything differs (a project's CI)
+#   scripts/linux/jtools sync            refresh the managed files, report the rest
+#   scripts/linux/jtools sync --check    report only; exit 1 when anything differs (a project's CI)
 #
 # The devkit is the unpacked jtools-devkit artifact (a file "version" beside this script), or devkit/ in a clone of
 # JToolsFramework (its version in conventions/parent/pom.xml).
@@ -35,6 +35,27 @@ while read -r file; do
   fi
 done < <(grep -v -E '^(#|$)' "$devkit/managed-files.list")
 
+# 1.3's layout, scripts/ alone, moved to 1.4's (moved-files.list)
+if [ -f "$devkit/moved-files.list" ]; then
+  while read -r old new; do
+    [ -e "$project/$old" ] || continue
+    differs=1
+    if $check; then echo "   to move: $old -> $new"; continue; fi
+    mkdir -p "$project/$(dirname "$new")"
+    case "$new" in
+      */jtools|*/jtools.bat)
+        [ -e "$project/$new" ] || cp -p "$devkit/$new" "$project/$new"
+        echo "   $new in place; remove $old by hand (it may be the one running this sync)" ;;
+      *.local.*)
+        if [ -e "$project/$new" ]; then echo "   $old and $new are both there: keep one"
+        else mv "$project/$old" "$project/$new"; echo "   moved: $old -> $new"; fi ;;
+      *)
+        rm -f "$project/$old"   # the devkit's own copy: its new one came with the managed files
+        echo "   moved: $old -> $new" ;;
+    esac
+  done < <(grep -v -E '^(#|$)' "$devkit/moved-files.list")
+fi
+
 echo "== the framework version"
 used=$(grep -A1 '<artifactId>jtools-parent</artifactId>' "$project/pom.xml" | sed -n 's:.*<version>\(.*\)</version>.*:\1:p')
 if [ "$used" = "$version" ]; then echo "   $version, the devkit's"
@@ -48,15 +69,15 @@ while IFS='=' read -r key value; do
   [ "$theirs" = "$value" ] || { echo "   $key: ${theirs:-(absent)} -> $value"; differs=1; }
 done < "$devkit/externals.conf"
 
-# scripts/jtools runs this very sync: it is never replaced by it, only said to differ — copied by hand when wanted;
-# likewise its Windows twin, jtools.bat
-for stub in jtools jtools.bat; do
-  [ -f "$devkit/scripts/$stub" ] || continue
-  if ! cmp -s "$devkit/scripts/$stub" "$project/scripts/$stub"; then
-    echo "== scripts/$stub differs from the devkit's: cp $devkit/scripts/$stub $project/scripts/$stub to take it"
+# scripts/linux/jtools runs this very sync: it is never replaced by it, only said to differ — copied by hand when
+# wanted; likewise its Windows twin, scripts/windows/jtools.bat
+for stub in scripts/linux/jtools scripts/windows/jtools.bat; do
+  [ -f "$devkit/$stub" ] && [ -f "$project/$stub" ] || continue
+  if ! cmp -s "$devkit/$stub" "$project/$stub"; then
+    echo "== $stub differs from the devkit's: cp $devkit/$stub $project/$stub to take it"
   fi
 done
 
 if [ $differs = 0 ]; then echo "== $project is in line with JToolsFramework $version"
 elif $check; then exit 1
-else echo "== read the diff in $project, run its scripts/ci.sh, commit there"; fi
+else echo "== read the diff in $project, run its scripts/linux/ci.sh, commit there"; fi

@@ -1,19 +1,19 @@
-# The files the devkit owns in every project: jtools new copies them into a new one, and scripts/jtools sync
+# The files the devkit owns in every project: jtools new copies them into a new one, and scripts/linux/jtools sync
 # refreshes them in an existing one. A change to one is made here, in JToolsFramework's devkit/, never in
 # its own copy (each says so in its header). One path per line, relative to the devkit and to the project.
-scripts/externals.sh
-scripts/setup.sh
-scripts/build.sh
-scripts/ci.sh
-scripts/run.sh
-scripts/stop.sh
-scripts/package.sh
-scripts/externals.bat
-scripts/setup.bat
-scripts/build.bat
-scripts/ci.bat
-scripts/run.bat
-scripts/stop.bat
-scripts/package.bat
+scripts/linux/externals.sh
+scripts/linux/setup.sh
+scripts/linux/build.sh
+scripts/linux/ci.sh
+scripts/linux/run.sh
+scripts/linux/stop.sh
+scripts/linux/package.sh
+scripts/windows/externals.bat
+scripts/windows/setup.bat
+scripts/windows/build.bat
+scripts/windows/ci.bat
+scripts/windows/run.bat
+scripts/windows/stop.bat
+scripts/windows/package.bat
 .githooks/pre-push
 .gitattributes

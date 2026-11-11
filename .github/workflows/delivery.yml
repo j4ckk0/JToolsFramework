@@ -22,7 +22,7 @@ jobs:
           path: external/downloads
           key: externals-${{ hashFiles('externals.conf') }}
       - name: The externals
-        run: scripts/setup.sh
+        run: scripts/linux/setup.sh
       - name: The delivery
         run: scripts/delivery.sh --untagged -DskipTests
       - uses: actions/upload-artifact@v4
@@ -48,7 +48,7 @@ jobs:
           jtools-*/install.sh Demo --dir "$RUNNER_TEMP/demo" --port 18096
       - name: Its CI, its distributions, its sync
         working-directory: ${{ runner.temp }}/demo
-        run: scripts/ci.sh && scripts/package.sh && scripts/jtools sync --check && ls -l releases/
+        run: scripts/linux/ci.sh && scripts/linux/package.sh && scripts/linux/jtools sync --check && ls -l releases/
       - name: A project's files as Linux makes them, for Windows to compare
         run: ~/.local/bin/jtools new Demo --dir "$RUNNER_TEMP/fresh" --port 18096 --no-git --no-build
       - name: Without git, a project without a repository
@@ -62,6 +62,22 @@ jobs:
           path: ${{ runner.temp }}/fresh
           include-hidden-files: true
           if-no-files-found: error
+      - name: A project made with 1.3.1, moved to 1.4's layout by its own scripts/jtools sync
+        run: |
+          curl -fsSLO https://github.com/j4ckk0/JToolsFramework/releases/download/v1.3.1/jtools-1.3.1.tar.gz && tar xzf jtools-1.3.1.tar.gz
+          version=$(cat jtools-1.4*/VERSION)
+          jtools-1.3.1/install.sh --no-project > /dev/null   # 1.3.1's devkit, as a developer on 1.3.1 has it
+          jtools-1.3.1/jtools new Old --dir "$RUNNER_TEMP/old" --port 18095 --no-git --no-build
+          cd "$RUNNER_TEMP/old"
+          test -f scripts/run.sh
+          sed -i "s/^JTOOLS_VERSION=.*/JTOOLS_VERSION=$version/" jtools.conf
+          sed -i "s|<version>1.3.1</version>|<version>$version</version>|" pom.xml
+          scripts/jtools sync
+          test -f scripts/linux/run.sh && test -f scripts/windows/run.bat && test -f scripts/linux/jtools && test ! -e scripts/run.sh && test ! -e scripts/run.bat
+          rm scripts/jtools scripts/jtools.bat
+          scripts/linux/jtools sync --check
+          JTOOLS_DOWNLOADS="$RUNNER_TEMP/demo/external/downloads" scripts/linux/setup.sh > /dev/null
+          scripts/linux/build.sh -q
 
   windows:
     needs: linux
@@ -96,11 +112,24 @@ jobs:
         working-directory: ${{ runner.temp }}\demo
         run: |
           $ErrorActionPreference = 'Continue'
-          foreach ($command in 'scripts\build.bat', 'scripts\package.bat', 'scripts\jtools.bat sync --check', "`"$env:USERPROFILE\.local\bin\jtools.bat`" version") {
+          foreach ($command in 'scripts\windows\build.bat', 'scripts\windows\package.bat', 'scripts\windows\jtools.bat sync --check', "`"$env:USERPROFILE\.local\bin\jtools.bat`" version") {
             cmd /c $command 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\step.log"
             if ($LASTEXITCODE -ne 0) { $e = ((Get-Content "$env:RUNNER_TEMP\step.log" -Tail 60) -join "`n").Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A'); Write-Output "::error title=$command::$e"; exit 1 }
           }
           Get-ChildItem releases
+      - name: run.bat builds when a file changed, and only then (Windows' archive marks)
+        working-directory: ${{ runner.temp }}\demo
+        run: |
+          $ErrorActionPreference = 'Continue'
+          $runs = @()
+          foreach ($touch in $false, $false, $true) {
+            if ($touch) { cmd /c "copy /b pom.xml +,, >nul" }
+            $out = (cmd /c "scripts\windows\run.bat --help" 2>&1 | Out-String)
+            if ($LASTEXITCODE -ne 0) { $e = $out.Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A'); Write-Output "::error title=run.bat --help::$e"; exit 1 }
+            $runs += $out.Contains('== building')
+          }
+          Write-Output "built: $runs"
+          if (-not ($runs[0] -and -not $runs[1] -and $runs[2])) { Write-Output "::error title=run.bat's rebuilds::built on the three runs: $runs - expected True, False, True"; exit 1 }
       - name: The same project as Linux's, but for its line endings
         run: |
           $ErrorActionPreference = 'Continue'
@@ -114,8 +143,32 @@ jobs:
           $env:Path = (($env:Path -split ';') | Where-Object { $_ -notmatch '\\Git\\' }) -join ';'
           cmd /c "`"$env:USERPROFILE\.local\bin\jtools.bat`" new NoGit --dir `"$env:RUNNER_TEMP\nogit`" --no-build" 2>&1 | Tee-Object -FilePath step.log
           if ($LASTEXITCODE -ne 0 -or (Test-Path "$env:RUNNER_TEMP\nogit\.git") -or -not (Test-Path "$env:RUNNER_TEMP\nogit\pom.xml")) { $e = ((Get-Content step.log -Tail 40) -join "`n").Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A'); Write-Output "::error title=jtools new without git::$e"; exit 1 }
+      - name: A project made with 1.3.1, moved to 1.4's layout by its own scripts\jtools sync
+        run: |
+          $ErrorActionPreference = 'Continue'
+          function Report($title) { $e = ((Get-Content "$env:RUNNER_TEMP\step.log" -Tail 60) -join "`n").Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A'); Write-Output "::error title=$title::$e"; exit 1 }
+          Invoke-WebRequest -UseBasicParsing -Uri https://github.com/j4ckk0/JToolsFramework/releases/download/v1.3.1/jtools-1.3.1.zip -OutFile old.zip
+          Expand-Archive -Path old.zip -DestinationPath old-delivery
+          $version = (Get-Content (Get-Item jtools-1.4*\VERSION -Exclude *.zip).FullName).Trim()
+          cmd /c "old-delivery\jtools-1.3.1\install.bat --no-project" 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\step.log"
+          if ($LASTEXITCODE -ne 0) { Report 'install.bat 1.3.1' }
+          cmd /c "old-delivery\jtools-1.3.1\jtools.bat new Old --dir `"$env:RUNNER_TEMP\old`" --port 18095 --no-git --no-build" 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\step.log"
+          if ($LASTEXITCODE -ne 0) { Report 'jtools 1.3.1 new' }
+          Set-Location "$env:RUNNER_TEMP\old"
+          (Get-Content jtools.conf) -replace '^JTOOLS_VERSION=.*', "JTOOLS_VERSION=$version" | Set-Content jtools.conf
+          (Get-Content pom.xml -Raw).Replace('<version>1.3.1</version>', "<version>$version</version>") | Set-Content pom.xml -NoNewline
+          cmd /c "scripts\jtools.bat sync" 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\step.log"
+          if ($LASTEXITCODE -ne 0) { Report 'scripts\jtools sync, from 1.3.1' }
+          foreach ($f in 'scripts\windows\run.bat', 'scripts\linux\run.sh', 'scripts\windows\jtools.bat') { if (-not (Test-Path $f)) { Write-Output "::error title=moved::$f is missing"; exit 1 } }
+          foreach ($f in 'scripts\run.bat', 'scripts\run.sh') { if (Test-Path $f) { Write-Output "::error title=moved::$f is still there"; exit 1 } }
+          Remove-Item scripts\jtools, scripts\jtools.bat
+          $env:JTOOLS_DOWNLOADS = "$env:RUNNER_TEMP\demo\external\downloads"
+          foreach ($command in 'scripts\windows\jtools.bat sync --check', 'scripts\windows\setup.bat', 'scripts\windows\build.bat -q') {
+            cmd /c $command 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\step.log"
+            if ($LASTEXITCODE -ne 0) { Report $command }
+          }
       - name: Git Bash's shell scripts, on Windows too, on a project the .bat scripts made (its files CRLF)
         shell: bash
         working-directory: ${{ runner.temp }}/demo
         run: |
-          scripts/build.sh -q > "$RUNNER_TEMP/bash.log" 2>&1 || { e=$(tail -60 "$RUNNER_TEMP/bash.log" | sed 's/%/%25/g' | tr -d '\r' | sed ':a;N;$!ba;s/\n/%0A/g'); echo "::error title=scripts/build.sh in Git Bash::$e"; exit 1; }
+          scripts/linux/build.sh -q > "$RUNNER_TEMP/bash.log" 2>&1 || { e=$(tail -60 "$RUNNER_TEMP/bash.log" | sed 's/%/%25/g' | tr -d '\r' | sed ':a;N;$!ba;s/\n/%0A/g'); echo "::error title=scripts/linux/build.sh in Git Bash::$e"; exit 1; }

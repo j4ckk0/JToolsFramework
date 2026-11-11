@@ -24,7 +24,7 @@ are downloaded — the framework itself is in this archive.
 | In this folder | What |
 |---|---|
 | `install.sh`, `install.bat` | the installer, for Linux and for Windows |
-| `jtools`, `jtools.bat` | the script that makes a project and keeps it up to date (`jtools new`, `scripts/jtools sync`), for Linux and for Windows |
+| `jtools`, `jtools.bat` | the script that makes a project and keeps it up to date (`jtools new`, `scripts/linux/jtools sync`), for Linux and for Windows |
 | `repository/` | the framework's artifacts, as Maven lays them out: jtools-parent, jtools-bom, the libraries, jtools-dist, jtools-devkit |
 | `VERSION`, `LICENSE` | its version, its licence (Apache 2.0) |
 

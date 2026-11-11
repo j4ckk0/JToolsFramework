@@ -13,4 +13,4 @@
 set -euo pipefail
 cd "$(dirname "$(readlink -f "$0")")/.."   # the framework's root
 scripts/check-versions.sh
-exec scripts/build.sh "$@"   # jtools.conf: BUILD_GOALS=clean install
+exec scripts/linux/build.sh "$@"   # jtools.conf: BUILD_GOALS=clean install

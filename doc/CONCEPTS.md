@@ -49,10 +49,10 @@ One idea, several names: the pages' **presence** (`/api/alive`, `/api/bye`, `Pag
 **automatic stop** (`PageWatch`: `setAutoStop`, `onLastPageGone`), which the Settings menu's `autoStop` switches off,
 and `--keep-alive` or `--no-browser` for one run.
 
-## 4. Self-contained: a clone and `scripts/setup.sh`
+## 4. Self-contained: a clone and `scripts/linux/setup.sh`
 
 Nothing the build needs is under source control **nor taken from the machine**: `externals.conf` names the JDK,
-Maven, Node.js and the jmods the distributions' runtimes are linked from, by URL and version; `scripts/setup.sh` downloads them into
+Maven, Node.js and the jmods the distributions' runtimes are linked from, by URL and version; `scripts/linux/setup.sh` downloads them into
 `external/` (ignored by git) under generic names (`external/jdk`, `external/maven`…), the only names the scripts and
 the build know. A machine with no internet sets `MIRROR` (an Artifactory, any HTTP folder); its credentials go in
 `externals.local.conf` or the environment, never in git. The versions live in `externals.conf` and nowhere else.
@@ -60,9 +60,9 @@ the build know. A machine with no internet sets `MIRROR` (an Artifactory, any HT
 ## 5. The scripts
 
 The same names in every project, each in `.sh` and `.bat`: `setup`, `build`, `ci`, `run`, `stop`, `package`, with
-`externals` sourced by all. `.githooks/pre-push` runs `scripts/ci.sh` (`jtools new` enables it: `git config
+`externals` sourced by all. `.githooks/pre-push` runs `scripts/linux/ci.sh` (`jtools new` enables it: `git config
 core.hooksPath .githooks`); `.gitattributes` keeps `.sh` in LF and `.bat` in CRLF. They are the devkit's
-([DEVKIT.md](DEVKIT.md)): a project never edits its copy — `scripts/jtools sync` refreshes it at the version
+([DEVKIT.md](DEVKIT.md)): a project never edits its copy — `scripts/linux/jtools sync` refreshes it at the version
 `jtools.conf` names. `run.sh` runs a copy of the jar (`<id>-run.jar`), so a
 build can replace the jar while the program runs.
 
@@ -74,7 +74,7 @@ externals' versions are `externals.conf`'s. Nothing else repeats them; a test ch
 
 ## 7. The distributions
 
-`scripts/package.sh` builds three self-contained archives into `releases/` (not tracked): a Linux and a macOS `tar.gz`
+`scripts/linux/package.sh` builds three self-contained archives into `releases/` (not tracked): a Linux and a macOS `tar.gz`
 with `<id>.sh`, and a Windows `zip` with `<Name>.exe` (launch4j, no console) and `<id>.bat` (a console). Each holds the
 program's one jar, its `<id>.ini` (the installation's settings: `port`, `host`, `log.level`, `log.folder`), the README and
 a runtime jlink trims to the modules the program needs (about 35 MB an archive) — nothing

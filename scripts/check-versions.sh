@@ -2,8 +2,8 @@
 #
 # Checks that the framework says one version everywhere: each module's <parent> version, jtools-parent's own
 # <version>, and its jtools.version property (what the projects' dependencies on the framework use). Run by
-# scripts/install.sh and scripts/ci.local.sh; a new version is set in all of them at once:
-#   sed -i 's/1.3.1/1.4.0/' pom.xml */*/pom.xml   (then read the diff: only the framework's versions may change)
+# scripts/install.sh and scripts/linux/ci.local.sh; a new version is set in all of them at once:
+#   sed -i 's/1.4.0/1.5.0/' pom.xml */*/pom.xml   (then read the diff: only the framework's versions may change)
 #
 set -euo pipefail
 cd "$(dirname "$(readlink -f "$0")")/.."   # the framework's root
@@ -18,8 +18,8 @@ for pom in pom.xml */*/pom.xml; do
     if [ "$found" != "$version" ]; then echo "$pom: jtools-parent $found, but jtools.version is $version" >&2; status=1; fi
   done < <(grep -A1 '<artifactId>jtools-parent</artifactId>' "$pom" | sed -n 's:.*<version>\(.*\)</version>.*:\1:p')
 done
-# scripts/jtools: the version `jtools new` makes outside a project
-for stub in devkit/scripts/jtools scripts/jtools devkit/scripts/jtools.bat scripts/jtools.bat; do
+# scripts/linux/jtools: the version `jtools new` makes outside a project
+for stub in devkit/scripts/linux/jtools scripts/linux/jtools devkit/scripts/windows/jtools.bat scripts/windows/jtools.bat; do
   said=$(sed -n 's/^\(set "\)\{0,1\}JTOOLS_DEFAULT_VERSION=\([0-9][^" \r]*\).*/\2/p' "$stub")
   [ "$said" = "$version" ] || { echo "$stub: JTOOLS_DEFAULT_VERSION=$said, but jtools.version is $version" >&2; status=1; }
 done

@@ -50,7 +50,7 @@
     <condition property="jdk-jmods.windows"><and><isset property="jdk.windows"/><not><isset property="jmods.windows"/></not></and></condition>
     <condition property="jdk-jmods.macos"><and><isset property="jdk.macos"/><not><isset property="jmods.macos"/></not></and></condition>
     <condition property="platform.none"><not><or><isset property="platform.linux"/><isset property="platform.windows"/><isset property="platform.macos"/></or></not></condition>
-    <fail if="platform.none" message="no jmods in ${jdk.archives} (jmods-linux.tar.gz, jmods-windows.zip, jmods-macos.tar.gz, Temurin's *jmods*linux*.tar.gz…, or a JDK up to 23's archive): run scripts/setup.sh (see doc/DEVKIT.md)"/>
+    <fail if="platform.none" message="no jmods in ${jdk.archives} (jmods-linux.tar.gz, jmods-windows.zip, jmods-macos.tar.gz, Temurin's *jmods*linux*.tar.gz…, or a JDK up to 23's archive): run scripts/linux/setup.sh (see doc/DEVKIT.md)"/>
   </target>
 
   <!-- jdeps and jlink: those of this machine's platform's archive, unpacked whole — jlink links only jmods of its own

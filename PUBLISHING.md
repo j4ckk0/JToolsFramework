@@ -18,7 +18,7 @@ Every artifact with its pom, the version written out in each (the framework's po
 | `org.jtools.framework:jtools-desktop` | `FileDialogs`: the native file dialogs | jar, sources, javadoc |
 | `org.jtools.framework:jtools-dist` | the distributions' build (jlink runtimes, archives) and launchers | jar, sources; its javadoc jar is a README |
 | `org.jtools.framework:jtools-web` | `@jtools/web`, as TypeScript sources | jar, sources; its javadoc jar is a README |
-| `org.jtools.framework:jtools-devkit` | a project's scripts and the starter, which `scripts/jtools` fetches | jar, sources; its javadoc jar is a README |
+| `org.jtools.framework:jtools-devkit` | a project's scripts and the starter, which `scripts/linux/jtools` fetches | jar, sources; its javadoc jar is a README |
 
 `jtools-dist`, `jtools-web` and `jtools-devkit` hold no Java, and Maven Central refuses a jar without its javadoc: theirs is one
 `README.txt` saying where their documentation is (`jtools.javadoc.placeholder.skip` in their poms). The aggregator
@@ -52,21 +52,21 @@ project of its own.
 
 1. The version, in every pom at once (`scripts/check-versions.sh` says they agree), not a SNAPSHOT; the projects'
    template follows it (`starter/template/pom.xml` names `__JTOOLS_VERSION__`, filled in from `jtools.version`), and
-   `scripts/jtools` names it as `JTOOLS_DEFAULT_VERSION`.
+   `scripts/linux/jtools` names it as `JTOOLS_DEFAULT_VERSION`.
 2. A dry run, nothing signed nor sent — the jars, sources and javadoc in each module's `target/`:
 
-       . scripts/externals.sh && mvn -Ppublish clean verify -Dgpg.skip
+       . scripts/linux/externals.sh && mvn -Ppublish clean verify -Dgpg.skip
 
 3. The upload, from the root: every module's tests, the jars, their sources and javadoc, signed, one bundle sent to
    the portal, where it is validated:
 
-       . scripts/externals.sh && mvn -Ppublish clean deploy
+       . scripts/linux/externals.sh && mvn -Ppublish clean deploy
 
 4. Nothing is released until **Publish** is pressed on <https://central.sonatype.com> (`autoPublish` is off), so a
    mistake costs nothing: drop the deployment there, fix, upload again.
-5. Then tag the version (`git tag v1.3.1 && git push origin v1.3.1`) — doc/GETTING-STARTED.md downloads
-   `scripts/jtools` from that tag — and, in the projects, name the new version as their parent's and as
-   `JTOOLS_VERSION` (`scripts/jtools sync` reports the ones behind).
+5. Then tag the version (`git tag v1.4.0 && git push origin v1.4.0`) — doc/GETTING-STARTED.md downloads
+   `scripts/linux/jtools` from that tag — and, in the projects, name the new version as their parent's and as
+   `JTOOLS_VERSION` (`scripts/linux/jtools sync` reports the ones behind).
 6. The delivery, on the tag's GitHub release — which README.md and GETTING-STARTED.md download it from: pushing the tag
    runs `.github/workflows/release.yml` on GitHub's machines, which builds it with `scripts/delivery.sh` (every test
    first; it refuses when `libraries/`, `conventions/`, `devkit/` or `starter/` differ from the tag) and creates the
@@ -94,4 +94,4 @@ These builds use the network (plugins, the upload): the framework does not.
 ## 5. Once on Central
 
 The projects no longer need `scripts/install.sh` first: Maven resolves jtools-parent and the libraries from Central,
-`scripts/jtools` the devkit; a hosted CI builds a project with nothing but Maven.
+`scripts/linux/jtools` the devkit; a hosted CI builds a project with nothing but Maven.

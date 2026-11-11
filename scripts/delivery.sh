@@ -3,7 +3,7 @@
 # Builds the delivery: releases/delivery/jtools-<version>.tar.gz and .zip (the same, for Windows), what a developer
 # downloads to start without a clone —
 # the framework's artifacts as a Maven repository (the nine jtools-bom names, with jtools-parent and jtools-bom), the
-# stub scripts/jtools (jtools.bat on Windows), and delivery/install.sh (install.bat), which installs them and makes a first
+# stub scripts/linux/jtools (jtools.bat on Windows), and delivery/install.sh (install.bat), which installs them and makes a first
 # project.
 # Every test runs first.
 #
@@ -26,7 +26,7 @@ if $tagged; then
   git diff --quiet "v$version" -- $shipped || { echo "$shipped differ from v$version: the delivery of $version would not be its tag" >&2; exit 1; }
 fi
 
-. scripts/externals.sh
+. scripts/linux/externals.sh
 deployed="$PWD/tmp/delivery-repository"
 rm -rf "$deployed"
 mvn -q -B clean deploy "-DaltDeploymentRepository=delivery::file://$deployed" "$@"
@@ -43,8 +43,8 @@ for artifact in $artifacts; do
   # the jar and the pom, with their .sha1; no maven-metadata.xml, no .md5: a local repository has no use for them
   find "$from" -maxdepth 1 -type f ! -name '*.md5' ! -name 'maven-metadata*' -exec cp {} "$to/" \;
 done
-cp devkit/scripts/jtools delivery/install.sh LICENSE "$stage/"
-for bat in delivery/install.bat devkit/scripts/jtools.bat; do sed 's/\r*$/\r/' "$bat" > "$stage/${bat##*/}"; done   # cmd reads its labels only with CRLF
+cp devkit/scripts/linux/jtools delivery/install.sh LICENSE "$stage/"
+for bat in delivery/install.bat devkit/scripts/windows/jtools.bat; do sed 's/\r*$/\r/' "$bat" > "$stage/${bat##*/}"; done   # cmd reads its labels only with CRLF
 sed "s/__VERSION__/$version/g" delivery/README.md > "$stage/README.md"
 echo "$version" > "$stage/VERSION"
 chmod +x "$stage/jtools" "$stage/install.sh"

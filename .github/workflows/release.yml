@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'The tag to release, as v1.3.1'
+        description: 'The tag to release, as v1.4.0'
         required: true
 
 permissions:
@@ -32,7 +32,7 @@ jobs:
           grep -q "<jtools.version>$version</jtools.version>" conventions/parent/pom.xml || { echo "the poms are not at $version"; exit 1; }
 
       - name: The externals — JDK, Maven, Node.js — as externals.conf names them
-        run: scripts/setup.sh
+        run: scripts/linux/setup.sh
 
       - name: The delivery, every test first
         run: scripts/delivery.sh

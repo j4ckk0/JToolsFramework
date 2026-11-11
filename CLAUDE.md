@@ -16,31 +16,31 @@ code, comments, tests, poms or docs. An example is a generic one (`Bookshelf`, `
 | `conventions/dist/src/main/resources/jtools-dist/` | `build.xml` (jdeps, jlink, the archives) and the launchers, `${jtools.app.*}` left for the project's build |
 | `libraries/{support,server,app,desktop}/` | `Json`, `Catalogue`, `Texts`, `Installation`; `WebServer`, `Exchange`, `Answer`, `PageWatch`, `Http`; `WebApp`, `CommandLine` and `DesktopOpener` (package-private), `UserSettings`, `SettingsFields`, `LaunchOptions`, `LogFormatter`; `FileDialogs` — the JDK only; a `package-info.java` each |
 | `libraries/web/src/lib/` | `@jtools/web` (shipped as sources in `jtools-web.jar`); `src/main.ts` is a harness, not shipped |
-| `devkit/` | what a project carries — `managed-files.list`, `scripts/`, `.githooks/`, `.gitattributes`, `externals.conf` — plus `scripts/jtools` and `scripts/jtools.bat` (the stubs, never managed) and `jtools-sync.sh` / `.bat`; the starter has `new-project.sh` / `.bat`: every Windows twin is .bat only, kept in step with its shell script; `pom.xml` packs it with the starter as jtools-devkit |
+| `devkit/` | what a project carries — `managed-files.list`, `scripts/`, `.githooks/`, `.gitattributes`, `externals.conf` — plus `scripts/linux/jtools` and `scripts/windows/jtools.bat` (the stubs, never managed) and `jtools-sync.sh` / `.bat`; the starter has `new-project.sh` / `.bat`: every Windows twin is .bat only, kept in step with its shell script; `pom.xml` packs it with the starter as jtools-devkit |
 | `starter/` | `new-project.sh` and `template/` (`__APP_NAME__`, `__APP_ID__`, `__APP_PORT__`, `__JTOOLS_VERSION__` in contents and paths) |
 | `examples/hello/` | the smallest program; in the reactor, never published |
 | `.github/workflows/delivery.yml` | at every push: the delivery built, then installed on Linux and on Windows, a project made, built, packaged, synced; Windows' project compared with Linux's |
 | `.github/workflows/release.yml` | on a pushed tag, on GitHub's machines: `scripts/delivery.sh`, then the tag's release with the delivery attached (or *Run workflow* for an older tag) |
 | `delivery/` | the delivery's `install.sh` and `install.bat` (Windows, .bat only) and README; `scripts/delivery.sh` packs them with the nine artifacts and the stub into `releases/delivery/jtools-<version>.tar.gz` |
-| `scripts/` | the framework's own (`install.sh`, `check-versions.sh`, `ci.local.sh`, `delivery.sh`) and copies of the devkit's, `JTOOLS_HOME=.` |
+| `scripts/` | the framework's own (`install.sh`, `check-versions.sh`, `delivery.sh`; `linux/ci.local.sh`) and copies of the devkit's in `linux/` and `windows/`, `JTOOLS_HOME=.` |
 
 ## Commands
 
 ```bash
 scripts/install.sh                  # versions agree, build, test, install into ~/.m2
-scripts/ci.sh                       # quiet install with npm ci, then ci.local.sh: scripts/ equal devkit/, and a
-                                    # project made by a lone scripts/jtools from the installed devkit passes its CI
-scripts/jtools sync [--check]       # the framework's own copies of the managed files, from devkit/
+scripts/linux/ci.sh                       # quiet install with npm ci, then ci.local.sh: scripts/ equal devkit/, and a
+                                    # project made by a lone scripts/linux/jtools from the installed devkit passes its CI
+scripts/linux/jtools sync [--check]       # the framework's own copies of the managed files, from devkit/
 starter/new-project.sh Name [--port N] [--id id] [--dir D] [--bare D] [--no-git] [--no-build]
-. scripts/externals.sh && mvn -Ppublish clean verify -Dgpg.skip   # what Maven Central would get (PUBLISHING.md); never deploy unasked
+. scripts/linux/externals.sh && mvn -Ppublish clean verify -Dgpg.skip   # what Maven Central would get (PUBLISHING.md); never deploy unasked
 ```
 
 ## Conventions
 
-- **A change to a managed file** is made in `devkit/`, copied into `scripts/` by `scripts/jtools sync`, verified by
-  `scripts/ci.sh`; projects take it with a new version.
+- **A change to a managed file** is made in `devkit/`, copied into `scripts/linux/` and `scripts/windows/` by `scripts/linux/jtools sync`, verified by
+  `scripts/linux/ci.sh`; projects take it with a new version.
 - **The libraries stay generic**: nothing of any application in them.
-- **One version** for every module, jtools-bom and `scripts/jtools` (`scripts/check-versions.sh`).
+- **One version** for every module, jtools-bom and `scripts/linux/jtools` (`scripts/check-versions.sh`).
 - **Apache License 2.0** (`LICENSE`, `NOTICE`): the build writes the header on every Java source of the libraries
   (`license-maven-plugin`) — a new class gets it at its first build; a `package-info.java` carries it by hand, above
   its javadoc. Never on `starter/template`: the projects generated from it are their owners', under their terms.

@@ -7,7 +7,7 @@ everything else of the build is the parent's. A generated project has all of it 
 <parent>
   <groupId>org.jtools.framework</groupId>
   <artifactId>jtools-parent</artifactId>
-  <version>1.3.1</version>
+  <version>1.4.0</version>
   <relativePath/>
 </parent>
 <properties>
@@ -36,7 +36,7 @@ Switched on by the file itself — the frontend's pom is its coordinates and not
 | Phase | What happens |
 |---|---|
 | `initialize` | `jtools-web` (the framework's TypeScript) unpacked into `target/jtools-web`, where `tsconfig.json`'s `"paths"` maps `@jtools/web` |
-| `generate-resources` | `npm install` (`-Dnpm.install=ci`: `npm ci`, what `scripts/ci.sh` passes), `npm run build` into `target/angular` |
+| `generate-resources` | `npm install` (`-Dnpm.install=ci`: `npm ci`, what `scripts/linux/ci.sh` passes), `npm run build` into `target/angular` |
 | `process-resources` | `target/angular/browser` copied to `static/` in the module's jar, `3rdpartylicenses.txt` to `static/licences/` |
 | `test` | `npm test -- --watch=false` (vitest); `-DskipTests` skips it with the Java tests |
 
@@ -52,12 +52,12 @@ no package to publish nor any `package-lock.json` integrity to keep — the Mave
   embedding every module and library, the page included, with `Main-Class: ${jtools.app.mainClass}`; a modular
   library's `module-info.class` stays out, the program's jar being a plain classpath one. The module's
   `<finalName>` is `${jtools.app.id}`.
-- **with `-Pdist`** (profile `dist`, what `scripts/package.sh` runs): `jtools-dist` unpacked into
+- **with `-Pdist`** (profile `dist`, what `scripts/linux/package.sh` runs): `jtools-dist` unpacked into
   `target/jtools-dist`, `<Name>.exe` (launch4j), then — once the program's jar is made — `jtools-dist`'s `build.xml`:
   1. the modules: what `jdeps` finds in the jar, and `jtools.dist.modules.extra` besides (`jdk.charsets,jdk.crypto.ec`
      by default: what no class names — files in any encoding, the elliptic curves TLS needs);
   2. a runtime per platform whose jmods are in `external/` — `jmods-linux.tar.gz`, `jmods-windows.zip`,
-     `jmods-macos.tar.gz`, which `scripts/setup.sh` deploys (a JDK from 24 on carries no jmods: Temurin publishes them
+     `jmods-macos.tar.gz`, which `scripts/linux/setup.sh` deploys (a JDK from 24 on carries no jmods: Temurin publishes them
      apart), or Temurin's own names, `*jmods*linux*.tar.gz`…, in the folder `jtools.jdk.archives` names; for a JDK up to
      23, its JDK archive's `jmods/` (`jdk-linux.tar.gz`…, `*jdk*linux*.tar.gz`…) —, linked by the `jlink` of this
      machine's platform's JDK archive (`jdk-linux.tar.gz`) — of the jmods' version by construction, whatever JDK runs
@@ -86,7 +86,7 @@ a version:
 
 ```kotlin
 dependencies {
-    implementation(platform("org.jtools.framework:jtools-bom:1.3.1"))
+    implementation(platform("org.jtools.framework:jtools-bom:1.4.0"))
     implementation("org.jtools.framework:jtools-app")
 }
 ```
@@ -97,7 +97,7 @@ dependencies {
     <dependency>
       <groupId>org.jtools.framework</groupId>
       <artifactId>jtools-bom</artifactId>
-      <version>1.3.1</version>
+      <version>1.4.0</version>
       <type>pom</type>
       <scope>import</scope>
     </dependency>

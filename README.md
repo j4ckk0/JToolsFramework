@@ -37,7 +37,7 @@ program needs. Nothing to install to run it.
 The scripts every project carries — `setup`, `build`, `ci`, `run`, `stop`, `package` and `jtools` — in `.sh` for Linux
 and in `.bat` for Windows, which needs no Git Bash. `setup` downloads the project's own JDK, Maven and Node.js into its
 `external/` folder, the ones for the computer it runs on, at the versions its `externals.conf` names: nothing is taken
-from your machine, so the project builds the same everywhere. `scripts/jtools sync` keeps the scripts up to date with
+from your machine, so the project builds the same everywhere. `scripts/linux/jtools sync` keeps the scripts up to date with
 the framework.
 
 ### The project template
@@ -46,7 +46,7 @@ the framework.
 (`frontend`) and the program (`app`), with a first endpoint, its tests, a git repository and a first build. You start
 from working code, not from a blank folder.
 
-Apache License 2.0. Version 1.3.1; on Maven Central once published (until then, the delivery's `install.sh` — the
+Apache License 2.0. Version 1.4.0; on Maven Central once published (until then, the delivery's `install.sh` — the
 [quick start](#quick-start-a-new-project-step-by-step) — puts it in `~/.m2`). [doc/CONCEPTS.md](doc/CONCEPTS.md) says
 the idea behind it in one page.
 
@@ -58,27 +58,27 @@ git repository, whose pre-push hook runs its CI; without it, the project is made
 Node.js to install: a project downloads its own into its `external/` folder the first time (about 450 MB).
 
 **1. Download the delivery** — one archive, the framework and its installer, from the
-[release](https://github.com/j4ckk0/JToolsFramework/releases/tag/v1.3.1):
+[release](https://github.com/j4ckk0/JToolsFramework/releases/tag/v1.4.0):
 
 ```bash
-curl -fsSLO https://github.com/j4ckk0/JToolsFramework/releases/download/v1.3.1/jtools-1.3.1.tar.gz
-tar xzf jtools-1.3.1.tar.gz
+curl -fsSLO https://github.com/j4ckk0/JToolsFramework/releases/download/v1.4.0/jtools-1.4.0.tar.gz
+tar xzf jtools-1.4.0.tar.gz
 ```
 
 **2. Install, and make your project** — `install.sh` asks the project's name and the folder its files go in:
 
 ```bash
-jtools-1.3.1/install.sh                                   # asks; or says it all at once:
-jtools-1.3.1/install.sh Bookshelf --dir ~/work/bookshelf
+jtools-1.4.0/install.sh                                   # asks; or says it all at once:
+jtools-1.4.0/install.sh Bookshelf --dir ~/work/bookshelf
 ```
 
 **On Windows**, the same with `.bat` scripts — no Git Bash, no PowerShell script: plain `.bat` files, with the `curl`
-and `tar` Windows 10 comes with. Download `jtools-1.3.1.zip` from the
-[release](https://github.com/j4ckk0/JToolsFramework/releases/tag/v1.3.1), extract it (right-click ▸ *Extract All*),
-and double-click `jtools-1.3.1\install.bat`: it asks the project's name and folder, and offers to put `jtools` on
-your `PATH`. From a command prompt, `jtools-1.3.1\install.bat Bookshelf --dir C:\work\bookshelf` says them at once.
-Each command below has its `.bat` twin: `scripts\run.bat`, `scripts\build.bat`, `scripts\package.bat`,
-`scripts\jtools sync`.
+and `tar` Windows 10 comes with. Download `jtools-1.4.0.zip` from the
+[release](https://github.com/j4ckk0/JToolsFramework/releases/tag/v1.4.0), extract it (right-click ▸ *Extract All*),
+and double-click `jtools-1.4.0\install.bat`: it asks the project's name and folder, and offers to put `jtools` on
+your `PATH`. From a command prompt, `jtools-1.4.0\install.bat Bookshelf --dir C:\work\bookshelf` says them at once.
+Each command below has its `.bat` twin: `scripts\windows\run.bat`, `scripts\windows\build.bat`, `scripts\windows\package.bat`,
+`scripts\windows\jtools sync`.
 
 It puts the framework into your local Maven repository (`~/.m2`) and `jtools` into `~/.local/bin`, then makes the
 project: its files in that folder, its development environment — a JDK, Maven and Node.js of its own, in its
@@ -91,25 +91,25 @@ bookshelf/
 ├── api/        its HTTP face: BookshelfApi.java — each endpoint asks core and turns its answer into JSON
 ├── frontend/   the Angular page: a view, it decides nothing — api.service.ts is its one door to the server
 ├── app/        the program: Launcher.java, a WebApp serving the API; its one jar and its distributions
-└── scripts/    setup, build, ci, run, stop, package — and jtools
+└── scripts/    linux/ and windows/: setup, build, ci, run, stop, package — and jtools
 ```
 
-**3. Run it**: `cd ~/work/bookshelf && scripts/run.sh` — the page opens in your browser; close it, and 15 seconds later the
+**3. Run it**: `cd ~/work/bookshelf && scripts/linux/run.sh` — the page opens in your browser; close it, and 15 seconds later the
 program stops (`--keep-alive` keeps it serving).
 
 **4. Add a feature**, one layer at a time: a method in `core` decides, an endpoint in `api` translates it to JSON, a method
-in `api.service.ts` and a view in `frontend` show it. `scripts/run.sh` rebuilds when a source is newer.
+in `api.service.ts` and a view in `frontend` show it. `scripts/linux/run.sh` rebuilds when a source is newer.
 
-**5. Test it**: `scripts/build.sh` — every Java test and the page's.
+**5. Test it**: `scripts/linux/build.sh` — every Java test and the page's.
 
-**6. Ship it**: `scripts/package.sh` — `releases/bookshelf-0.1.0-linux.tar.gz`, `-macos.tar.gz` and `-windows.zip`,
+**6. Ship it**: `scripts/linux/package.sh` — `releases/bookshelf-0.1.0-linux.tar.gz`, `-macos.tar.gz` and `-windows.zip`,
 each with its launchers and a trimmed Java runtime: unpack, run, nothing to install.
 
-**7. Keep it up to date**: `scripts/jtools sync` refreshes the scripts at the framework version `jtools.conf` names.
+**7. Keep it up to date**: `scripts/linux/jtools sync` refreshes the scripts at the framework version `jtools.conf` names.
 
 The internet is needed the first time: the project's tools and the libraries its build uses (Maven plugins, npm
 packages) are downloaded; the framework itself is in the archive. To change the framework too, clone it instead:
-`git clone`, then `scripts/setup.sh && scripts/install.sh` in the clone, and its `devkit/scripts/jtools` is your
+`git clone`, then `scripts/linux/setup.sh && scripts/install.sh` in the clone, and its `devkit/scripts/linux/jtools` is your
 `jtools`.
 
 [doc/GETTING-STARTED.md](doc/GETTING-STARTED.md) is the same walk in full — what to type, what you should see, the code of
@@ -194,7 +194,7 @@ curl 'http://127.0.0.1:8089/api/hello?name=script'   # {"message":"Hello, script
 ```
 
 - **Without a page**: `--no-browser` starts the program without opening one, and it keeps serving until it is told to
-  stop (`scripts/stop.sh`, `POST /api/quit`, Ctrl+C). The framework's own endpoints come with it: `/api/about`,
+  stop (`scripts/linux/stop.sh`, `POST /api/quit`, Ctrl+C). The framework's own endpoints come with it: `/api/about`,
   `/api/settings`, `/api/quit`.
 - **Another protocol beside the JSON**: `server.handle("/mcp", handler)` mounts a plain JDK handler — an assistant's
   tool endpoint, say — behind the same checks.
@@ -210,24 +210,24 @@ curl 'http://127.0.0.1:8089/api/hello?name=script'   # {"message":"Hello, script
 |---|---|---|
 | [`libraries/`](libraries) | `support`, `server`, `app`, `desktop`: the Java libraries; `web`: `@jtools/web`, for an Angular page | `jtools-support`, `-server`, `-app`, `-desktop`, `-web` |
 | [`conventions/`](conventions) | `parent`: the build; `bom`: the versions alone; `dist`: the distributions' build (jdeps, jlink, the archives) and launchers | `jtools-parent`, `jtools-bom`, `jtools-dist` |
-| [`devkit/`](devkit) | what a project carries: its scripts, its pre-push hook, `.gitattributes`, the default `externals.conf`; `scripts/jtools` | `jtools-devkit`, with the starter |
+| [`devkit/`](devkit) | what a project carries: its scripts, its pre-push hook, `.gitattributes`, the default `externals.conf`; `scripts/linux/jtools` | `jtools-devkit`, with the starter |
 | [`starter/`](starter) | the template and `new-project.sh`, which `jtools new` runs | in `jtools-devkit` |
 | [`delivery/`](delivery) | the delivery's installers — `install.sh` for Linux, `install.bat` for Windows — and README; `scripts/delivery.sh` builds the archives a release carries | `jtools-<version>.tar.gz` and `.zip`, on GitHub's releases |
 | [`examples/`](examples) | `hello`, `todo`, `greeter`: three very small programs, each a step further | never: built and tested with the rest |
 | [`doc/`](doc) | [GETTING-STARTED](doc/GETTING-STARTED.md), [CONCEPTS](doc/CONCEPTS.md), [LIBRARIES](doc/LIBRARIES.md), [CONVENTIONS](doc/CONVENTIONS.md), [DEVKIT](doc/DEVKIT.md), [ADOPTING](doc/ADOPTING.md) (moving an existing program onto it), [design/](doc/design) (why it is as it is) | — |
-| `scripts/` | the framework's own — `install`, `check-versions`, `ci.local`, `delivery` — and the devkit's, which the framework carries like any project | — |
+| `scripts/` | the framework's own — `install`, `check-versions`, `delivery`, `linux/ci.local` — and the devkit's, in `linux/` and `windows/`, which the framework carries like any project | — |
 
 **Developing the framework itself**:
 
 ```bash
-scripts/setup.sh       # the externals: JDK 25, Maven, Node.js, each platform's jmods (once)
+scripts/linux/setup.sh       # the externals: JDK 25, Maven, Node.js, each platform's jmods (once)
 scripts/install.sh     # versions agree, build, test, install into ~/.m2
-scripts/ci.sh          # the same quietly, then: the framework's scripts equal the devkit's, and a project made by a lone
-                       # scripts/jtools from the installed devkit passes its own CI
+scripts/linux/ci.sh          # the same quietly, then: the framework's scripts equal the devkit's, and a project made by a lone
+                       # scripts/linux/jtools from the installed devkit passes its own CI
 ```
 
-`git config core.hooksPath .githooks` runs `scripts/ci.sh` before every push. A project developed together with the
-framework names the clone in its `jtools.conf` (`JTOOLS_HOME`): its `scripts/jtools` then takes the devkit from the
+`git config core.hooksPath .githooks` runs `scripts/linux/ci.sh` before every push. A project developed together with the
+framework names the clone in its `jtools.conf` (`JTOOLS_HOME`): its `scripts/linux/jtools` then takes the devkit from the
 working tree. Publishing to Maven Central: [PUBLISHING.md](PUBLISHING.md).
 
 ## The dependencies to set
@@ -241,7 +241,7 @@ framework ([doc/ADOPTING.md](doc/ADOPTING.md)):
 <parent>
   <groupId>org.jtools.framework</groupId>
   <artifactId>jtools-parent</artifactId>
-  <version>1.3.1</version>
+  <version>1.4.0</version>
   <relativePath/>
 </parent>
 <properties>
@@ -279,7 +279,7 @@ conventions (the one jar and the distributions are jtools-parent's):
 
 ```kotlin
 dependencies {
-    implementation(platform("org.jtools.framework:jtools-bom:1.3.1"))
+    implementation(platform("org.jtools.framework:jtools-bom:1.4.0"))
     implementation("org.jtools.framework:jtools-app")
 }
 ```
@@ -288,5 +288,5 @@ dependencies {
 `target/jtools-web`, and the page's `tsconfig.json` maps it: `"paths": { "@jtools/web": ["./target/jtools-web/index.ts"] }`.
 
 **The tools** — JDK, Maven, Node.js — are named in the project's `externals.conf`, with their versions, and
-`scripts/setup.sh` downloads them into `external/`: none is installed on the machine
+`scripts/linux/setup.sh` downloads them into `external/`: none is installed on the machine
 ([doc/DEVKIT.md](doc/DEVKIT.md)).
