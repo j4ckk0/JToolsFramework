@@ -85,7 +85,13 @@ jobs:
     defaults:
       run:
         shell: pwsh
+    env:
+      REPORT: ${{ github.workspace }}\framework\.github\report-failure.bat
     steps:
+      - uses: actions/checkout@v4   # .github alone: its report-failure.bat
+        with:
+          path: framework
+          sparse-checkout: .github
       - uses: actions/download-artifact@v4
         with:
           name: delivery
@@ -93,10 +99,17 @@ jobs:
         with:
           name: made-on-linux
           path: made-on-linux
+      - name: report-failure.bat makes one annotation of a log's last 60 lines
+        run: |
+          $lines = @('first line') + (1..70 | ForEach-Object { "line $_" }) + @('', '50% done, a <tag> & a | pipe', 'last line')
+          Set-Content -Path report-test.log -Value $lines
+          $out = (& $env:REPORT 'self-test' report-test.log) -join ''
+          $ok = $out.StartsWith('::error title=self-test::') -and $out.Contains('%0A%0A50%25 done, a <tag> & a | pipe%0Alast line%0A') -and -not $out.Contains('first line') -and $out.Contains('line 14%0A') -and -not $out.Contains('line 13%0A')
+          if (-not $ok) { Write-Output "::error title=report-failure.bat::its output: $($out.Replace('%', '%25'))"; exit 1 }
       - name: git's identity, for the projects' first commits
         run: git config --global user.name "JToolsFramework CI"; git config --global user.email "ci@example.invalid"
-      # Each step runs the .bat scripts in cmd, as a developer would; when one fails, its output's end becomes the
-      # step's error annotation, which GitHub's API shows to anyone (a job's log needs the repository's admin).
+      # Each step runs the .bat scripts in cmd, as a developer would; when one fails, report-failure.bat makes its
+      # output's end the step's error annotation.
       - name: The machine's Maven settings, should a build not find the framework
         run: |
           Write-Output "M2_REPO=$env:M2_REPO MAVEN_OPTS=$env:MAVEN_OPTS USERPROFILE=$env:USERPROFILE HOME=$env:HOME"
@@ -107,14 +120,14 @@ jobs:
           Expand-Archive -Path (Get-Item jtools-*.zip).FullName -DestinationPath .
           $delivery = (Get-Item jtools-* -Exclude *.zip, *.gz).FullName
           cmd /c "`"$delivery\install.bat`" Demo --dir `"$env:RUNNER_TEMP\demo`" --port 18096" 2>&1 | Tee-Object -FilePath step.log
-          if ($LASTEXITCODE -ne 0) { $e = ((Get-Content step.log -Tail 60) -join "`n").Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A'); Write-Output "::error title=install.bat::$e"; exit 1 }
+          if ($LASTEXITCODE -ne 0) { & $env:REPORT install.bat step.log; exit 1 }
       - name: Its build, its distributions, its sync (the .bat scripts)
         working-directory: ${{ runner.temp }}\demo
         run: |
           $ErrorActionPreference = 'Continue'
           foreach ($command in 'scripts\windows\build.bat', 'scripts\windows\package.bat', 'scripts\windows\jtools.bat sync --check', "`"$env:USERPROFILE\.local\bin\jtools.bat`" version") {
             cmd /c $command 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\step.log"
-            if ($LASTEXITCODE -ne 0) { $e = ((Get-Content "$env:RUNNER_TEMP\step.log" -Tail 60) -join "`n").Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A'); Write-Output "::error title=$command::$e"; exit 1 }
+            if ($LASTEXITCODE -ne 0) { & $env:REPORT ($command -replace '"', '') "$env:RUNNER_TEMP\step.log"; exit 1 }
           }
           Get-ChildItem releases
       - name: run.bat builds when a file changed, and only then (Windows' archive marks)
@@ -125,9 +138,9 @@ jobs:
           foreach ($touch in $false, $false, $true) {
             # a file saved as an editor saves it: its text written again, which marks it "to archive"
             if ($touch) { $f = (Resolve-Path pom.xml).Path; [IO.File]::WriteAllText($f, [IO.File]::ReadAllText($f)); Write-Output "pom.xml: $((Get-Item $f).Attributes)" }
-            $out = (cmd /c "scripts\windows\run.bat --help" 2>&1 | Out-String)
-            if ($LASTEXITCODE -ne 0) { $e = $out.Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A'); Write-Output "::error title=run.bat --help::$e"; exit 1 }
-            $runs += $out.Contains('== building')
+            cmd /c "scripts\windows\run.bat --help" > "$env:RUNNER_TEMP\step.log" 2>&1
+            if ($LASTEXITCODE -ne 0) { & $env:REPORT 'run.bat --help' "$env:RUNNER_TEMP\step.log"; exit 1 }
+            $runs += (Get-Content "$env:RUNNER_TEMP\step.log" -Raw).Contains('== building')
           }
           Write-Output "built: $runs"
           if (-not ($runs[0] -and -not $runs[1] -and $runs[2])) { Write-Output "::error title=run.bat's rebuilds::built on the three runs: $runs - expected True, False, True"; exit 1 }
@@ -135,19 +148,19 @@ jobs:
         run: |
           $ErrorActionPreference = 'Continue'
           cmd /c "`"$env:USERPROFILE\.local\bin\jtools.bat`" new Demo --dir `"$env:RUNNER_TEMP\fresh`" --port 18096 --no-git --no-build" 2>&1 | Tee-Object -FilePath step.log
-          if ($LASTEXITCODE -ne 0) { $e = ((Get-Content step.log -Tail 60) -join "`n").Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A'); Write-Output "::error title=jtools new::$e"; exit 1 }
+          if ($LASTEXITCODE -ne 0) { & $env:REPORT 'jtools new' step.log; exit 1 }
           & 'C:\Program Files\Git\usr\bin\diff.exe' -r --strip-trailing-cr made-on-linux "$env:RUNNER_TEMP\fresh" 2>&1 | Tee-Object -FilePath step.log
-          if ($LASTEXITCODE -ne 0) { $e = ((Get-Content step.log -TotalCount 80) -join "`n").Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A'); Write-Output "::error title=differs from Linux's::$e"; exit 1 }
+          if ($LASTEXITCODE -ne 0) { & $env:REPORT "differs from Linux's" step.log; exit 1 }
       - name: Without git, a project without a repository
         run: |
           $ErrorActionPreference = 'Continue'
           $env:Path = (($env:Path -split ';') | Where-Object { $_ -notmatch '\\Git\\' }) -join ';'
           cmd /c "`"$env:USERPROFILE\.local\bin\jtools.bat`" new NoGit --dir `"$env:RUNNER_TEMP\nogit`" --no-build" 2>&1 | Tee-Object -FilePath step.log
-          if ($LASTEXITCODE -ne 0 -or (Test-Path "$env:RUNNER_TEMP\nogit\.git") -or -not (Test-Path "$env:RUNNER_TEMP\nogit\pom.xml")) { $e = ((Get-Content step.log -Tail 40) -join "`n").Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A'); Write-Output "::error title=jtools new without git::$e"; exit 1 }
+          if ($LASTEXITCODE -ne 0 -or (Test-Path "$env:RUNNER_TEMP\nogit\.git") -or -not (Test-Path "$env:RUNNER_TEMP\nogit\pom.xml")) { & $env:REPORT 'jtools new without git' step.log; exit 1 }
       - name: A project made with 1.3.1, moved to 1.4's layout by its own scripts\jtools sync
         run: |
           $ErrorActionPreference = 'Continue'
-          function Report($title) { $e = ((Get-Content "$env:RUNNER_TEMP\step.log" -Tail 60) -join "`n").Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A'); Write-Output "::error title=$title::$e"; exit 1 }
+          function Report($title) { & $env:REPORT $title "$env:RUNNER_TEMP\step.log"; exit 1 }
           Invoke-WebRequest -UseBasicParsing -Uri https://github.com/j4ckk0/JToolsFramework/releases/download/v1.3.1/jtools-1.3.1.zip -OutFile old.zip
           Expand-Archive -Path old.zip -DestinationPath old-delivery
           $version = (Get-Content (Get-Item jtools-1.4*\VERSION -Exclude *.zip).FullName).Trim()
