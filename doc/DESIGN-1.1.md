@@ -423,3 +423,15 @@ Where it departs from the sections above:
   jlink links only jmods of its own version, and XsdViewer's scripts build with whatever Java is on the PATH (the
   system's 25 here) — the framework's first version failed there, where XsdViewer's own build did not.
 
+**Forced by the second migration, DCSBuilder's:**
+
+- `WebApp.language()`: the run's language — `--lang`'s, else the machine's — known from the routes on. DCSBuilder's
+  MCP tools answer a client that names no language in it; `--lang` being the framework's option, the program could
+  not read it.
+- `WebServer.host()`: the address the server listens on, as given. DCSBuilder's `/mcp` keeps a rule stricter than
+  §3.6's — this computer only, even on a wildcard address, where the framework accepts any `Host` — and needs the
+  `--host` to apply it. §3.4's "McpHttp losing its own Host check" did not hold: dropping it would have opened
+  `/mcp` to the network whenever the page is.
+- Kept as found, not fixed: a startup failure is logged in the console's language (the same line is the console's
+  message), where §4.3 wants the log in English and DCSBuilder logged it so; a 1.2 candidate, with a decision on
+  what the console then shows.

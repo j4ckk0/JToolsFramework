@@ -246,6 +246,7 @@ class WebServerTest {
         try (WebServer open = new WebServer("test-page", new PageWatch()).start("0.0.0.0", 0)) {
             assertTrue(open.allowedHost("192.168.1.20:" + open.port()));
             assertTrue(open.url().startsWith("http://localhost:"));
+            assertEquals("0.0.0.0", open.host(), "the address as given, for a route of stricter rules");
         }
     }
 

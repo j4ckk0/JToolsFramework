@@ -211,6 +211,15 @@ public final class WebServer implements AutoCloseable {
         return http.getAddress().getPort();
     }
 
+    /**
+     * The address it listens on, as the program was told ({@code --host}): {@code 127.0.0.1} by default, a wildcard
+     * ({@code 0.0.0.0}) when it serves the network; null before {@link #start}. For a route with a rule of its own on
+     * the {@code Host} it accepts — DCSBuilder's MCP, which answers this computer only even then.
+     */
+    public String host() {
+        return host;
+    }
+
     /** The page's address: on this computer, {@code localhost} stands for every interface. */
     public String url() {
         String shown = host == null || WILDCARD_HOSTS.contains(host) ? "localhost" : host;

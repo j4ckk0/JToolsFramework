@@ -99,6 +99,7 @@ public final class WebApp {
     private Consumer<List<String>> operands;
     private boolean oneFile;
     private IntConsumer exit = System::exit;
+    private Locale language = Locale.getDefault();
 
     private record ExtraOption(String valueName, String help, Consumer<String> action) {}
 
@@ -204,6 +205,15 @@ public final class WebApp {
         return this;
     }
 
+    /**
+     * The language this run speaks where no page asks for one — its console, and what the program says to a client
+     * that names none (DCSBuilder's MCP tools): {@code --lang}'s, else the machine's. Known once the command line is
+     * read, so from {@link #routes} on.
+     */
+    public Locale language() {
+        return language;
+    }
+
     // ---- the run --------------------------------------------------------------------------------------------
 
     /** Runs the program; on a command line or a start it cannot run, says why and exits (2, 3). */
@@ -227,6 +237,7 @@ public final class WebApp {
             return;
         }
         console = console(options);
+        language = options.lang() != null ? options.lang() : Locale.getDefault();
         if (options.help()) {
             System.out.println(usage(console));
             return;
@@ -271,6 +282,7 @@ public final class WebApp {
         } catch (UsageException e) {
             throw new IllegalArgumentException(e.getMessage(), e);
         }
+        language = options.lang() != null ? options.lang() : Locale.getDefault();
         if (operands != null) operands.accept(options.operands());
         exit = code -> {};
         return startServer(options, program);

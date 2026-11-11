@@ -164,6 +164,22 @@ class BuiltInRoutesTest {
         }
     }
 
+    /** --lang is the run's language, known to the program's routes: what it says to a client naming none. */
+    @Test
+    void tellsTheProgramTheRunsLanguage() throws Exception {
+        java.util.concurrent.atomic.AtomicReference<java.util.Locale> seen = new java.util.concurrent.atomic.AtomicReference<>();
+        WebApp[] app = new WebApp[1];
+        app[0] = WebApp.named("JToolsTest").id(ID).routes(s -> seen.set(app[0].language()));
+        try (WebServer other = app[0].start("--port", "0", "--lang", "fr")) {
+            assertEquals(java.util.Locale.FRENCH, seen.get(), "known when the routes are registered");
+            assertEquals(java.util.Locale.FRENCH, app[0].language());
+        }
+        app[0] = WebApp.named("JToolsTest").id(ID);
+        try (WebServer other = app[0].start("--port", "0")) {
+            assertEquals(java.util.Locale.getDefault(), app[0].language(), "the machine's without --lang");
+        }
+    }
+
     @Test
     void quitsWhenThePageSaysSo() throws Exception {
         HttpResponse<String> answer = post(WebApp.QUIT, "");
