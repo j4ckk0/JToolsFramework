@@ -233,6 +233,7 @@ jobs:
           cmd /c "scripts\windows\release.bat" 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\step.log"
           if ($LASTEXITCODE -eq 0) { Write-Output "::error title=release.bat::a refused token published"; exit 1 }
           if (-not (Select-String -Path "$env:RUNNER_TEMP\step.log" -SimpleMatch 'github.com refuses the token (HTTP 401)' -Quiet)) { & $env:REPORT 'release.bat, a refused token' "$env:RUNNER_TEMP\step.log"; exit 1 }
+          exit 0   # the refused token's run is the last command: GitHub would take its exit code, 1, for the step's
       - name: run.bat builds when a file changed, and only then (Windows' archive marks)
         working-directory: ${{ runner.temp }}\demo
         run: |
