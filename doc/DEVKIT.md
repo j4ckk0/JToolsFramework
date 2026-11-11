@@ -16,14 +16,15 @@ A project on JToolsFramework builds, runs and packages with the same scripts as 
 | `scripts/linux/run.sh` | builds when a source is newer than the jar, then runs a copy of it (so that a build can replace the jar meanwhile) with the arguments given: `scripts/linux/run.sh --no-browser --port 9090`; `--rebuild` forces the build |
 | `scripts/linux/stop.sh` | stops the program running from this project |
 | `scripts/linux/package.sh` | `mvn package -Pdist`: the Linux, macOS and Windows archives into `releases/`; the previous versions' removed. The project's own options, which `jtools.conf` declares (`PACKAGE_OPTION`, below), add their Maven arguments: `scripts/linux/package.sh --with-model` |
+| `scripts/linux/release.sh` | publishes the version the root pom names, once its tag `v<version>` exists and `package` has made its archives: the notes are `CHANGELOG.md`'s `## <version>` section, the archives' SHA-256 beneath. With `RELEASE_GITHUB` (below), a GitHub Release, the tag pushed there first and every `releases/<id>-<version>*` file attached — its token `$GITHUB_TOKEN`, else `~/.config/github/<id>-release-token`, a fine-grained token with *Contents: read and write* on that repository; without it, a local release: `releases/<id>-<version>.sha256` and `-notes.md` beside the archives. `--draft`, a GitHub draft; `--dry-run`, the notes printed and nothing published |
 | `scripts/linux/jtools` | the devkit itself: `sync`, `sync --check`, `version`, `new` (below) — the one script the devkit never refreshes |
 
 Each has its `.bat` twin in `scripts\windows\` — `setup.bat`, `build.bat`, `ci.bat`, `run.bat`, `stop.bat`,
-`package.bat`, `jtools.bat` —, typed in a command prompt: `scripts\windows\run.bat`, `scripts\windows\jtools sync`.
+`package.bat`, `release.bat`, `jtools.bat` —, typed in a command prompt: `scripts\windows\run.bat`, `scripts\windows\jtools sync`.
 Plain `.bat` files, Windows 10's own `curl` and `tar`: no Git Bash, no PowerShell. The shell scripts also run in Git
 Bash, where they take the Windows tools.
 
-**A project made before 1.4** has its scripts in `scripts/` alone: name 1.5.1 in its `jtools.conf` and its pom, then
+**A project made before 1.4** has its scripts in `scripts/` alone: name 1.6.0 in its `jtools.conf` and its pom, then
 `scripts/jtools sync` (or `scripts\jtools sync`) moves them — the devkit's own into `linux/` and `windows/`, the
 project's `*.local.sh` and `*.local.bat` beside them —, and puts the new `jtools` and `jtools.bat` in place: remove the
 old two by hand, the sync may be running from one of them. `sync --check` lists what is still to move.
@@ -78,6 +79,7 @@ scripts/linux/build.sh`. A key written twice counts once, by its first line — 
 | `JTOOLS_VERSION` | — | the devkit `scripts/linux/jtools` takes the managed files from |
 | `JTOOLS_HOME` | — | a clone of JToolsFramework to take them from instead (relative to the project, or absolute) |
 | `PACKAGE_OPTION` | — | `<name> <Maven arguments>`: an option of `package`'s own, `--<name>`, which adds those arguments to its build — a profile of the project's, `-Pdist-model`. One line per option |
+| `RELEASE_GITHUB` | — | `<owner>/<repository>`: where `release` publishes — a GitHub Release from the version's tag. Without it, `release` makes a local release, beside the archives |
 | `PACKAGE_ARCHIVES` | — | `<name> <suffix>…`: what else `--<name>` makes in `releases/`, `<APP_ID>-<version><suffix>` — `-linux-with-model.tar.gz`: `package` checks it is there, and removes its previous versions as it does the standard archives'. One line per option |
 
 An option of `package`'s own, declared once for both systems:

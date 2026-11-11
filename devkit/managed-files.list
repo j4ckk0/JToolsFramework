@@ -8,6 +8,7 @@ scripts/linux/ci.sh
 scripts/linux/run.sh
 scripts/linux/stop.sh
 scripts/linux/package.sh
+scripts/linux/release.sh
 scripts/windows/externals.bat
 scripts/windows/setup.bat
 scripts/windows/build.bat
@@ -15,5 +16,6 @@ scripts/windows/ci.bat
 scripts/windows/run.bat
 scripts/windows/stop.bat
 scripts/windows/package.bat
+scripts/windows/release.bat
 .githooks/pre-push
 .gitattributes

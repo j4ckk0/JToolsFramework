@@ -7,7 +7,7 @@ everything else of the build is the parent's. A generated project has all of it 
 <parent>
   <groupId>org.jtools.framework</groupId>
   <artifactId>jtools-parent</artifactId>
-  <version>1.5.1</version>
+  <version>1.6.0</version>
   <relativePath/>
 </parent>
 <properties>
@@ -86,7 +86,7 @@ a version:
 
 ```kotlin
 dependencies {
-    implementation(platform("org.jtools.framework:jtools-bom:1.5.1"))
+    implementation(platform("org.jtools.framework:jtools-bom:1.6.0"))
     implementation("org.jtools.framework:jtools-app")
 }
 ```
@@ -97,7 +97,7 @@ dependencies {
     <dependency>
       <groupId>org.jtools.framework</groupId>
       <artifactId>jtools-bom</artifactId>
-      <version>1.5.1</version>
+      <version>1.6.0</version>
       <type>pom</type>
       <scope>import</scope>
     </dependency>
