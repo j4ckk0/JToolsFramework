@@ -123,7 +123,8 @@ jobs:
           $ErrorActionPreference = 'Continue'
           $runs = @()
           foreach ($touch in $false, $false, $true) {
-            if ($touch) { cmd /c "copy /b pom.xml +,, >nul" }
+            # a file saved as an editor saves it: its text written again, which marks it "to archive"
+            if ($touch) { $f = (Resolve-Path pom.xml).Path; [IO.File]::WriteAllText($f, [IO.File]::ReadAllText($f)); Write-Output "pom.xml: $((Get-Item $f).Attributes)" }
             $out = (cmd /c "scripts\windows\run.bat --help" 2>&1 | Out-String)
             if ($LASTEXITCODE -ne 0) { $e = $out.Replace('%', '%25').Replace("`r", '').Replace("`n", '%0A'); Write-Output "::error title=run.bat --help::$e"; exit 1 }
             $runs += $out.Contains('== building')
