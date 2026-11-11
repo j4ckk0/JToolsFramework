@@ -26,7 +26,7 @@
  * then answers 409 and the page offers the browser's own). A module of its own: choosing files is a feature a program
  * opts into.
  * <pre>{@code
- * List<Path> chosen = FileDialogs.chooseFilesToOpen("Open a schema", true, new FileDialogs.Filter("XML Schema", List.of("*.xsd")));
+ * List<Path> chosen = FileDialogs.chooseFilesToOpen("Open readings", true, new FileDialogs.Filter("Readings", List.of("*.csv")));
  * }</pre>
  */
 package org.jtools.framework.desktop;

@@ -253,7 +253,7 @@ public final class WebApp {
      * is an {@link IllegalArgumentException}), the operands handed over, the Settings menu's port, the routes, the
      * automatic stop. And nothing of a process: <b>no {@code .ini} is read</b> — a stray one in the repository must not
      * change a test run —, no log is set up, no browser opened, nothing ever exits (the stop and {@code /api/quit} close
-     * the server only). {@code start("--port", "0", "--keep-alive", "samples/a.xsd")}; close the server after.
+     * the server only). {@code start("--port", "0", "--keep-alive", "data/readings.csv")}; close the server after.
      */
     public WebServer start(String... args) throws IOException {
         Class<?> program = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass();

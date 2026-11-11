@@ -263,7 +263,11 @@ CLAUDE.md and PUBLISHING.md follow the moves; PUBLISHING.md's artifact table gai
 ## 11. What changes for a program on 1.1
 
 `jtools-parent` 1.2.0; `jtools-launcher` becomes `jtools-app` in its poms (or the BOM, with Gradle); one import line per
-file that names `org.jtools.framework.launcher`. Its own test suite is the acceptance. A project generated from 1.1 —
+file that names `org.jtools.framework.launcher`; and the names a structural review settled before the first release
+(§13): `I18n` → `Texts`, `I18n.catalogue` → `Catalogue.load`, `Exchange.i18n()` → `texts()`, `WebApp.texts` and
+`WebServer.texts` → `catalogue`, `PageWatch.setEnabled`/`isEnabled`/`watch` → `setAutoStop`/`autoStops`/`onLastPageGone`,
+`jtools.program.skip` → `jtools.app.skip` — a pom still setting the old name builds no program jar, silently.
+Its own test suite is the acceptance. A project generated from 1.1 —
 only the framework's CI trials — has nothing to keep. The devkit is opt-in (§6.3).
 
 ## 12. The order of the work
@@ -321,3 +325,10 @@ Each step with its tests, the framework's CI — the generated project built, ru
 - **A failure's dialog asks for a terminal**, not only a console: a JDK's `System.console()` may answer one with its
   output redirected (JDK 22 to 24 did by default), which would leave an `.exe` without its dialog; `isTerminal()`
   says what is meant.
+- **Names settled before the first release**, by a review of the code's legibility: one language's texts are `Texts`,
+  all of them a `Catalogue` (`Catalogue.load`, `Exchange.texts()`, the builders' `catalogue(…)`); the automatic stop
+  is named as the settings name it (`PageWatch.setAutoStop`, `autoStops`, `onLastPageGone`); the program's module opts
+  in with `jtools.app.skip`, like the `jtools.app.*` it sets, and `jtools.weblib.skip` says what it skips;
+  `DesktopOpener` lives in `jtools-app`, its only user, package-private; `WebApp`'s command line is a class of its
+  own, `CommandLine`; the scripts' guard is `refuse_while_running`; the template's first route is the business's own,
+  `GET /api/status`, its page's frame reading the framework's `/api/about`.

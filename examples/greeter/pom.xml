@@ -21,7 +21,7 @@
     <jtools.app.skip>false</jtools.app.skip>
     <jtools.app.id>greeter</jtools.app.id>
     <jtools.app.name>Greeter</jtools.app.name>
-    <jtools.app.mainClass>org.jtools.greeter.Greeter</jtools.app.mainClass>
+    <jtools.app.mainClass>org.jtools.greeter.GreeterApp</jtools.app.mainClass>
     <jtools.app.port>8087</jtools.app.port>
     <jtools.app.windowsVersion>1.2.0.0</jtools.app.windowsVersion>
   </properties>

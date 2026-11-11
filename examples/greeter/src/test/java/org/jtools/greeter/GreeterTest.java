@@ -26,7 +26,7 @@ class GreeterTest {
     void start() throws Exception {
         node = "org/jtools/greeter-test-" + UUID.randomUUID();   // the settings in a node of the test's own, removed after
         System.setProperty("greeter.preferences", node);
-        server = Greeter.program().start("--port", "0", "--keep-alive");
+        server = GreeterApp.program().start("--port", "0", "--keep-alive");
     }
 
     @AfterEach
@@ -60,7 +60,7 @@ class GreeterTest {
 
     @Test
     void takesAnOptionOfItsOwn() throws Exception {
-        try (WebServer howdy = Greeter.program().start("--port", "0", "--keep-alive", "--greeting", "Howdy")) {
+        try (WebServer howdy = GreeterApp.program().start("--port", "0", "--keep-alive", "--greeting", "Howdy")) {
             String said = client.send(HttpRequest.newBuilder(URI.create(howdy.url() + "api/greeting")).build(), HttpResponse.BodyHandlers.ofString()).body();
             assertEquals("{\"text\":\"Howdy, you!\"}", said);
         }

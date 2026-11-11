@@ -108,7 +108,7 @@ display: a route then answers 409, and the page offers the browser's own. A libr
 a program opts into.
 
 ```java
-List<Path> chosen = FileDialogs.chooseFilesToOpen("Open a schema", true, new FileDialogs.Filter("XML Schema", List.of("*.xsd")));
+List<Path> chosen = FileDialogs.chooseFilesToOpen("Open readings", true, new FileDialogs.Filter("Readings", List.of("*.csv")));
 ```
 
 ## jtools-web — the Angular page's side

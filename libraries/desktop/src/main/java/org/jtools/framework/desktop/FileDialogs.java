@@ -60,9 +60,9 @@ public final class FileDialogs {
     /** What the dialogs say themselves, in the machine's language: they open on its desktop. */
     private static final Catalogue CATALOGUE = Catalogue.load(FileDialogs.class, "org.jtools.framework.desktop.texts", Locale.ENGLISH, Locale.FRENCH);
 
-    /** What a dialog lets pick: a description and glob patterns ({@code *.xsd}). */
+    /** What a dialog lets pick: a description and glob patterns ({@code *.csv}). */
     public record Filter(String description, List<String> globs) {
-        /** The extensions of the globs, for the toolkits that filter that way ({@code xsd}). */
+        /** The extensions of the globs, for the toolkits that filter that way ({@code csv}). */
         List<String> extensions() {
             return globs.stream().map(g -> g.substring(g.lastIndexOf('.') + 1)).toList();
         }
@@ -281,7 +281,7 @@ public final class FileDialogs {
                 return List.of(command, "--title", title, "--getexistingdirectory", dir);
             }
 
-            /** {@code XML Schema files (*.xsd *.wsdl)} */
+            /** {@code Readings (*.csv *.tsv)} */
             private static String qtFilter(Filter f) {
                 return f.description() + " (" + String.join(" ", f.globs()) + ")";
             }
@@ -305,7 +305,7 @@ public final class FileDialogs {
                 return List.of(command, "--file-selection", "--directory", "--title=" + title, "--filename=" + dir + File.separator);
             }
 
-            /** {@code --file-filter=XML Schema files | *.xsd *.wsdl} */
+            /** {@code --file-filter=Readings | *.csv *.tsv} */
             private static String gtkFilter(Filter f) {
                 return "--file-filter=" + f.description() + " | " + String.join(" ", f.globs());
             }

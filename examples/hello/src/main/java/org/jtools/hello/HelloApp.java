@@ -10,9 +10,9 @@ import org.jtools.framework.app.WebApp;
  * page in the browser, and stops once the page is closed — the command line, the log, the settings and the stop are
  * {@link WebApp}'s; {@code --help} lists them.
  */
-public final class Hello {
+public final class HelloApp {
 
-    private Hello() {}
+    private HelloApp() {}
 
     /** The program: what {@link #main} launches and what the test starts. */
     public static WebApp program() {

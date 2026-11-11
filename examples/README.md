@@ -22,6 +22,6 @@ external/jdk/bin/java -jar examples/greeter/target/greeter.jar --greeting Howdy
 
 ## Read one
 
-Start from the program's class (`Hello`, `TodoApp`, `Greeter`), then its page (`src/main/resources/web/index.html`),
+Start from the program's class (`HelloApp`, `TodoApp`, `GreeterApp`), then its page (`src/main/resources/web/index.html`),
 then its test. The Angular kind of page is the generated project's: `jtools new` makes one
 ([../doc/GETTING-STARTED.md](../doc/GETTING-STARTED.md)).

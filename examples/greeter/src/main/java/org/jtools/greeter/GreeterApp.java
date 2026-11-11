@@ -16,16 +16,16 @@ import org.jtools.framework.support.Texts;
  * {@code ex.texts()}) —, an option of its own on the command line ({@code --greeting Howdy}), and a setting of its own,
  * the name to greet, kept from one run to the next beside the framework's ({@code /api/settings}, {@link SettingsFields}).
  */
-public final class Greeter {
+public final class GreeterApp {
 
     static final String ID = "greeter", GREETING = WebServer.API + "/greeting", J_NAME = "name", J_TEXT = "text";
     /** The program's texts: i18n/greeter.properties, i18n/greeter_fr.properties. */
-    static final Catalogue CATALOGUE = Catalogue.load(Greeter.class, "i18n.greeter", Locale.ENGLISH, Locale.FRENCH);
+    static final Catalogue CATALOGUE = Catalogue.load(GreeterApp.class, "i18n.greeter", Locale.ENGLISH, Locale.FRENCH);
 
     private String word;   // --greeting's, else the language's
 
     public static WebApp program() {
-        Greeter greeter = new Greeter();
+        GreeterApp greeter = new GreeterApp();
         return WebApp.named("Greeter").defaultPort(8087).pageRoot("web").catalogue(CATALOGUE)
                 .option("--greeting", "WORD", "option.greeting", word -> greeter.word = word)
                 .settingsFields(new NameSetting())

@@ -26,7 +26,7 @@ class HelloTest {
     void start() throws Exception {
         node = "org/jtools/hello-test-" + UUID.randomUUID();   // the settings in a node of the test's own, removed after
         System.setProperty("hello.preferences", node);
-        server = Hello.program().start("--port", "0", "--keep-alive");
+        server = HelloApp.program().start("--port", "0", "--keep-alive");
     }
 
     @AfterEach

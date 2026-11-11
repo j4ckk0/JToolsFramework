@@ -21,7 +21,7 @@
     <jtools.app.skip>false</jtools.app.skip>
     <jtools.app.id>hello</jtools.app.id>
     <jtools.app.name>Hello</jtools.app.name>
-    <jtools.app.mainClass>org.jtools.hello.Hello</jtools.app.mainClass>
+    <jtools.app.mainClass>org.jtools.hello.HelloApp</jtools.app.mainClass>
     <jtools.app.port>8089</jtools.app.port>
     <jtools.app.windowsVersion>1.2.0.0</jtools.app.windowsVersion>
   </properties>
