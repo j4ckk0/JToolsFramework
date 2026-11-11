@@ -306,3 +306,18 @@ Each step with its tests, the framework's CI — the generated project built, ru
 - **The framework names no program built on it**: its examples are generic ones (`examples/`), its designs say what it
   is, not where it came from.
 - **Three examples, not one** (§8): `hello`, `todo`, `greeter` — each a step further, all very small.
+- **The baseline is Java 25**, the long-term-support release after 21, decided once 1.2 was written: 1.2.0 is the first
+  release on Maven Central, so it is the first one for Java 25 too. jtools-parent compiles at `--release 25`;
+  the devkit's `externals.conf` names Temurin 25. A program on the framework moves with it: its JDK, and its own
+  bytecode's level unless it keeps a lower one for a library of its own.
+- **The jmods come apart from the JDK**: from JDK 24 on a JDK may carry no `jmods/`, and Temurin's do not — it publishes
+  one jmods archive per platform. `JMODS_LINUX`, `JMODS_WINDOWS`, `JMODS_MACOS` name them; setup deploys them as
+  `external/jmods-<os>`, and the host's JDK archive alone (its `jlink`): the other platforms' JDKs, 280 MB, are no
+  longer downloaded. jtools-dist's `build.xml` links each platform from its jmods archive, else — a JDK up to 23 —
+  from its JDK archive's `jmods/`.
+- **Setup redeploys what changed**: each external remembers the URL it was deployed from (`external/.<name>.url`), and
+  one `externals.conf` now names at another version is deployed again; the other scripts say it is out of date until
+  then. Without it, a new JDK in `externals.conf` would have kept the old one deployed.
+- **A failure's dialog asks for a terminal**, not only a console: a JDK's `System.console()` may answer one with its
+  output redirected (JDK 22 to 24 did by default), which would leave an `.exe` without its dialog; `isTerminal()`
+  says what is meant.

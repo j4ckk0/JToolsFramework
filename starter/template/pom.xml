@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <!-- The build conventions — Java 21, the page built by npm, the program's jar, the distributions — come from
+  <!-- The build conventions — Java 25, the page built by npm, the program's jar, the distributions — come from
        JToolsFramework's jtools-parent (scripts/install.sh there puts it in ~/.m2); this pom says what is this
        project's own: its modules and the jtools.app.* properties of its program. -->
   <parent>

@@ -27,23 +27,32 @@ wants() { grep -q "^$1=" externals.conf; }
 
 [ -f scripts/externals.local.sh ] && . scripts/externals.local.sh
 
-# What setup deploys and is not there; empty when all is.
+# The URL an external was deployed from (external/.<name>.url, which setup writes): one externals.conf no longer names
+# — a new version — is as good as missing.
+url_of() { sed -n "s|^$1=||p" externals.conf | head -1; }
+current() { [ "$(cat "$ext/.$1.url" 2>/dev/null)" = "$(url_of "$2")" ]; }
+
+# What setup deploys and is not there, or is of another version than externals.conf's; empty when all is.
 missing_externals() {
   local m=
-  wants JDK_LINUX && { [ -x "$ext/jdk/bin/java" ] || m="$m jdk/"; }
-  wants MAVEN_LINUX && { [ -x "$ext/maven/bin/mvn" ] || m="$m maven/"; }
-  wants GRADLE && { [ -x "$ext/gradle/bin/gradle" ] || m="$m gradle/"; }
-  wants NODE_LINUX && { [ -x "$ext/node/bin/node" ] || m="$m node/"; }
-  wants JDK_LINUX && { [ -s "$ext/jdk-linux.tar.gz" ] || m="$m jdk-linux.tar.gz"; }
-  wants JDK_WINDOWS && { [ -s "$ext/jdk-windows.zip" ] || m="$m jdk-windows.zip"; }
-  wants JDK_MACOS && { [ -s "$ext/jdk-macos.tar.gz" ] || m="$m jdk-macos.tar.gz"; }
+  wants JDK_LINUX && { [ -x "$ext/jdk/bin/java" ] && current jdk JDK_LINUX || m="$m jdk/"; }
+  wants MAVEN_LINUX && { [ -x "$ext/maven/bin/mvn" ] && current maven MAVEN_LINUX || m="$m maven/"; }
+  wants GRADLE && { [ -x "$ext/gradle/bin/gradle" ] && current gradle GRADLE || m="$m gradle/"; }
+  wants NODE_LINUX && { [ -x "$ext/node/bin/node" ] && current node NODE_LINUX || m="$m node/"; }
+  wants JDK_LINUX && { [ -s "$ext/jdk-linux.tar.gz" ] && current jdk-linux.tar.gz JDK_LINUX || m="$m jdk-linux.tar.gz"; }
+  wants JMODS_LINUX && { [ -s "$ext/jmods-linux.tar.gz" ] && current jmods-linux.tar.gz JMODS_LINUX || m="$m jmods-linux.tar.gz"; }
+  wants JMODS_WINDOWS && { [ -s "$ext/jmods-windows.zip" ] && current jmods-windows.zip JMODS_WINDOWS || m="$m jmods-windows.zip"; }
+  wants JMODS_MACOS && { [ -s "$ext/jmods-macos.tar.gz" ] && current jmods-macos.tar.gz JMODS_MACOS || m="$m jmods-macos.tar.gz"; }
+  # a JDK up to 23 carries its jmods: its archive, for a platform with no JMODS_*
+  wants JDK_WINDOWS && ! wants JMODS_WINDOWS && { [ -s "$ext/jdk-windows.zip" ] && current jdk-windows.zip JDK_WINDOWS || m="$m jdk-windows.zip"; }
+  wants JDK_MACOS && ! wants JMODS_MACOS && { [ -s "$ext/jdk-macos.tar.gz" ] && current jdk-macos.tar.gz JDK_MACOS || m="$m jdk-macos.tar.gz"; }
   if declare -F missing_local_externals >/dev/null; then m="$m$(missing_local_externals)"; fi
   echo "$m"
 }
 
 missing=$(missing_externals)
 if [ -n "$missing" ]; then
-  echo "external/ is not set up: missing$missing (scripts/setup.sh deploys them, see README: Externals)" >&2
+  echo "external/ is not set up: missing, or of another version than externals.conf's:$missing (scripts/setup.sh deploys them)" >&2
   if [ -t 0 ] && [ -t 2 ]; then
     read -r -p "Run scripts/setup.sh now? [Y/n] " answer
     case "$answer" in ''|[Yy]*) scripts/setup.sh ;; *) exit 1 ;; esac

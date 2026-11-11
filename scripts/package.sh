@@ -3,7 +3,7 @@
 #
 # Build the self-contained distributions (jar + a runtime jlink trims to what the program needs + launchers;
 # <name>.exe without a console), into releases/:
-#   releases/<id>-<version>-linux.tar.gz, -windows.zip, and -macos.tar.gz when externals.conf names JDK_MACOS
+#   releases/<id>-<version>-linux.tar.gz, -windows.zip, and -macos.tar.gz when externals.conf names JMODS_MACOS
 #
 #   scripts/package.sh
 #   scripts/package.sh -DskipTests      # extra arguments are passed to mvn
@@ -41,7 +41,7 @@ check_jar=$(mktemp)
 trap 'rm -f "$check_jar"' EXIT
 base="$APP_ID-$version"
 archives=("releases/$base-windows.zip" "releases/$base-linux.tar.gz")
-[ -s external/jdk-macos.tar.gz ] && archives+=("releases/$base-macos.tar.gz")
+{ [ -s external/jmods-macos.tar.gz ] || [ -s external/jdk-macos.tar.gz ]; } && archives+=("releases/$base-macos.tar.gz")
 for archive in "${archives[@]}"; do
   [ -f "$archive" ] || { echo "no $archive: the build did not make it" >&2; exit 1; }
   case "$archive" in

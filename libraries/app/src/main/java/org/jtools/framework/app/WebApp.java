@@ -513,7 +513,10 @@ public final class WebApp {
     private void fail(String logged, String shown, int code) {
         Logging.toFileOnly(Level.SEVERE, WebApp.class.getName(), logged);
         System.err.println(shown);
-        if (System.console() == null && !GraphicsEnvironment.isHeadless()) {
+        // no terminal to read it — an .exe, a double-click —: a console that is not a terminal counts as none (a JDK's
+        // System.console() may answer one even with its output redirected)
+        java.io.Console console = System.console();
+        if ((console == null || !console.isTerminal()) && !GraphicsEnvironment.isHeadless()) {
             try {
                 JOptionPane.showMessageDialog(null, shown, name, JOptionPane.ERROR_MESSAGE);
             } catch (Exception noDialog) { /* the console said it */ }

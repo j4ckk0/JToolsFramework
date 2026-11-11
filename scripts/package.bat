@@ -3,7 +3,7 @@ rem Managed by JToolsFramework's devkit (scripts/jtools sync refreshes it): chan
 rem
 rem Build the self-contained distributions (jar + a runtime jlink trims to what the program needs + launchers;
 rem <name>.exe without a console), into releases\:
-rem   releases\<id>-<version>-linux.tar.gz, -windows.zip, and -macos.tar.gz when externals.conf names JDK_MACOS
+rem   releases\<id>-<version>-linux.tar.gz, -windows.zip, and -macos.tar.gz when externals.conf names JMODS_MACOS
 rem
 rem   scripts\package.bat
 rem   scripts\package.bat -DskipTests      extra arguments are passed to mvn
@@ -35,7 +35,10 @@ rem What every distribution must carry: the jar, its launchers, the .ini and the
 set "BASE=%APP_ID%-%VERSION%"
 call :check "releases\%BASE%-windows.zip" %APP_ID%.jar "%APP_NAME%.exe" %APP_ID%.bat %APP_ID%.ini README.md jre/bin/java.exe jre/release || exit /b 1
 call :check "releases\%BASE%-linux.tar.gz" %APP_ID%.jar %APP_ID%.sh %APP_ID%.ini README.md jre/bin/java jre/release || exit /b 1
-if exist external\jdk-macos.tar.gz call :check "releases\%BASE%-macos.tar.gz" %APP_ID%.jar %APP_ID%.sh %APP_ID%.ini README.md jre/bin/java jre/release || exit /b 1
+set "MACOS="
+if exist external\jmods-macos.tar.gz set "MACOS=1"
+if exist external\jdk-macos.tar.gz set "MACOS=1"
+if defined MACOS call :check "releases\%BASE%-macos.tar.gz" %APP_ID%.jar %APP_ID%.sh %APP_ID%.ini README.md jre/bin/java jre/release || exit /b 1
 echo == releases\ checked: each with its runtime and launchers
 exit /b 0
 

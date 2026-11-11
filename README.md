@@ -8,7 +8,7 @@ JToolsFramework is four things, each with a door below:
 
 - **a small framework** — the libraries a program's code calls: the server, the routes, the command line, the
   settings, the log, the stop (`jtools-app`, the JDK and nothing else);
-- **its build conventions** — the parent pom a project inherits: Java 21, the tests, the program's one jar, the
+- **its build conventions** — the parent pom a project inherits: Java 25, the tests, the program's one jar, the
   distributions with a runtime jlink trims (`jtools-parent`);
 - **a development environment** — the scripts a project carries (setup, build, run, package…), its tools downloaded
   into the project, never taken from the machine (`jtools-devkit`);
@@ -79,7 +79,7 @@ a Gradle build takes `jtools-bom`'s versions instead. The project's scripts — 
 ## Developing the framework
 
 ```bash
-scripts/setup.sh       # the externals: JDK 21, Maven, Node.js, the JDK archives (once)
+scripts/setup.sh       # the externals: JDK 25, Maven, Node.js, each platform's jmods (once)
 scripts/install.sh     # versions agree, build, test, install into ~/.m2
 scripts/ci.sh          # the same quietly, then: the framework's scripts equal the devkit's, and a project made by a lone
                        # scripts/jtools from the installed devkit passes its own CI

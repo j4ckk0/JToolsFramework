@@ -3,14 +3,17 @@
 #
 # Deploys the project's externals into external/ (not under source control), from externals.conf — each tool only
 # when externals.conf names it:
-#   external/jdk, maven, gradle, node                    JDK_*, MAVEN_*, GRADLE, NODE_*: extracted, their top directory stripped
-#   external/jdk-linux.tar.gz, jdk-windows.zip, jdk-macos.tar.gz  JDK_*: the JDKs the distributions' runtimes are linked
-#                                                                 from, kept as archives (hard links to the downloads)
-#   external/downloads/                                  the archives as downloaded (kept: a second run downloads nothing)
+#   external/jdk, maven, gradle, node    JDK_LINUX, MAVEN_LINUX, GRADLE, NODE_LINUX: extracted, their top directory stripped
+#   external/jdk-linux.tar.gz            JDK_LINUX again, as its archive: the jlink that links the distributions' runtimes
+#   external/jmods-linux.tar.gz, jmods-windows.zip, jmods-macos.tar.gz   JMODS_*: the jmods each platform's runtime is
+#                                        linked from, kept as archives (hard links to the downloads)
+#   external/downloads/                  the archives as downloaded (kept: a second run downloads nothing)
+# Each external remembers the URL it was deployed from (external/.<name>.url): one externals.conf names at another
+# version is deployed again — a new JDK is a line changed there, then this script.
 # then the project's own extras: scripts/setup.local.sh, when it has one, is sourced with fetch and deploy at hand,
 # $force set, and the options this script does not know in $local_args.
 #
-#   scripts/setup.sh            deploys what is missing
+#   scripts/setup.sh            deploys what is missing, or deployed from another URL than externals.conf's
 #   scripts/setup.sh --force    downloads and deploys everything again
 #
 # MIRROR=<url> in externals.conf, or in the environment, fetches <MIRROR>/<file name> instead of the URLs;
@@ -96,30 +99,38 @@ deploy() {
 
 mkdir -p "$ext" "$dl"
 
-# the tools, under their generic names: present when their launcher is (a failed deployment leaves none)
+# Whether an external is deployed from the URL externals.conf names now (external/.<name>.url says the one it came from).
+deployed_from() { [ "$(cat "$ext/.$1.url" 2>/dev/null)" = "$2" ]; }
+stamp() { printf '%s\n' "$2" > "$ext/.$1.url"; }
+
+# the tools, under their generic names: present when their launcher is (a failed deployment leaves none), from that URL
 for spec in "jdk JDK_LINUX bin/java" "maven MAVEN_LINUX bin/mvn" "gradle GRADLE bin/gradle" "node NODE_LINUX bin/node"; do
   set -- $spec
   [ -n "${!2:-}" ] || continue   # a tool this project does without
   dir=$ext/$1
-  if [ -x "$dir/$3" ] && ! $force; then echo "== $dir present"; continue; fi
+  if [ -x "$dir/$3" ] && deployed_from "$1" "${!2}" && ! $force; then echo "== $dir present"; continue; fi
   file=$(fetch "${!2}") || exit 1   # downloaded before the directory is touched
   deploy "$file" "$dir"
+  stamp "$1" "${!2}"
   echo "== $dir deployed"
 done
 
-# the JDKs the distributions' runtimes are linked from, kept as archives under generic names: a hard link to the
-# download when both are on one file system (they weigh 200 MB each), a copy otherwise
-for spec in "jdk-linux.tar.gz JDK_LINUX" "jdk-windows.zip JDK_WINDOWS" "jdk-macos.tar.gz JDK_MACOS"; do
+# the archives the distributions are made from, under generic names: the JDK's own (its jlink), and the jmods of each
+# platform — a hard link to the download when both are on one file system, a copy otherwise
+# — and, for a platform with no JMODS_* (a JDK up to 23, which carries its jmods), that platform's JDK archive instead
+for spec in "jdk-linux.tar.gz JDK_LINUX" "jmods-linux.tar.gz JMODS_LINUX" "jmods-windows.zip JMODS_WINDOWS" "jmods-macos.tar.gz JMODS_MACOS" \
+            "jdk-windows.zip JDK_WINDOWS JMODS_WINDOWS" "jdk-macos.tar.gz JDK_MACOS JMODS_MACOS"; do
   set -- $spec
   [ -n "${!2:-}" ] || continue
+  [ -n "${3:-}" ] && [ -n "${!3:-}" ] && continue   # that platform's jmods come apart
   target=$ext/$1
-  if [ -s "$target" ] && ! $force; then echo "== $target present"; continue; fi
+  if [ -s "$target" ] && deployed_from "$1" "${!2}" && ! $force; then echo "== $target present"; continue; fi
   file=$(fetch "${!2}") || exit 1
   rm -f "$target"
   ln "$file" "$target" 2>/dev/null || cp "$file" "$target"
+  stamp "$1" "${!2}"
   echo "== $target deployed"
 done
-
 # the project's own extras
 if [ -f scripts/setup.local.sh ]; then . scripts/setup.local.sh; fi
 

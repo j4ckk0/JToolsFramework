@@ -45,7 +45,8 @@ presence protocol is the same.
 ### 3. The distributions
 
 With `-Pdist`, jtools-parent's profile builds the Linux, macOS and Windows archives with a runtime jlink trims, from the
-JDK archives in `external/` (`jdk-linux.tar.gz`… or Temurin's own names; `jtools.jdk.archives` names another folder).
+jmods in `external/` (`jmods-linux.tar.gz`… or Temurin's own names; for a JDK up to 23, its JDK archives;
+`jtools.jdk.archives` names another folder).
 The program's assembly descriptors, launch4j configuration and launchers go; what the archives carry of the repository
 is `jtools.dist.include` (`samples/**`), of the module `src/dist/files/`. A flavour of the program's own — archives
 carrying more, a large model or a data set — stays its own profile, made of what the parent's has just made

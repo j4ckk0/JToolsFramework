@@ -9,7 +9,7 @@
 
   <!-- The parent of every project on JToolsFramework, and of the framework's own modules: the conventions of the build,
        said once. A project's root pom names it as <parent>, sets the jtools.app.* properties below, and gets:
-         - Java 21, UTF-8, JUnit 5, the plugins' versions, the tests run from the root of the repository;
+         - Java 25, UTF-8, JUnit 5, the plugins' versions, the tests run from the root of the repository;
          - in a module holding an angular.json: the page built by npm (install, build, test), its build under
            static/ in the module's jar, and @jtools/web unpacked into target/jtools-web (profile jtools-frontend);
          - in the module setting jtools.program.skip to false: the program's one jar, embedding every module
@@ -65,7 +65,7 @@
   <properties>
     <!-- the framework's version, for the projects' dependencies on its modules: always this pom's own <version> -->
     <jtools.version>1.2.0</jtools.version>
-    <maven.compiler.release>21</maven.compiler.release>
+    <maven.compiler.release>25</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <junit.version>5.12.2</junit.version>
 
@@ -452,9 +452,9 @@
         releases/<id>-<version>-macos.tar.gz   the same, Apple silicon
         releases/<id>-<version>-windows.zip    <name>.exe (no console), <id>.bat (console), the same, jre\
       plus whatever the module keeps in src/dist/files/. Each jre/ is a runtime jlink trims to the modules the program
-      needs (jdeps on its jar, and jtools.dist.modules.extra), linked from that platform's JDK in external/
-      (jdk-linux.tar.gz, jdk-windows.zip, jdk-macos.tar.gz: scripts/setup.sh); a platform whose JDK is not there is not
-      built. jtools-dist's build.xml does it, once the program's jar is made.
+      needs (jdeps on its jar, and jtools.dist.modules.extra), linked from that platform's jmods in external/
+      (jmods-linux.tar.gz, jmods-windows.zip, jmods-macos.tar.gz: scripts/setup.sh); a platform whose jmods are not
+      there is not built. jtools-dist's build.xml does it, once the program's jar is made.
     -->
     <profile>
       <id>dist</id>

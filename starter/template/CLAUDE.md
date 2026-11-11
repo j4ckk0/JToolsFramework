@@ -6,7 +6,7 @@ feature goes). This project is built on JToolsFramework __JTOOLS_VERSION__ (http
 
 ## What it is
 
-A local web application: a Java 21 server (JToolsFramework's `WebServer`, the JDK's own HttpServer) holds the whole
+A local web application: a Java 25 server (JToolsFramework's `WebServer`, the JDK's own HttpServer) holds the whole
 business; an Angular page is its view only. It serves `http://127.0.0.1:__APP_PORT__/`, opens the browser, and stops
 15 s after its last page is closed (`--keep-alive` or `--no-browser` keep it running).
 
@@ -22,7 +22,7 @@ business; an Angular page is its view only. It serves `http://127.0.0.1:__APP_PO
 ## Commands
 
 ```bash
-scripts/setup.sh [--force]     # externals into external/ (JDK 21, Maven, Node 24, the JDK archives)
+scripts/setup.sh [--force]     # externals into external/ (JDK 25, Maven, Node 24, each platform's jmods)
 scripts/build.sh [-DskipTests] # clean build, every test (JUnit + vitest)
 scripts/ci.sh                  # quiet, npm ci; the pre-push hook runs it
 scripts/run.sh [--rebuild] [--port N] [--no-browser] [--keep-alive]

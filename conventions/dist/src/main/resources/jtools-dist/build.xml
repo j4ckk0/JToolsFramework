@@ -4,11 +4,12 @@
 
     modules        the modules the program needs: what jdeps finds in its jar, and jtools.dist.modules.extra
                    besides (what no class names: the charsets, the elliptic curves of TLS)
-    runtimes       for each platform whose JDK archive is in jdk.archives — jdk-linux.tar.gz, jdk-windows.zip,
-                   jdk-macos.tar.gz (what scripts/setup.sh deploys), or Temurin's own names (*jdk*linux*.tar.gz,
-                   *jdk*windows*.zip, *jdk*mac*.tar.gz: a JRE's do not match) —, its jmods unpacked and a trimmed
-                   runtime linked from them by the jlink of this machine's platform's archive — of the archives'
-                   version by construction, whatever JDK runs the build —, else of the JDK running it
+    runtimes       for each platform whose jmods are in jdk.archives, a trimmed runtime linked from them: its jmods
+                   archive — jmods-linux.tar.gz, jmods-windows.zip, jmods-macos.tar.gz (what scripts/setup.sh deploys),
+                   or Temurin's own names, *jmods*linux*.tar.gz… —, a JDK from 24 on carrying none of its own; else
+                   its JDK archive's jmods/ (a JDK up to 23: jdk-linux.tar.gz…, *jdk*linux*.tar.gz…, a JRE's do not
+                   match). Linked by the jlink of this machine's platform's JDK archive — of the jmods' version by
+                   construction, whatever JDK runs the build —, else of the JDK running it
     distributions  <id>-<version>-linux.tar.gz and -macos.tar.gz (<id>.sh), -windows.zip (<name>.exe without a
                    console, <id>.bat with one): the jar, the launchers, <id>.ini, the README, LICENSE and NOTICE when
                    the project has them, what jtools.dist.include names of the repository (samples/**) under the
@@ -28,6 +29,9 @@
   <patternset id="jdk.linux"><include name="jdk-linux.tar.gz"/><include name="*jdk*linux*.tar.gz"/></patternset>
   <patternset id="jdk.windows"><include name="jdk-windows.zip"/><include name="*jdk*windows*.zip"/></patternset>
   <patternset id="jdk.macos"><include name="jdk-macos.tar.gz"/><include name="*jdk*mac*.tar.gz"/></patternset>
+  <patternset id="jmods.linux"><include name="jmods-linux.tar.gz"/><include name="*jmods*linux*.tar.gz"/></patternset>
+  <patternset id="jmods.windows"><include name="jmods-windows.zip"/><include name="*jmods*windows*.zip"/></patternset>
+  <patternset id="jmods.macos"><include name="jmods-macos.tar.gz"/><include name="*jmods*mac*.tar.gz"/></patternset>
   <condition property="exec.suffix" value=".exe"><os family="windows"/></condition>
   <condition property="host" value="windows"><os family="windows"/></condition>
   <condition property="host" value="macos"><os family="mac"/></condition>
@@ -37,12 +41,22 @@
     <condition property="jdk.linux"><resourcecount when="greater" count="0"><fileset dir="${jdk.archives}" erroronmissingdir="false"><patternset refid="jdk.linux"/></fileset></resourcecount></condition>
     <condition property="jdk.windows"><resourcecount when="greater" count="0"><fileset dir="${jdk.archives}" erroronmissingdir="false"><patternset refid="jdk.windows"/></fileset></resourcecount></condition>
     <condition property="jdk.macos"><resourcecount when="greater" count="0"><fileset dir="${jdk.archives}" erroronmissingdir="false"><patternset refid="jdk.macos"/></fileset></resourcecount></condition>
-    <condition property="jdk.none"><not><or><isset property="jdk.linux"/><isset property="jdk.windows"/><isset property="jdk.macos"/></or></not></condition>
-    <fail if="jdk.none" message="no JDK archive in ${jdk.archives} (jdk-linux.tar.gz, jdk-windows.zip, jdk-macos.tar.gz, or Temurin's *jdk*linux*.tar.gz…): run scripts/setup.sh (see README: Externals)"/>
+    <condition property="jmods.linux"><resourcecount when="greater" count="0"><fileset dir="${jdk.archives}" erroronmissingdir="false"><patternset refid="jmods.linux"/></fileset></resourcecount></condition>
+    <condition property="jmods.windows"><resourcecount when="greater" count="0"><fileset dir="${jdk.archives}" erroronmissingdir="false"><patternset refid="jmods.windows"/></fileset></resourcecount></condition>
+    <condition property="jmods.macos"><resourcecount when="greater" count="0"><fileset dir="${jdk.archives}" erroronmissingdir="false"><patternset refid="jmods.macos"/></fileset></resourcecount></condition>
+    <!-- a platform is built when its jmods are there, apart or in its JDK archive -->
+    <condition property="platform.linux"><or><isset property="jmods.linux"/><isset property="jdk.linux"/></or></condition>
+    <condition property="platform.windows"><or><isset property="jmods.windows"/><isset property="jdk.windows"/></or></condition>
+    <condition property="platform.macos"><or><isset property="jmods.macos"/><isset property="jdk.macos"/></or></condition>
+    <condition property="jdk-jmods.linux"><and><isset property="jdk.linux"/><not><isset property="jmods.linux"/></not></and></condition>
+    <condition property="jdk-jmods.windows"><and><isset property="jdk.windows"/><not><isset property="jmods.windows"/></not></and></condition>
+    <condition property="jdk-jmods.macos"><and><isset property="jdk.macos"/><not><isset property="jmods.macos"/></not></and></condition>
+    <condition property="platform.none"><not><or><isset property="platform.linux"/><isset property="platform.windows"/><isset property="platform.macos"/></or></not></condition>
+    <fail if="platform.none" message="no jmods in ${jdk.archives} (jmods-linux.tar.gz, jmods-windows.zip, jmods-macos.tar.gz, Temurin's *jmods*linux*.tar.gz…, or a JDK up to 23's archive): run scripts/setup.sh (see doc/DEVKIT.md)"/>
   </target>
 
   <!-- jdeps and jlink: those of this machine's platform's archive, unpacked whole — jlink links only jmods of its own
-       version, and the JDK running the build may be another (a system Java 25 building for 21) —, else the running JDK's -->
+       version, and the JDK running the build may be another (a system Java of another update) —, else the running JDK's -->
   <target name="tools" depends="detect">
     <condition property="host.linux"><and><equals arg1="${host}" arg2="linux"/><isset property="jdk.linux"/></and></condition>
     <condition property="host.windows"><and><equals arg1="${host}" arg2="windows"/><isset property="jdk.windows"/></and></condition>
@@ -78,8 +92,17 @@
     <echo message="the runtimes' modules: ${modules}"/>
   </target>
 
-  <!-- only the jmods of each archive: the rest of a JDK is of no use to jlink -->
-  <target name="unpack-linux" if="jdk.linux">
+  <!-- each platform's jmods, from its jmods archive (one top folder of .jmod files), else from its JDK archive's jmods/ -->
+  <target name="unpack-linux" depends="unpack-linux-jmods, unpack-linux-jdk"/>
+  <target name="unpack-linux-jmods" if="jmods.linux">
+    <delete dir="${jmods}/linux"/>
+    <untar dest="${jmods}/linux" compression="gzip">
+      <fileset dir="${jdk.archives}"><patternset refid="jmods.linux"/></fileset>
+      <patternset includes="*/*.jmod"/>
+      <cutdirsmapper dirs="1"/>
+    </untar>
+  </target>
+  <target name="unpack-linux-jdk" if="jdk-jmods.linux">
     <delete dir="${jmods}/linux"/>
     <untar dest="${jmods}/linux" compression="gzip">
       <fileset dir="${jdk.archives}"><patternset refid="jdk.linux"/></fileset>
@@ -87,7 +110,16 @@
       <cutdirsmapper dirs="2"/>
     </untar>
   </target>
-  <target name="unpack-windows" if="jdk.windows">
+  <target name="unpack-windows" depends="unpack-windows-jmods, unpack-windows-jdk"/>
+  <target name="unpack-windows-jmods" if="jmods.windows">
+    <delete dir="${jmods}/windows"/>
+    <unzip dest="${jmods}/windows">
+      <fileset dir="${jdk.archives}"><patternset refid="jmods.windows"/></fileset>
+      <patternset includes="*/*.jmod"/>
+      <cutdirsmapper dirs="1"/>
+    </unzip>
+  </target>
+  <target name="unpack-windows-jdk" if="jdk-jmods.windows">
     <delete dir="${jmods}/windows"/>
     <unzip dest="${jmods}/windows">
       <fileset dir="${jdk.archives}"><patternset refid="jdk.windows"/></fileset>
@@ -95,7 +127,16 @@
       <cutdirsmapper dirs="2"/>
     </unzip>
   </target>
-  <target name="unpack-macos" if="jdk.macos">
+  <target name="unpack-macos" depends="unpack-macos-jmods, unpack-macos-jdk"/>
+  <target name="unpack-macos-jmods" if="jmods.macos">
+    <delete dir="${jmods}/macos"/>
+    <untar dest="${jmods}/macos" compression="gzip">
+      <fileset dir="${jdk.archives}"><patternset refid="jmods.macos"/></fileset>
+      <patternset includes="*/*.jmod"/>
+      <cutdirsmapper dirs="1"/>
+    </untar>
+  </target>
+  <target name="unpack-macos-jdk" if="jdk-jmods.macos">
     <delete dir="${jmods}/macos"/>
     <untar dest="${jmods}/macos" compression="gzip">
       <fileset dir="${jdk.archives}"><patternset refid="jdk.macos"/></fileset>
@@ -103,7 +144,6 @@
       <cutdirsmapper dirs="4"/>
     </untar>
   </target>
-
   <macrodef name="link">
     <attribute name="os"/>
     <sequential>
@@ -120,9 +160,9 @@
       </exec>
     </sequential>
   </macrodef>
-  <target name="link-linux" if="jdk.linux"><link os="linux"/></target>
-  <target name="link-windows" if="jdk.windows"><link os="windows"/></target>
-  <target name="link-macos" if="jdk.macos"><link os="macos"/></target>
+  <target name="link-linux" if="platform.linux"><link os="linux"/></target>
+  <target name="link-windows" if="platform.windows"><link os="windows"/></target>
+  <target name="link-macos" if="platform.macos"><link os="macos"/></target>
 
   <target name="runtimes" depends="modules, unpack-linux, unpack-windows, unpack-macos, link-linux, link-windows, link-macos"/>
 
@@ -162,9 +202,9 @@
       </tar>
     </sequential>
   </macrodef>
-  <target name="dist-linux" if="jdk.linux"><unix-dist os="linux"/></target>
-  <target name="dist-macos" if="jdk.macos"><unix-dist os="macos"/></target>
-  <target name="dist-windows" if="jdk.windows">
+  <target name="dist-linux" if="platform.linux"><unix-dist os="linux"/></target>
+  <target name="dist-macos" if="platform.macos"><unix-dist os="macos"/></target>
+  <target name="dist-windows" if="platform.windows">
     <zip destfile="${release.dir}/${dist.name}-windows.zip">
       <zipfileset file="${jar}" fullpath="${dist.name}/${jtools.app.id}.jar"/>
       <zipfileset file="${exe}" fullpath="${dist.name}/${jtools.app.name}.exe"/>

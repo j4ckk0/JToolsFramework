@@ -28,7 +28,7 @@ other scripts offer to when it has not been run. JToolsFramework comes from Mave
 repository where a clone of it puts it (its `scripts/install.sh`).
 
 ```bash
-scripts/setup.sh                 # the externals: JDK 21, Maven, Node.js, the JDK archives (once)
+scripts/setup.sh                 # the externals: JDK 25, Maven, Node.js, each platform's jmods (once)
 scripts/build.sh                 # mvn clean package: app/target/__APP_ID__.jar, every test (Java and the page's)
 scripts/build.sh -DskipTests     # extra arguments go to mvn
 scripts/ci.sh                    # quiet, the page's dependencies exactly as package-lock.json has them (npm ci)
@@ -64,10 +64,11 @@ Nothing the build needs is under source control nor taken from the machine: `scr
 
 | `external/` | What it is |
 |---|---|
-| `jdk/` | Temurin JDK 21 (every script's `JAVA_HOME`) |
+| `jdk/` | Temurin JDK 25 (every script's `JAVA_HOME`) |
 | `maven/` | Maven, the build |
 | `node/` | Node.js and npm, the page's build (run by Maven) |
-| `jdk-linux.tar.gz`, `jdk-windows.zip`, `jdk-macos.tar.gz` | the Temurin JDKs the distributions' runtimes are linked from (jlink) |
+| `jdk-linux.tar.gz` | the same JDK as its archive: the `jlink` that links the distributions' runtimes |
+| `jmods-linux.tar.gz`, `jmods-windows.zip`, `jmods-macos.tar.gz` | each platform's jmods, which the runtimes are linked from |
 
 ## Packaging
 

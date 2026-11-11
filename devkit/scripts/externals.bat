@@ -21,7 +21,7 @@ for /f "usebackq eol=# tokens=1* delims==" %%a in ("jtools.conf") do set "%%a=%%
 set "EXT=%CD%\external"
 call :missing
 if defined MISSING (
-  echo external\ is not set up: missing%MISSING% ^(scripts\setup.bat deploys them, see README: Externals^) >&2
+  echo external\ is not set up: missing, or of another version than externals.conf's:%MISSING% ^(scripts\setup.bat deploys them^) >&2
   choice /c YN /n /t 30 /d N /m "Run scripts\setup.bat now? [Y/N] "
   if errorlevel 2 exit /b 1
   call "%~dp0setup.bat" || exit /b 1
@@ -39,17 +39,28 @@ set "JAR="
 if defined APP_ID set "JAR=%APP_MODULE%\target\%APP_ID%.jar"
 exit /b 0
 
-rem ---- what setup deploys and is not there, in MISSING (undefined when all is there); a tool externals.conf does
-rem      not name is not wanted
+rem ---- what setup deploys and is not there, or came from another URL than externals.conf names, in MISSING (undefined
+rem      when all is there); a tool externals.conf does not name is not wanted
 :missing
 set "MISSING="
-call :wanted JDK_WINDOWS && if not exist "%EXT%\jdk\bin\java.exe" set "MISSING=%MISSING% jdk\"
-call :wanted MAVEN_WINDOWS && if not exist "%EXT%\maven\bin\mvn.cmd" set "MISSING=%MISSING% maven\"
-call :wanted GRADLE && if not exist "%EXT%\gradle\bin\gradle.bat" set "MISSING=%MISSING% gradle\"
-call :wanted NODE_WINDOWS && if not exist "%EXT%\node\node.exe" set "MISSING=%MISSING% node\"
-call :wanted JDK_LINUX && if not exist "%EXT%\jdk-linux.tar.gz" set "MISSING=%MISSING% jdk-linux.tar.gz"
-call :wanted JDK_WINDOWS && if not exist "%EXT%\jdk-windows.zip" set "MISSING=%MISSING% jdk-windows.zip"
-call :wanted JDK_MACOS && if not exist "%EXT%\jdk-macos.tar.gz" set "MISSING=%MISSING% jdk-macos.tar.gz"
+call :wanted JDK_WINDOWS && call :check jdk JDK_WINDOWS "jdk\bin\java.exe" "jdk\"
+call :wanted MAVEN_WINDOWS && call :check maven MAVEN_WINDOWS "maven\bin\mvn.cmd" "maven\"
+call :wanted GRADLE && call :check gradle GRADLE "gradle\bin\gradle.bat" "gradle\"
+call :wanted NODE_WINDOWS && call :check node NODE_WINDOWS "node\node.exe" "node\"
+call :wanted JDK_WINDOWS && call :check jdk-windows.zip JDK_WINDOWS jdk-windows.zip jdk-windows.zip
+call :wanted JMODS_LINUX && call :check jmods-linux.tar.gz JMODS_LINUX jmods-linux.tar.gz jmods-linux.tar.gz
+call :wanted JMODS_WINDOWS && call :check jmods-windows.zip JMODS_WINDOWS jmods-windows.zip jmods-windows.zip
+call :wanted JMODS_MACOS && call :check jmods-macos.tar.gz JMODS_MACOS jmods-macos.tar.gz jmods-macos.tar.gz
+exit /b 0
+
+rem ---- %3 present under external\ and deployed from the URL externals.conf names for %2 (external\.%1.url), else %4 missing
+:check
+set "STAMP="
+set "WANT="
+if exist "%EXT%\.%~1.url" set /p STAMP=<"%EXT%\.%~1.url"
+for /f "tokens=1* delims==" %%a in ('findstr /b /c:"%~2=" externals.conf') do set "WANT=%%b"
+if not exist "%EXT%\%~3" (set "MISSING=%MISSING% %~4" & exit /b 0)
+if not "%STAMP%"=="%WANT%" set "MISSING=%MISSING% %~4"
 exit /b 0
 
 :wanted

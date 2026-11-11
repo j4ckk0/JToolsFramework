@@ -10,7 +10,7 @@ A project on JToolsFramework builds, runs and packages with the same scripts as 
 
 | Script | What it does |
 |---|---|
-| `scripts/setup.sh` | downloads the externals `externals.conf` names into `external/` — the JDK, Maven, Node.js, the JDK archives the distributions link their runtimes from —, once; `--force` downloads again. The other scripts offer to run it when something is missing |
+| `scripts/setup.sh` | downloads the externals `externals.conf` names into `external/` — the JDK, Maven, Node.js, each platform's jmods the distributions' runtimes are linked from —, once, and again for what `externals.conf` names at another version; `--force` downloads everything again. The other scripts offer to run it when something is missing |
 | `scripts/build.sh` | a clean build with every test (`BUILD_GOALS`); extra arguments go to Maven (`-DskipTests`) |
 | `scripts/ci.sh` | the same, quiet, the page's dependencies installed exactly (`npm ci`), then `scripts/ci.local.sh` when there is one: what `.githooks/pre-push` runs before every push (`git config core.hooksPath .githooks`, which `jtools new` sets) |
 | `scripts/run.sh` | builds when a source is newer than the jar, then runs a copy of it (so that a build can replace the jar meanwhile) with the arguments given: `scripts/run.sh --no-browser --port 9090`; `--rebuild` forces the build |
@@ -64,10 +64,18 @@ and again when `~/.m2` holds a newer jar of that version. It needs `curl` and `u
 ## externals.conf
 
 Each tool is deployed only when `externals.conf` names it: `JDK_*` → `external/jdk`, `MAVEN_*` → `external/maven`,
-`NODE_*` → `external/node`, `GRADLE` → `external/gradle`; `JDK_LINUX`, `JDK_WINDOWS`, `JDK_MACOS` → also the archives
-`external/jdk-linux.tar.gz`, `jdk-windows.zip`, `jdk-macos.tar.gz` the distributions' runtimes are linked from (hard
-links to the downloads). A project without a page drops `NODE_*`; one without a macOS distribution drops `JDK_MACOS`.
-The versions live there and nowhere else; `jtools new` copies the devkit's, `sync` reports where they differ.
+`NODE_*` → `external/node`, `GRADLE` → `external/gradle`; the host's JDK (`JDK_LINUX`, on Windows `JDK_WINDOWS`)
+also as its archive, `external/jdk-linux.tar.gz`, whose `jlink` links the distributions' runtimes; `JMODS_LINUX`,
+`JMODS_WINDOWS`, `JMODS_MACOS` → `external/jmods-linux.tar.gz`, `jmods-windows.zip`, `jmods-macos.tar.gz`, the jmods each
+platform's runtime is linked from (a JDK from 24 on carries none: Temurin publishes them apart, of the same version).
+All are hard links to the downloads. A project without a page drops `NODE_*`; one without a macOS distribution drops
+`JMODS_MACOS`. A JDK up to 23 needs no `JMODS_*`: its archive carries its jmods (`JDK_WINDOWS`, `JDK_MACOS` → its
+archives then).
+
+The versions live there and nowhere else; `jtools new` copies the devkit's, `sync` reports where they differ. **A new
+version is a line changed there, then `scripts/setup.sh`**: each external remembers the URL it was deployed from
+(`external/.<name>.url`), and one deployed from another URL is deployed again — the other scripts say it is out of
+date until then.
 `JTOOLS_DOWNLOADS=<dir>` in the environment shares one downloads folder between projects.
 
 **Behind a company's proxy**: `MIRROR=<url>` — an Artifactory, any HTTP folder holding the same file names —, and

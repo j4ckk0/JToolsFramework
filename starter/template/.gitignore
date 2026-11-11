@@ -8,7 +8,7 @@ target/
 
 # The distributions (scripts/package.*), kept from one build to the next
 /releases/
-# The externals: JDK, Maven, Node.js, the JDK archives the distributions' runtimes are linked from (scripts/setup.sh, README: Externals)
+# The externals: JDK, Maven, Node.js, the jmods the distributions' runtimes are linked from (scripts/setup.sh, README: Externals)
 /external
 # your mirror and its credentials (setup reads it on top of externals.conf)
 /externals.local.conf

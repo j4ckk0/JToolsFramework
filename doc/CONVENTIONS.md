@@ -25,7 +25,7 @@ And in the program's module, `<jtools.program.skip>false</jtools.program.skip>`:
 
 ## What every module gets
 
-Java 21 (`maven.compiler.release`), UTF-8, JUnit 5 (a test dependency of every module), the plugins' versions, the
+Java 25 (`maven.compiler.release`), UTF-8, JUnit 5 (a test dependency of every module), the plugins' versions, the
 tests run from the root of the repository (`workingDirectory`: they read `pom.xml`, `frontend/…`, `samples/` by
 relative paths), `Implementation-Title`/`-Version` in every jar's manifest.
 
@@ -56,11 +56,13 @@ no package to publish nor any `package-lock.json` integrity to keep — the Mave
   `target/jtools-dist`, `<Name>.exe` (launch4j), then — once the program's jar is made — `jtools-dist`'s `build.xml`:
   1. the modules: what `jdeps` finds in the jar, and `jtools.dist.modules.extra` besides (`jdk.charsets,jdk.crypto.ec`
      by default: what no class names — files in any encoding, the elliptic curves TLS needs);
-  2. a runtime per platform whose JDK is in `external/` (`jdk-linux.tar.gz`, `jdk-windows.zip`, `jdk-macos.tar.gz`,
-     which `scripts/setup.sh` deploys — or Temurin's own names, `*jdk*linux*.tar.gz`…, in the folder
-     `jtools.jdk.archives` names, a `jre/` say): its `jmods` unpacked, linked by the `jlink` of this machine's platform's
-     archive — of the archives' version by construction, whatever JDK runs Maven —, else of the JDK running it (`--strip-debug
-     --no-man-pages --no-header-files --compress zip-6`) — all of one version, which `externals.conf` says once;
+  2. a runtime per platform whose jmods are in `external/` — `jmods-linux.tar.gz`, `jmods-windows.zip`,
+     `jmods-macos.tar.gz`, which `scripts/setup.sh` deploys (a JDK from 24 on carries no jmods: Temurin publishes them
+     apart), or Temurin's own names, `*jmods*linux*.tar.gz`…, in the folder `jtools.jdk.archives` names; for a JDK up to
+     23, its JDK archive's `jmods/` (`jdk-linux.tar.gz`…, `*jdk*linux*.tar.gz`…) —, linked by the `jlink` of this
+     machine's platform's JDK archive (`jdk-linux.tar.gz`) — of the jmods' version by construction, whatever JDK runs
+     Maven —, else of the JDK running it (`--strip-debug --no-man-pages --no-header-files --compress zip-6`) — all of one
+     version, which `externals.conf` says once;
   3. the archives into `releases/`: `<id>-<version>-linux.tar.gz` and `-macos.tar.gz` (`<id>.sh`, the executable bits
      set), `-windows.zip` (`<Name>.exe`, `<id>.bat`), each with the jar, `<id>.ini`, the README, `LICENSE` and
      `NOTICE` when the project has them, what `jtools.dist.include` names of the repository under the same path

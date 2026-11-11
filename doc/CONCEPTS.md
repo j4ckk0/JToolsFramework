@@ -48,7 +48,7 @@ the 15 s run. Nothing happens before a first page has opened.
 ## 4. Self-contained: a clone and `scripts/setup.sh`
 
 Nothing the build needs is under source control **nor taken from the machine**: `externals.conf` names the JDK,
-Maven, Node.js and the JDK archives the distributions' runtimes are linked from, by URL and version; `scripts/setup.sh` downloads them into
+Maven, Node.js and the jmods the distributions' runtimes are linked from, by URL and version; `scripts/setup.sh` downloads them into
 `external/` (ignored by git) under generic names (`external/jdk`, `external/maven`…), the only names the scripts and
 the build know. A machine with no internet sets `MIRROR` (an Artifactory, any HTTP folder); its credentials go in
 `externals.local.conf` or the environment, never in git. The versions live in `externals.conf` and nowhere else.
