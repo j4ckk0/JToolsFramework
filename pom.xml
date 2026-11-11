@@ -34,5 +34,6 @@
     <module>conventions/dist</module>
     <module>libraries/web</module>
     <module>devkit</module>
+    <module>examples/hello</module>
   </modules>
 </project>

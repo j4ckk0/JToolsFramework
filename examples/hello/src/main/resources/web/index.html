@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Hello</title>
+  <style>
+    body { font: 16px/1.5 system-ui, sans-serif; max-width: 32rem; margin: 3rem auto; padding: 0 1rem; }
+    input, button { font: inherit; padding: .3rem .6rem; }
+  </style>
+</head>
+<body>
+  <h1>Hello</h1>
+  <p><input id="name" placeholder="your name"> <button id="ask">Ask the server</button></p>
+  <p id="answer"></p>
+  <p><button id="quit">Quit</button> — or close this page: the server stops 15 seconds later.</p>
+  <script>
+    // The page's presence, the whole of it: a stream the server holds while the page is open, a beacon as it closes.
+    // Without them the server would not know when to stop (WebServer: /api/alive, /api/bye).
+    const page = crypto.randomUUID();
+    new EventSource('/api/alive?id=' + page);
+    addEventListener('pagehide', () => navigator.sendBeacon('/api/bye?id=' + page));
+
+    // The business is the server's: the page asks, and shows what it is answered — {"error"} when it is refused.
+    async function ask(path, options) {
+      const answer = await fetch(path, options);
+      const json = await answer.json();
+      if (!answer.ok) throw new Error(json.error);
+      return json;
+    }
+    document.getElementById('ask').onclick = async () => {
+      const name = document.getElementById('name').value || 'world';
+      try {
+        document.getElementById('answer').textContent = (await ask('/api/hello?name=' + encodeURIComponent(name))).message;
+      } catch (e) {
+        document.getElementById('answer').textContent = e.message;
+      }
+    };
+    document.getElementById('quit').onclick = () => ask('/api/quit', { method: 'POST' }).then(() => document.body.textContent = 'Stopped.');
+  </script>
+</body>
+</html>
