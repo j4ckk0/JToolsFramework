@@ -71,12 +71,10 @@ set "TAG=v%VERSION%"
 set "BASE=%APP_ID%-%VERSION%"
 set "WORK=%TEMP%\jtools-release-%RANDOM%"
 mkdir "%WORK%" || exit /b 1
-rem the console in UTF-8 while the notes are read and written: CHANGELOG.md is UTF-8
-for /f "tokens=2 delims=:." %%c in ('chcp') do set "CODEPAGE=%%c"
-chcp 65001 >nul
+rem CHANGELOG.md's UTF-8 goes through as bytes, in the console's own code page: one character a byte, read and written
+rem back alike (in UTF-8, chcp 65001, set /p mangles what is not ASCII)
 call :release
 set "STATUS=%errorlevel%"
-chcp %CODEPAGE% >nul
 rd /s /q "%WORK%" 2>nul
 exit /b %STATUS%
 

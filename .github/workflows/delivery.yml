@@ -224,8 +224,10 @@ jobs:
           $env:RELEASE_GITHUB = 'example/demo'
           cmd /c "scripts\windows\release.bat --dry-run" 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\step.log"
           if ($LASTEXITCODE -ne 0) { & $env:REPORT 'release.bat --dry-run' "$env:RUNNER_TEMP\step.log"; exit 1 }
-          $request = [IO.File]::ReadAllText("$PWD\releases\demo-0.1.0-release.json") | ConvertFrom-Json
-          if ($request.body -ne $notes -or $request.tag_name -ne 'v0.1.0' -or $request.draft -ne $false) { Write-Output "::error title=release.bat --dry-run::the request's body is not the notes: $($request.body.Replace('%', '%25').Replace("`n", '%0A'))"; exit 1 }
+          $request = $null
+          try { $request = [IO.File]::ReadAllText("$PWD\releases\demo-0.1.0-release.json") | ConvertFrom-Json } catch { }
+          if ($null -eq $request) { & $env:REPORT 'release.bat --dry-run: the request is not JSON' "$PWD\releases\demo-0.1.0-release.json"; exit 1 }
+          if ($request.body -ne $notes -or $request.tag_name -ne 'v0.1.0' -or $request.draft -ne $false) { & $env:REPORT 'release.bat --dry-run: the request is not the notes' "$PWD\releases\demo-0.1.0-release.json"; exit 1 }
           $env:RELEASE_GITHUB = '${{ github.repository }}'
           $env:GITHUB_TOKEN = 'not-a-real-token'
           cmd /c "scripts\windows\release.bat" 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\step.log"
