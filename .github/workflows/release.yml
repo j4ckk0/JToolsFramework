@@ -1,0 +1,58 @@
+# The GitHub release of a version: its delivery, jtools-X.Y.Z.tar.gz and its .sha256, built by scripts/delivery.sh from
+# what the tag holds, every test first. It runs on GitHub's machines — gh and the token are theirs — when a tag vX.Y.Z
+# is pushed; for a tag pushed before this workflow existed, from Actions ▸ release ▸ Run workflow, with that tag.
+name: release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'The tag to release, as v1.2.0'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event_name == 'push' && github.ref_name || inputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # the tags: delivery.sh checks that what it builds is what the tag holds
+
+      - name: The tag names the version every pom says
+        run: |
+          version="${TAG#v}"
+          git rev-parse -q --verify "refs/tags/$TAG" > /dev/null || { echo "no tag $TAG"; exit 1; }
+          grep -q "<jtools.version>$version</jtools.version>" conventions/parent/pom.xml || { echo "the poms are not at $version"; exit 1; }
+
+      - name: The externals — JDK, Maven, Node.js — as externals.conf names them
+        run: scripts/setup.sh
+
+      - name: The delivery, every test first
+        run: scripts/delivery.sh
+
+      - name: The release, the delivery attached
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${TAG#v}"
+          {
+            echo "One archive to start a project on JToolsFramework $version — no clone, nothing to build:"
+            echo
+            echo '```bash'
+            echo "curl -fsSLO https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/jtools-$version.tar.gz"
+            echo "tar xzf jtools-$version.tar.gz"
+            echo "jtools-$version/install.sh        # asks the project's name and the folder its files go in"
+            echo '```'
+            echo
+            echo "It installs the framework into ~/.m2 and jtools into ~/.local/bin, then makes the project — its JDK, Maven"
+            echo "and Node.js downloaded into it, built. The guide: [GETTING-STARTED](https://github.com/$GITHUB_REPOSITORY/blob/master/doc/GETTING-STARTED.md)."
+          } > notes.md
+          gh release view "$TAG" > /dev/null 2>&1 || gh release create "$TAG" --verify-tag --title "JToolsFramework $version" --notes-file notes.md
+          gh release upload "$TAG" --clobber "releases/delivery/jtools-$version.tar.gz" "releases/delivery/jtools-$version.tar.gz.sha256"

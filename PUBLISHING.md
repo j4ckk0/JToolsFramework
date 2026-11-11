@@ -67,10 +67,12 @@ project of its own.
 5. Then tag the version (`git tag v1.2.0 && git push origin v1.2.0`) — doc/GETTING-STARTED.md downloads
    `scripts/jtools` from that tag — and, in the projects, name the new version as their parent's and as
    `JTOOLS_VERSION` (`scripts/jtools sync` reports the ones behind).
-6. The delivery: `scripts/delivery.sh` builds `releases/delivery/jtools-<version>.tar.gz` and its `.sha256` from what the
-   tag holds (it refuses when `libraries/`, `conventions/`, `devkit/` or `starter/` differ from it); attach both to the
-   tag's release on GitHub (*Releases* ▸ *Draft a new release* ▸ the tag), which README.md and GETTING-STARTED.md
-   download it from.
+6. The delivery, on the tag's GitHub release — which README.md and GETTING-STARTED.md download it from: pushing the tag
+   runs `.github/workflows/release.yml` on GitHub's machines, which builds it with `scripts/delivery.sh` (every test
+   first; it refuses when `libraries/`, `conventions/`, `devkit/` or `starter/` differ from the tag) and creates the
+   release with `jtools-<version>.tar.gz` and its `.sha256` attached. For a tag pushed before the workflow existed:
+   *Actions* ▸ *release* ▸ *Run workflow*, with the tag. By hand, the same: `scripts/delivery.sh`, then attach
+   `releases/delivery/*` to the release in GitHub's page.
 
 ## 4. Learnt the first time
 

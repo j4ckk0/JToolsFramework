@@ -19,6 +19,7 @@ code, comments, tests, poms or docs. An example is a generic one (`Bookshelf`, `
 | `devkit/` | what a project carries — `managed-files.list`, `scripts/`, `.githooks/`, `.gitattributes`, `externals.conf` — plus `scripts/jtools` (the stub, never managed) and `jtools-sync.sh`; `pom.xml` packs it with the starter as jtools-devkit |
 | `starter/` | `new-project.sh` and `template/` (`__APP_NAME__`, `__APP_ID__`, `__APP_PORT__`, `__JTOOLS_VERSION__` in contents and paths) |
 | `examples/hello/` | the smallest program; in the reactor, never published |
+| `.github/workflows/release.yml` | on a pushed tag, on GitHub's machines: `scripts/delivery.sh`, then the tag's release with the delivery attached (or *Run workflow* for an older tag) |
 | `delivery/` | the delivery's `install.sh` and README; `scripts/delivery.sh` packs them with the nine artifacts and the stub into `releases/delivery/jtools-<version>.tar.gz` |
 | `scripts/` | the framework's own (`install.sh`, `check-versions.sh`, `ci.local.sh`, `delivery.sh`) and copies of the devkit's, `JTOOLS_HOME=.` |
 
