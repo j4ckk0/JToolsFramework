@@ -15,7 +15,7 @@ JToolsFramework is four things:
   settings, the log, the stop (`jtools-app`; the JDK and nothing else);
 - **its build conventions** — the parent pom a project inherits: Java 25, the tests, the program's one jar, the
   distributions with a runtime jlink trims (`jtools-parent`);
-- **a development environment** — the scripts a project carries (setup, build, run, package…), its tools downloaded
+- **a development environment** — the scripts a project carries (setup, build, run, package, release…), its tools downloaded
   into the project, never taken from the machine (`jtools-devkit`);
 - **a project template** — the way a new project begins (`jtools new`).
 
@@ -38,8 +38,8 @@ The scripts every project carries, in one folder for each system — a developer
 
 ```
 scripts/
-├── linux/     setup.sh  build.sh  ci.sh  run.sh  stop.sh  package.sh  jtools
-└── windows/   setup.bat build.bat ci.bat run.bat stop.bat package.bat jtools.bat
+├── linux/     setup.sh  build.sh  ci.sh  run.sh  stop.sh  package.sh  release.sh  jtools
+└── windows/   setup.bat build.bat ci.bat run.bat stop.bat package.bat release.bat jtools.bat
 ```
 
 The Windows ones are plain `.bat` files: no Git Bash, no PowerShell. `setup` downloads the project's own JDK, Maven
@@ -96,7 +96,8 @@ bookshelf/
 ├── api/        its HTTP face: BookshelfApi.java — each endpoint asks core and turns its answer into JSON
 ├── frontend/   the Angular page: a view, it decides nothing — api.service.ts is its one door to the server
 ├── app/        the program: Launcher.java, a WebApp serving the API; its one jar and its distributions
-└── scripts/    linux/ and windows/: setup, build, ci, run, stop, package — and jtools
+├── scripts/    linux/ and windows/: setup, build, ci, run, stop, package, release — and jtools
+└── CHANGELOG.md  what each version brought: release takes a version's notes from it
 ```
 
 In the project's folder, then:
