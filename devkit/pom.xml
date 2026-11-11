@@ -16,6 +16,7 @@
   <!-- One jar, jtools-devkit/ inside, laid out as a project is (scripts/, .githooks/), plus what makes one:
          jtools-devkit/version                the version, which scripts/linux/jtools and jtools-sync.sh read
          jtools-devkit/managed-files.list     the files a project carries and never edits
+         jtools-devkit/new-project.list       what else a new project gets: its port, the stubs, the page's npm files
          jtools-devkit/scripts/ .githooks/ .gitattributes externals.conf   those files, and the default externals
          jtools-devkit/jtools-sync.sh, .bat   what scripts/linux/jtools sync runs (on Windows, jtools.bat runs the .bat)
          jtools-devkit/starter/               new-project.sh and .bat, the template, and frontend/: the page's npm files
@@ -36,6 +37,7 @@
           <include>externals.conf</include>
           <include>managed-files.list</include>
           <include>moved-files.list</include>
+          <include>new-project.list</include>
           <include>jtools-sync.sh</include>
           <include>jtools-sync.bat</include>
         </includes>
@@ -46,7 +48,7 @@
         <targetPath>jtools-devkit/starter</targetPath>
       </resource>
       <!-- the page's dependencies and editor settings a new project's frontend starts from: @jtools/web's own, the
-           Angular the framework's CI builds -->
+           Angular the framework's CI builds; new-project.list's "page" lines name the same files -->
       <resource>
         <directory>${project.basedir}/../libraries/web</directory>
         <includes>

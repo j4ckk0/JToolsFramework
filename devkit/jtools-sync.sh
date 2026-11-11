@@ -69,9 +69,9 @@ while IFS='=' read -r key value; do
   [ "$theirs" = "$value" ] || { echo "   $key: ${theirs:-(absent)} -> $value"; differs=1; }
 done < "$devkit/externals.conf"
 
-# scripts/linux/jtools runs this very sync: it is never replaced by it, only said to differ — copied by hand when
-# wanted; likewise its Windows twin, scripts/windows/jtools.bat
-for stub in scripts/linux/jtools scripts/windows/jtools.bat; do
+# The stubs (new-project.list): scripts/linux/jtools runs this very sync, so they are never replaced by it, only said
+# to differ — copied by hand when wanted
+for stub in $(tr -d '\r' < "$devkit/new-project.list" | sed -n 's/^stub //p'); do
   [ -f "$devkit/$stub" ] && [ -f "$project/$stub" ] || continue
   if ! cmp -s "$devkit/$stub" "$project/$stub"; then
     echo "== $stub differs from the devkit's: cp $devkit/$stub $project/$stub to take it"

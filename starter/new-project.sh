@@ -27,7 +27,8 @@ else
   devkit=$clone/devkit frontend=$clone/libraries/web
   version=$(sed -n 's:.*<jtools.version>\(.*\)</jtools.version>.*:\1:p' "$clone/conventions/parent/pom.xml")
 fi
-DEFAULT_PORT=8090
+# the port, the stubs, the page's files: new-project.list, which new-project.bat reads too
+DEFAULT_PORT=$(sed -n 's/^port \([0-9]*\).*/\1/p' "$devkit/new-project.list")
 
 name= id= port= dir= bare= git=true build=true
 while [ $# -gt 0 ]; do
@@ -80,18 +81,20 @@ substitute() {
   substitute < "$starter/template/$file" > "$target"
 done
 
-# What the devkit owns: the managed files, the two stubs (scripts/linux/jtools, scripts/windows/jtools.bat), the default
-# externals.conf; the page's dependencies and editor settings (the same Angular as @jtools/web's, which the framework's CI builds).
+# What the devkit owns (managed-files.list), then the rest of new-project.list: the stubs, the default externals.conf,
+# the page's dependencies and editor settings.
 grep -v -E '^(#|$)' "$devkit/managed-files.list" | while read -r file; do
   mkdir -p "$dir/$(dirname "$file")"
   cp -p "$devkit/$file" "$dir/$file"
 done
-for stub in scripts/linux/jtools scripts/windows/jtools.bat; do cp -p "$devkit/$stub" "$dir/$stub"; done
-chmod +x "$dir"/scripts/linux/*.sh "$dir/scripts/linux/jtools" "$dir/.githooks/pre-push"
-cp "$devkit/externals.conf" "$dir/"
-for file in package.json package-lock.json tsconfig.spec.json .editorconfig .prettierrc .gitignore; do
-  cp "$frontend/$file" "$dir/frontend/$file"
+grep -v -E '^(#|$)' "$devkit/new-project.list" | while read -r kind value; do
+  value=${value%$'\r'}   # a list checked out with CRLF reads the same
+  case "$kind" in
+    stub|devkit) mkdir -p "$dir/$(dirname "$value")"; cp -p "$devkit/$value" "$dir/$value" ;;
+    page) cp "$frontend/$value" "$dir/frontend/$value" ;;
+  esac
 done
+chmod +x "$dir"/scripts/linux/*.sh "$dir/scripts/linux/jtools" "$dir/.githooks/pre-push"
 sed -i "s/\"name\": \"jtools-web\"/\"name\": \"$id\"/" "$dir/frontend/package.json" "$dir/frontend/package-lock.json"
 
 cd "$dir"

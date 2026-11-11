@@ -60,11 +60,9 @@ for /f "usebackq eol=# tokens=1* delims==" %%a in ("%DEVKIT%\externals.conf") do
 )
 for %%d in (!DIFFERS!) do endlocal & set "DIFFERS=%%d"
 
-rem scripts\windows\jtools runs this very sync: it is never replaced by it, only said to differ - copied by hand when
-rem wanted; likewise its Linux twin, scripts\linux\jtools
-for %%s in (scripts\linux\jtools scripts\windows\jtools.bat) do if exist "%DEVKIT%\%%s" if exist "%PROJECT%\%%s" (
-  fc /b "%DEVKIT%\%%s" "%PROJECT%\%%s" >nul 2>&1 || echo == %%s differs from the devkit's: copy %DEVKIT%\%%s into %PROJECT%\%%s to take it
-)
+rem The stubs (new-project.list): scripts\windows\jtools.bat runs this very sync, so they are never replaced by it, only
+rem said to differ - copied by hand when wanted
+for /f "usebackq eol=# tokens=1,2" %%a in ("%DEVKIT%\new-project.list") do if "%%a"=="stub" call :reportstub "%%b"
 
 if "%DIFFERS%"=="0" (
   echo == %PROJECT% is in line with JToolsFramework %VERSION%
@@ -72,6 +70,16 @@ if "%DIFFERS%"=="0" (
 )
 if "%CHECK%"=="1" exit /b 1
 echo == read the diff in %PROJECT%, run its scripts\windows\ci.bat, commit there
+exit /b 0
+
+rem ---- a stub of the devkit's, said when the project's differs
+:reportstub
+set "FILE=%~1"
+set "FILE=%FILE:/=\%"
+if not exist "%DEVKIT%\%FILE%" exit /b 0
+if not exist "%PROJECT%\%FILE%" exit /b 0
+fc /b "%DEVKIT%\%FILE%" "%PROJECT%\%FILE%" >nul 2>&1 && exit /b 0
+echo == %FILE% differs from the devkit's: copy %DEVKIT%\%FILE% into %PROJECT%\%FILE% to take it
 exit /b 0
 
 :managed

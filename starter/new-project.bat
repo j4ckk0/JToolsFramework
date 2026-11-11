@@ -106,7 +106,8 @@ if exist "%BARE%" (
   exit /b 1
 )
 :port
-if not defined PORT set "PORT=8090"
+rem the port, the stubs, the page's files: new-project.list, which new-project.sh reads too
+if not defined PORT for /f "usebackq eol=# tokens=1,2" %%a in ("%DEVKIT%\new-project.list") do if "%%a"=="port" set "PORT=%%b"
 set "NOT_DIGITS="
 for /f "delims=0123456789" %%x in ("%PORT%") do set "NOT_DIGITS=%%x"
 if defined NOT_DIGITS goto :badport
@@ -133,12 +134,14 @@ chcp 65001 >nul
 for /f "delims=" %%f in ('dir /s /b /a-d "%TEMPLATE%"') do call :template "%%f"
 chcp %CODEPAGE% >nul
 
-rem What the devkit owns: the managed files, the two stubs (scripts\linux\jtools, scripts\windows\jtools.bat), the default
-rem externals.conf; the page's dependencies and editor settings (the same Angular as @jtools/web's, which the framework's CI builds).
+rem What the devkit owns (managed-files.list), then the rest of new-project.list: the stubs, the default externals.conf,
+rem the page's dependencies and editor settings.
 for /f "usebackq eol=# delims=" %%f in ("%DEVKIT%\managed-files.list") do call :devkit "%%f"
-for %%s in (scripts\linux\jtools scripts\windows\jtools.bat) do copy /y "%DEVKIT%\%%s" "%DIR%\%%s" >nul
-copy /y "%DEVKIT%\externals.conf" "%DIR%\externals.conf" >nul
-for %%f in (package.json package-lock.json tsconfig.spec.json .editorconfig .prettierrc .gitignore) do copy /y "%FRONTEND%\%%f" "%DIR%\frontend\%%f" >nul
+for /f "usebackq eol=# tokens=1,2" %%a in ("%DEVKIT%\new-project.list") do (
+  if "%%a"=="stub" call :devkit "%%b"
+  if "%%a"=="devkit" call :devkit "%%b"
+  if "%%a"=="page" copy /y "%FRONTEND%\%%b" "%DIR%\frontend\%%b" >nul
+)
 for %%f in (package.json package-lock.json) do (
   move /y "%DIR%\frontend\%%f" "%DIR%\frontend\%%f.jtools" >nul
   call :rename "%DIR%\frontend\%%f.jtools" "%DIR%\frontend\%%f"

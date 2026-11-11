@@ -1,0 +1,17 @@
+# What jtools new puts in a new project besides its template and the managed files (managed-files.list), read by
+# new-project.sh and new-project.bat alike, one "kind value" a line:
+#   port N      the port a project is given without --port
+#   stub PATH   a stub, from the devkit; jtools sync says when it differs, and never replaces it
+#   devkit PATH a file from the devkit, the project's to change afterwards
+#   page FILE   a file of the page's library (@jtools/web: the Angular the framework's CI builds), into frontend/;
+#               devkit/pom.xml packs the same files into the devkit's starter/frontend/
+port 8090
+stub scripts/linux/jtools
+stub scripts/windows/jtools.bat
+devkit externals.conf
+page package.json
+page package-lock.json
+page tsconfig.spec.json
+page .editorconfig
+page .prettierrc
+page .gitignore
