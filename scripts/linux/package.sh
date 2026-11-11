@@ -8,7 +8,7 @@
 #   scripts/linux/package.sh
 #   scripts/linux/package.sh -DskipTests      # extra arguments are passed to mvn
 #
-# The runtimes are linked from the jmods of external/ (scripts/linux/setup.sh deploys them). The version is the root pom's <revision>.
+# The runtimes are linked from the jmods of external/ (scripts/linux/setup.sh deploys them). The version is the root pom's <revision>, or its own <version>.
 # The releases of the previous versions are removed once the new one is built: releases/ holds the release of the
 # version pom.xml names, and whatever else you put there is left alone.
 #
@@ -22,7 +22,9 @@ refuse_while_running "packaging"
 mvn $BUILD_GOALS -Pdist "$@"
 
 version=$(sed -n 's:.*<revision>\(.*\)</revision>.*:\1:p' pom.xml | head -1)   # said once, in the root pom
-[ -n "$version" ] || { echo "pom.xml has no <revision>: the scripts read the version there" >&2; exit 1; }
+# or, in a pom with no ${revision}, its own <version>: the first one outside its <parent>
+[ -n "$version" ] || version=$(sed '/<parent>/,/<\/parent>/d' pom.xml | sed -n 's:.*<version>\(.*\)</version>.*:\1:p' | head -1)
+[ -n "$version" ] || { echo "pom.xml names no version (its <revision>, or its own <version>): the scripts read it there" >&2; exit 1; }
 
 # The releases of the previous versions go, now that the new one is there (only ours, named after another version).
 for archive in "releases/$APP_ID"-*-windows.zip "releases/$APP_ID"-*-linux.tar.gz "releases/$APP_ID"-*-macos.tar.gz; do

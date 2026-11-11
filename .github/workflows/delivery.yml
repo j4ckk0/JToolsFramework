@@ -49,6 +49,14 @@ jobs:
       - name: Its CI, its distributions, its sync
         working-directory: ${{ runner.temp }}/demo
         run: scripts/linux/ci.sh && scripts/linux/package.sh && scripts/linux/jtools sync --check && ls -l releases/
+      - name: A project whose poms say their version, with no ${revision} - package.sh reads the root pom's own
+        working-directory: ${{ runner.temp }}/demo
+        run: |
+          sed -i -e 's/\${revision}/0.1.0/g' -e '/<revision>/d' pom.xml */pom.xml
+          ! grep -q revision pom.xml
+          scripts/linux/package.sh -q -DskipTests
+          ls -l releases/demo-0.1.0-linux.tar.gz releases/demo-0.1.0-windows.zip
+          git checkout -- .
       - name: A project's files as Linux makes them, for Windows to compare
         run: ~/.local/bin/jtools new Demo --dir "$RUNNER_TEMP/fresh" --port 18096 --no-git --no-build
       - name: Without git, a project without a repository
@@ -130,6 +138,19 @@ jobs:
             if ($LASTEXITCODE -ne 0) { & $env:REPORT ($command -replace '"', '') "$env:RUNNER_TEMP\step.log"; exit 1 }
           }
           Get-ChildItem releases
+      - name: A project whose poms say their version, with no ${revision} - package.bat reads the root pom's own
+        working-directory: ${{ runner.temp }}\demo
+        run: |
+          $ErrorActionPreference = 'Continue'
+          foreach ($pom in Get-ChildItem -Recurse -Depth 1 -Filter pom.xml) {
+            $text = [IO.File]::ReadAllText($pom.FullName).Replace('${revision}', '0.1.0') -replace '(?m)^[ \t]*<revision>.*</revision>[ \t]*\r?\n', ''
+            [IO.File]::WriteAllText($pom.FullName, $text)
+          }
+          if (Select-String -Path pom.xml -Pattern revision -Quiet) { Write-Output "::error title=no revision::pom.xml still names a revision"; exit 1 }
+          cmd /c "scripts\windows\package.bat -q -DskipTests" 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\step.log"
+          if ($LASTEXITCODE -ne 0) { & $env:REPORT 'package.bat, no revision' "$env:RUNNER_TEMP\step.log"; exit 1 }
+          if (-not (Test-Path releases\demo-0.1.0-windows.zip)) { Write-Output "::error title=package.bat, no revision::no releases\demo-0.1.0-windows.zip"; exit 1 }
+          git checkout -- .
       - name: run.bat builds when a file changed, and only then (Windows' archive marks)
         working-directory: ${{ runner.temp }}\demo
         run: |

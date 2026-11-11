@@ -68,7 +68,8 @@ build can replace the jar while the program runs.
 
 ## 6. Versions said once
 
-The program's version is the root pom's `<revision>` (CI-friendly: the modules' `<parent>` refer to it), with its
+The program's version is the root pom's `<revision>` (CI-friendly: the modules' `<parent>` refer to it) — or, in a
+project that writes its versions out, the root pom's own `<version>`, which `package` reads as well —, with its
 four-part form `jtools.app.windowsVersion` that an `.exe` wants. The framework's version is the parent's. The
 externals' versions are `externals.conf`'s. Nothing else repeats them; a test checks what must agree (the port).
 

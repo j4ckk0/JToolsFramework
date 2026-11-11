@@ -52,3 +52,12 @@ builds it with the new scripts, on Linux and on Windows.
   longer reach back into `WebApp`, which holds them.
 - **`.github/report-failure.bat`** makes a failed Windows step's log its error annotation, where the workflow repeated
   the same PowerShell line in each step; the workflow tests it first.
+
+## 5. 1.4.2: a project that writes its versions out
+
+The devkit's `package.sh` and `package.bat` read the program's version from the root pom's `<revision>`, which
+`jtools new`'s projects have; a program adopting the devkit with its versions written out in each pom
+(`<version>5.7.0</version>`) had its archives built, then `package` failed, finding no version. From 1.4.2, without
+a `<revision>` they read the root pom's own `<version>` — the first one outside its `<parent>` —, and ADOPTING.md
+says so. The workflow `delivery` packages its trial project once more with its poms rewritten that way, on Linux
+and on Windows.

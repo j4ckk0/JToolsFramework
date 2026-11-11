@@ -59,8 +59,9 @@ runtime of one.
 
 `jtools.conf` at the root (APP_ID, APP_NAME, APP_MODULE, BUILD_GOALS, `JTOOLS_VERSION`), `scripts/linux/jtools` copied from
 the devkit, then `scripts/linux/jtools sync`: the devkit's scripts replace the project's. What the project's own did beyond
-them goes into `scripts/linux/*.local.sh` ([DEVKIT.md](DEVKIT.md)). A program whose scripts do much of their own keeps them: the
-devkit is a convenience, not a condition.
+them goes into `scripts/linux/*.local.sh` ([DEVKIT.md](DEVKIT.md)). The poms keep their versions as they are: `package` reads the
+root pom's `<revision>`, or its own `<version>`. A program whose scripts do much of their own keeps them: the devkit is
+a convenience, not a condition.
 
 ### 5. The page (an Angular page)
 

@@ -8,7 +8,7 @@ rem
 rem   scripts\windows\package.bat
 rem   scripts\windows\package.bat -DskipTests      extra arguments are passed to mvn
 rem
-rem The runtimes are linked from the jmods of external\ (scripts\windows\setup.bat deploys them). The version is the root pom's <revision>.
+rem The runtimes are linked from the jmods of external\ (scripts\windows\setup.bat deploys them). The version is the root pom's <revision>, or its own <version>.
 rem The releases of the previous versions are removed once the new one is built.
 rem
 cd /d "%~dp0..\.."
@@ -23,12 +23,29 @@ if not defined APP_ID (
 call mvn %BUILD_GOALS% -Pdist %* || exit /b 1
 
 for /f "delims=" %%l in ('findstr /r /c:"<revision>.*</revision>" pom.xml') do if not defined VERSION_LINE set "VERSION_LINE=%%l"
-if not defined VERSION_LINE (
-  echo pom.xml has no ^<revision^>: the scripts read the version there >&2
-  exit /b 1
-)
+if not defined VERSION_LINE goto :own_version
 set "VERSION=%VERSION_LINE:*<revision>=%"
 set "VERSION=%VERSION:</revision>=%"
+goto :versioned
+:own_version
+rem a pom with no ${revision}: its own <version>, the first one before or after its <parent>, found by line numbers
+set "PARENT_START="
+set "PARENT_END="
+for /f "delims=:" %%n in ('findstr /n /c:"<parent>" pom.xml') do if not defined PARENT_START set "PARENT_START=%%n"
+for /f "delims=:" %%n in ('findstr /n /c:"</parent>" pom.xml') do if not defined PARENT_END set "PARENT_END=%%n"
+if not defined PARENT_START set "PARENT_START=0"
+if not defined PARENT_END set "PARENT_END=0"
+for /f "tokens=1* delims=:" %%a in ('findstr /n /c:"<version>" pom.xml') do (
+  if not defined VERSION_LINE if %%a LSS %PARENT_START% set "VERSION_LINE=%%b"
+  if not defined VERSION_LINE if %%a GTR %PARENT_END% set "VERSION_LINE=%%b"
+)
+if not defined VERSION_LINE (
+  echo pom.xml names no version - its ^<revision^>, or its own ^<version^>: the scripts read it there >&2
+  exit /b 1
+)
+set "VERSION=%VERSION_LINE:*<version>=%"
+set "VERSION=%VERSION:</version>=%"
+:versioned
 for %%a in (releases\%APP_ID%-*-windows.zip releases\%APP_ID%-*-linux.tar.gz releases\%APP_ID%-*-macos.tar.gz) do call :previous "%%a"
 
 rem What every distribution must carry: the jar, its launchers, the .ini and the runtime.
