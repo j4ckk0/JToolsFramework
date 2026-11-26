@@ -14,11 +14,17 @@
   <p id="answer"></p>
   <p><button id="quit">Quit</button> — or close this page: the server stops 15 seconds later.</p>
   <script>
-    // The page's presence, the whole of it: a stream the server holds while the page is open, a beacon as it closes.
-    // Without them the server would not know when to stop (WebServer: /api/alive, /api/bye).
+    // The page's presence, the whole of it: a stream held by the browser's tab holding the lock, a beacon as it closes —
+    // the server stops once none is left (doc/CONCEPTS.md, the page's presence: why one stream per browser).
     const page = crypto.randomUUID();
-    new EventSource('/api/alive?id=' + page);
-    addEventListener('pagehide', () => navigator.sendBeacon('/api/bye?id=' + page));
+    navigator.locks.request('jtools.presence', () => new Promise((release) => {
+      const stream = new EventSource('/api/alive?id=' + page);
+      addEventListener('pagehide', () => {
+        stream.close();
+        navigator.sendBeacon('/api/bye?id=' + page);
+        release();
+      });
+    }));
 
     // The business is the server's: the page asks, and shows what it is answered — {"error"} when it is refused.
     async function ask(path, options) {

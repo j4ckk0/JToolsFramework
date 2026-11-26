@@ -33,13 +33,21 @@ Naming, as `jtools new` makes it: groupId `org.jtools`, artifactIds `<id>-<modul
 ## 3. The page's presence, and the stop
 
 The protocol every page speaks (`WebServer`, `PageWatch`; `@jtools/web`'s `PagePresenceService` for an Angular page;
-three lines of plain JavaScript otherwise — examples/hello):
+a few lines of plain JavaScript otherwise — examples/hello):
 
 | | |
 |---|---|
-| `GET /api/alive?id=<page>` | an event stream the page holds for its whole life; the server pings it every **5 s** |
-| `POST /api/bye?id=<page>` | the page's beacon as it goes (`pagehide`) |
-| the stop | no page left for **15 s** (a reload, a laptop waking up): the program exits |
+| the lock | the browser's pages queue for a Web Lock (`navigator.locks`); the one holding it holds the stream |
+| `GET /api/alive?id=<page>` | an event stream the lock's holder keeps open while it lives; the server pings it every **5 s** |
+| `POST /api/bye?id=<page>` | the holder's beacon as it goes (`pagehide`); the browser then hands the lock to the next page, which opens its own stream |
+| the stop | no stream left for **15 s** (a reload, a laptop waking up): the program exits |
+
+**One stream per browser, not per page**: a browser opens at most six HTTP/1.1 connections to a server, all its tabs
+together, and a stream holds one for as long as its page lives. A stream per page would take them all at the sixth
+tab, whose requests — and every other tab's — would then wait for ever, and a seventh tab would not even load. The
+server counts the streams, so it sees one page per browser; the stop still comes once a browser's last page has gone.
+Without Web Locks — a page served over http to another computer (`--host`) is not a secure context — each page holds a
+stream of its own, and the limit applies again.
 
 A page that closes normally sends its beacon: the stop comes 15 s later. A crashed browser sends none; its stream
 breaks, which a ping notices — the first write after a close usually still succeeds, so up to two pings (10 s) — then

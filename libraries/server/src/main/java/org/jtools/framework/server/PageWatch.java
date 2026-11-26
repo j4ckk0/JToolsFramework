@@ -29,8 +29,9 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * The pages open on the server, and the automatic stop once the last one has gone: each holds a
- * {@code GET /api/alive?id=} stream and sends {@code POST /api/bye?id=} as it closes ({@link WebServer}); none left for
+ * The pages open on the server, and the automatic stop once the last one has gone: one page of each browser holds a
+ * {@code GET /api/alive?id=} stream for all its tabs, and sends {@code POST /api/bye?id=} as it closes, before another
+ * tab takes the stream over ({@link WebServer}; doc/CONCEPTS.md, the page's presence); none left for
  * the grace (a reload, a laptop waking up) runs the stop. Nothing before a first page is seen — a server started
  * without a browser waits as long as it takes —, nothing while {@link #setAutoStop switched off}; the check is re-verified
  * when it fires.
@@ -74,7 +75,7 @@ public final class PageWatch {
         arm();
     }
 
-    /** How many pages are open. */
+    /** How many pages hold a stream: one per browser whose pages take turns, as {@code @jtools/web}'s do. */
     public int count() {
         return pages.size();
     }

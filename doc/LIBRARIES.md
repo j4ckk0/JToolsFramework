@@ -77,8 +77,8 @@ server.get("/api/books", ex -> books.list())                         // a List, 
   defence against DNS rebinding —, and so is a request changing state from another site's `Origin`.
 - **The page**: the files of the page's classpath folder, with an ETag (304 when unchanged); `index.html` for a path
   without an extension (an Angular page's own routes), a 404 for a missing file.
-- **The presence**: `GET /api/alive?id=` (a stream the page holds), `POST /api/bye?id=` (its beacon); `PageWatch`
-  counts the pages and runs the stop.
+- **The presence**: `GET /api/alive?id=` (a stream one page of each browser holds), `POST /api/bye?id=` (its
+  beacon); `PageWatch` counts the streams and runs the stop ([CONCEPTS.md](CONCEPTS.md#3-the-pages-presence-and-the-stop)).
 
 Public for a technical reason: `Http` (the content types an `Answer` names: `Http.TYPE_JSON`, `TYPE_XML`, `TYPE_ZIP`…).
 
@@ -114,9 +114,10 @@ List<Path> chosen = FileDialogs.chooseFilesToOpen("Open a book list", true, new 
 ## jtools-web — the Angular page's side
 
 `@jtools/web`, TypeScript compiled with the project's page (jtools-parent unpacks it into `frontend/target/jtools-web`,
-`tsconfig.json`'s `paths` maps it): `provideJTools()` (the presence, started with the page), `PagePresenceService`,
-`apiErrorMessage()` (a refusal's `{"error"}` as a sentence), `ProgramApiService` (`/api/about`, `/api/settings`,
-`/api/quit`, `/api/log/open`, which `WebApp` answers), `ThemeService` (the light or dark palette), and the menu bar:
+`tsconfig.json`'s `paths` maps it): `provideJTools()` (the presence, started with the page), `PagePresenceService`
+(one stream per browser, its tabs taking turns), `apiErrorMessage()` (a refusal's `{"error"}` as a sentence),
+`ProgramApiService` (`/api/about`, `/api/settings`, `/api/quit`, `/api/log/open`, which `WebApp` answers),
+`ThemeService` (the light or dark palette), and the menu bar:
 
 ```html
 <jtools-menu-bar name="Bookshelf" (stopped)="stopped.set(true)">
@@ -141,7 +142,7 @@ starter's `styles.css`: `--background`, `--surface`, `--text`, `--muted`, `--bor
 `--error-fill`, `--error-text`, `--ok-fill`, `--ok-text` —, the light palette's values where a page has none; Dark
 theme stamps `data-theme="light"` or `"dark"` on `<html>`, for the page's palette to switch on.
 
-A page in plain JavaScript needs none of it — the presence is three lines ([examples/hello](../examples/hello)).
+A page in plain JavaScript needs none of it — the presence is a few lines ([examples/hello](../examples/hello)).
 
 ---
 

@@ -403,8 +403,8 @@ public final class WebServer implements AutoCloseable {
     // ---- the presence of the pages --------------------------------------------------------------------------
 
     /**
-     * {@code GET /api/alive?id=}: the page's presence, an event stream held open for its whole life — the browser drops
-     * it when the page is closed or crashes. The pings notice a closed socket ({@link PageWatch} then counts the page gone).
+     * {@code GET /api/alive?id=}: the page's presence, an event stream held open by one page of each browser while it
+     * lives — the browser drops it when the page is closed or crashes. The pings notice a closed socket ({@link PageWatch} then counts the page gone).
      */
     private void alive(HttpExchange ex) throws IOException {
         String id = Http.query(ex, PARAM_PAGE);

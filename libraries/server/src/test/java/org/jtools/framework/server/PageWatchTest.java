@@ -68,6 +68,19 @@ class PageWatchTest {
     }
 
     @Test
+    void aStreamHandedToAnotherTabKeepsItRunning() throws Exception {
+        PageWatch watch = new PageWatch(GRACE);
+        CountDownLatch stopped = new CountDownLatch(1);
+        watch.onLastPageGone(stopped::countDown);
+        watch.opened("a");
+        watch.closed("a");   // its beacon
+        watch.opened("b");   // the next tab, given the lock
+        watch.closed("a");   // a's stream ending after its beacon
+        assertFalse(stopped.await(GRACE.toMillis() * 3, TimeUnit.MILLISECONDS));
+        assertEquals(1, watch.count());
+    }
+
+    @Test
     void neverStopsWhenDisabled() throws Exception {
         PageWatch watch = new PageWatch(GRACE);
         watch.setAutoStop(false);

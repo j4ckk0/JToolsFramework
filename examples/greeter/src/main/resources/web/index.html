@@ -17,9 +17,16 @@
   </p>
   <p><small>The name is kept by the server for the next runs; the greeting is said in the language chosen here.</small></p>
   <script>
+    // The page's presence: one stream per browser, its tabs taking turns (doc/CONCEPTS.md says why).
     const page = crypto.randomUUID();
-    new EventSource('/api/alive?id=' + page);
-    addEventListener('pagehide', () => navigator.sendBeacon('/api/bye?id=' + page));
+    navigator.locks.request('jtools.presence', () => new Promise((release) => {
+      const stream = new EventSource('/api/alive?id=' + page);
+      addEventListener('pagehide', () => {
+        stream.close();
+        navigator.sendBeacon('/api/bye?id=' + page);
+        release();
+      });
+    }));
 
     // Every request says the page's language: the server answers in it.
     const language = () => document.getElementById('language').value;
