@@ -52,7 +52,10 @@ Settings menu (`/api/settings`), else `__APP_ID__.ini`'s next to the jar (`port=
 `~/.__APP_ID__/logs/__APP_ID__.0.log` (`--log-file`, or `log.folder` in the `.ini`), its lines in English.
 
 The framework answers four endpoints of its own beside the application's: `/api/settings` (the automatic stop, the
-port), `/api/about` (name, version, log file), `/api/quit` and `/api/log/open`.
+port), `/api/about` (name, version, log file), `/api/quit` and `/api/log/open`. The page's menu bar, `@jtools/web`'s
+`<jtools-menu-bar>` in `frontend/src/app/app.html`, is their view: **File** ▸ Quit __APP_NAME__; **Settings** ▸ Dark
+theme (kept in the browser), Stop the server when the last page is closed, Server port…; **Logs** ▸ Open the log;
+**Help** ▸ Embedded Java runtime…, About __APP_NAME__…. The program's own menus go inside it, `<jtools-menu label="…">`.
 
 **The page alone, live-reloaded**: start the server (`scripts/linux/run.sh --no-browser`), then `cd frontend && npm start`
 serves the page on `http://localhost:4200/`, sending `/api` to the server (`frontend/proxy.conf.json`).

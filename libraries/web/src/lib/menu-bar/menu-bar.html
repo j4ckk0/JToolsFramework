@@ -1,0 +1,205 @@
+<nav class="jtools-topbar">
+  <jtools-menu label="File" hint="The program itself">
+    <ng-content select="[fileItems]" />
+    <hr />
+    <button
+      type="button"
+      role="menuitem"
+      [title]="'Stop the ' + name() + ' server and close this page'"
+      (click)="quit()"
+    >
+      Quit {{ name() }}
+    </button>
+  </jtools-menu>
+
+  <ng-content />
+
+  <jtools-menu label="Settings">
+    <button
+      type="button"
+      role="menuitemcheckbox"
+      [attr.aria-checked]="theme.dark()"
+      title="On: the dark palette; off: the light one. Until you choose, the page follows the browser’s preference; the choice is kept in this browser."
+      (click)="theme.toggle()"
+    >
+      Dark theme
+    </button>
+    <button
+      type="button"
+      role="menuitemcheckbox"
+      [attr.aria-checked]="autoStop()"
+      [title]="
+        'The server\'s automatic stop:\n• on — it exits by itself 15 seconds after the last page showing it has been closed (a reload or a restart of the browser is not a closed page);\n• off — it keeps running, as --keep-alive and --no-browser do, until File ▸ Quit ' +
+        name() +
+        ' or Ctrl+C.\nThe choice is kept for the next runs.'
+      "
+      (click)="toggleAutoStop()"
+    >
+      Stop the server when the last page is closed
+    </button>
+    <button
+      type="button"
+      role="menuitem"
+      class="jtools-aligned"
+      title="Choose the port the server listens on, kept for the next start"
+      (click)="showPortDialog()"
+    >
+      Server port…
+    </button>
+  </jtools-menu>
+
+  <jtools-menu label="Logs" (opened)="loadAbout()">
+    <button
+      type="button"
+      role="menuitem"
+      [title]="'Opens the log file in your computer\'s text viewer: what ' + name() + ' did'"
+      (click)="openLog()"
+    >
+      Open the log
+    </button>
+    @if (about(); as about) {
+      <hr />
+      <div class="jtools-menu-note">
+        {{ about.logFile ? 'File: ' + about.logFile : 'This run keeps no log file.' }}
+      </div>
+    }
+  </jtools-menu>
+
+  <jtools-menu label="Help">
+    <ng-content select="[helpItems]" />
+    <hr />
+    <button
+      type="button"
+      role="menuitem"
+      title="What the distributions bundle to run without a Java of your own: its licence, its source"
+      (click)="showRuntime()"
+    >
+      Embedded Java runtime…
+    </button>
+    <hr />
+    <button type="button" role="menuitem" (click)="showAbout()">About {{ name() }}…</button>
+  </jtools-menu>
+
+  <span class="jtools-name">{{ name() }}</span>
+</nav>
+
+@if (message(); as message) {
+  <div class="jtools-status" [class.jtools-info]="message.info" role="status">
+    <span>{{ message.text }}</span>
+    <button class="jtools-close" type="button" title="Clear this message" (click)="clearMessage()">
+      ×
+    </button>
+  </div>
+}
+
+<!-- About's own text stays in the page, shown only in its dialog: a projection is made once, whatever is open -->
+<div class="jtools-modal" [hidden]="dialog() !== 'about'" (click)="backdrop($event)">
+  <div class="jtools-dialog" role="dialog" aria-labelledby="jtoolsAboutTitle">
+    <div class="jtools-dialog-head">
+      <b id="jtoolsAboutTitle">{{ name() }}</b
+      ><button class="jtools-close" type="button" (click)="closeDialog()">×</button>
+    </div>
+    <div class="jtools-dialog-body">
+      <p>Version {{ about()?.version ?? '?' }}</p>
+      <p class="jtools-help">Java {{ about()?.javaVersion ?? '?' }}</p>
+      @if (about()?.logFile; as logFile) {
+        <p class="jtools-help">Log file: {{ logFile }}</p>
+      }
+      <ng-content select="[about]" />
+    </div>
+  </div>
+</div>
+
+@switch (dialog()) {
+  @case ('runtime') {
+    <div class="jtools-modal" (click)="backdrop($event)">
+      <div class="jtools-dialog" role="dialog" aria-labelledby="jtoolsRuntimeTitle">
+        <div class="jtools-dialog-head">
+          <b id="jtoolsRuntimeTitle">Embedded Java runtime</b
+          ><button class="jtools-close" type="button" (click)="closeDialog()">×</button>
+        </div>
+        <div class="jtools-dialog-body">
+          <p>
+            The distributions (the Linux, macOS and Windows archives) bundle an OpenJDK runtime,
+            Eclipse Temurin{{ javaMajor() ? ' ' + javaMajor() : '' }}, so they need no Java
+            installed. The program's jar alone bundles no runtime and needs a Java{{
+              javaMajor() ? ' ' + javaMajor() : ''
+            }}
+            of your own.
+          </p>
+          <p>
+            That runtime is licensed under the GNU General Public License, version 2, with the
+            Classpath Exception. The Classpath Exception is what lets {{ name() }} be distributed
+            alongside the runtime without affecting {{ name() }}'s own terms.
+          </p>
+          <p>
+            The runtime's own licence and notices travel with it, in the jre/legal/ directory of
+            each archive; the exact build is in jre/release. Its source code is available from:
+          </p>
+          <p>
+            <a
+              [href]="
+                'https://adoptium.net/temurin/releases/' +
+                (javaMajor() ? '?version=' + javaMajor() : '')
+              "
+              target="_blank"
+              rel="noopener"
+              >Eclipse Temurin releases ↗</a
+            ><br />
+            <a
+              [href]="
+                'https://github.com/openjdk/' + (javaMajor() ? 'jdk' + javaMajor() + 'u' : '')
+              "
+              target="_blank"
+              rel="noopener"
+              >OpenJDK source{{ javaMajor() ? ' (jdk' + javaMajor() + 'u)' : '' }} ↗</a
+            >
+          </p>
+          @if (about()?.javaVersion; as javaVersion) {
+            <p class="jtools-help">This server runs on Java {{ javaVersion }}.</p>
+          }
+          <div class="jtools-actions">
+            <button class="jtools-btn" type="button" (click)="closeDialog()">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+  @case ('port') {
+    <div class="jtools-modal" (click)="backdrop($event)">
+      <div class="jtools-dialog" role="dialog" aria-labelledby="jtoolsPortTitle">
+        <div class="jtools-dialog-head">
+          <b id="jtoolsPortTitle">Server port</b
+          ><button class="jtools-close" type="button" (click)="closeDialog()">×</button>
+        </div>
+        <div class="jtools-dialog-body">
+          <p>The port the server listens on.</p>
+          <p>A change takes effect the next time {{ name() }} starts.</p>
+          <div class="jtools-row">
+            <label for="jtoolsPortInput">Port</label>
+            <input
+              id="jtoolsPortInput"
+              type="number"
+              step="1"
+              [min]="portRange.MIN"
+              [max]="portRange.MAX"
+              [placeholder]="settings()?.currentPort ?? ''"
+              [value]="portText()"
+              (input)="portText.set($any($event.target).value)"
+              (keydown.enter)="savePort()"
+            />
+          </div>
+          <p class="jtools-help">
+            Leave it empty to use the default ({{ settings()?.defaultPort ?? '?' }}).
+          </p>
+          <div class="jtools-actions">
+            <button class="jtools-btn" type="button" (click)="closeDialog()">Cancel</button>
+            <button class="jtools-btn jtools-primary" type="button" (click)="savePort()">
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+}

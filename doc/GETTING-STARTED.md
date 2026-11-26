@@ -94,7 +94,7 @@ What it made:
 Bookshelf/
 ├── core/       the business: Bookshelf.java, pure Java — every rule, every computation, every state
 ├── api/        its HTTP face: BookshelfApi.java — each endpoint asks core and turns its answer into JSON
-├── frontend/   the Angular page: a view, it decides nothing — api.service.ts is its one door to the server
+├── frontend/   the Angular page: a view, it decides nothing — api.service.ts is its one door to the API
 ├── app/        the program: Launcher.java, a WebApp serving the API; its one jar and its distributions
 ├── pom.xml     the modules and five jtools.app.* properties; everything else is jtools-parent's
 ├── jtools.conf, externals.conf     what the scripts know of the project, the externals' versions
@@ -113,6 +113,9 @@ scripts/linux/run.sh
 ```
 … INFO    org.jtools.framework.app.WebApp - Bookshelf 0.1.0 is ready on http://127.0.0.1:8090/; it stops when its last page is closed (or Ctrl+C); log: ~/.bookshelf/logs/bookshelf.0.log
 ```
+
+The menu bar is `@jtools/web`'s: **File** ▸ Quit, **Settings** (the dark theme, the automatic stop, the port),
+**Logs**, **Help** ▸ About; the program's own menus go beside them (`frontend/src/app/app.html`).
 
 Close the page: 15 seconds later the program stops. `scripts/linux/run.sh --keep-alive` keeps it serving (`scripts/linux/stop.sh`
 stops it then); `scripts/linux/run.sh --help` lists every option.
@@ -148,7 +151,7 @@ An endpoint answers with what it returns — a `Map` or a `List` as JSON, `null`
 `new WebServer.Refusal(400, reason)`, and the page reads `{"error": reason}` — [examples/todo](../examples/todo)
 shows one.
 
-**The page** shows — its one door to the server, `frontend/src/app/api.service.ts`, a method beside `status()`:
+**The page** shows — its one door to the API, `frontend/src/app/api.service.ts`, a method beside `status()`:
 
 ```typescript
 books(): Observable<{ count: number }> {

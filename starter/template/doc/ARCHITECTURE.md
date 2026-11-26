@@ -26,7 +26,7 @@ beyond what it displays; it asks `api/…` and shows the answer. A rule found in
 What is not here is JToolsFramework's: `WebServer` (the endpoints, the page, the presence, the Host and Origin checks),
 `Exchange` (what an endpoint reads of a request), `PageWatch` (the stop once the last page has gone), `WebApp` (the command
 line, the Settings menu's port, the `.ini`, the log, the browser, and the endpoints `/api/settings`, `/api/about`,
-`/api/quit`, `/api/log/open`), `@jtools/web` (the page's presence, the server's errors), the build (`jtools-parent`:
+`/api/quit`, `/api/log/open`), `@jtools/web` (the page's presence, the server's errors, the menu bar and its endpoints), the build (`jtools-parent`:
 the page, the program's jar, the jlink distributions) and the scripts. Its `doc/CONCEPTS.md` says the conventions.
 
 ## The API

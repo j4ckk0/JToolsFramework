@@ -6,13 +6,13 @@
   <parent>
     <groupId>org.jtools.framework</groupId>
     <artifactId>jtools-parent</artifactId>
-    <version>1.6.1</version>
+    <version>1.7.0</version>
     <relativePath>../../conventions/parent/pom.xml</relativePath>
   </parent>
   <artifactId>jtools-web</artifactId>
   <packaging>jar</packaging>
   <name>JToolsFramework web</name>
-  <description>@jtools/web, the page's side of the framework, as TypeScript sources: the presence that keeps the server running (PagePresenceService), provideJTools(), the reading of the server's errors. A project's frontend gets them unpacked into target/jtools-web and compiles them with its page.</description>
+  <description>@jtools/web, the page's side of the framework, as TypeScript sources: the presence that keeps the server running (PagePresenceService), provideJTools(), the reading of the server's errors, the menu bar every program has (MenuBar, Menu) and the endpoints behind it (ProgramApiService), the light or dark palette (ThemeService). A project's frontend gets them unpacked into target/jtools-web and compiles them with its page.</description>
   <properties>
     <!-- the parent's jtools-frontend profile builds and tests this workspace with npm (its angular.json), but there is
          nothing to unpack here — this is what gets unpacked — and the test page it builds is not shipped -->

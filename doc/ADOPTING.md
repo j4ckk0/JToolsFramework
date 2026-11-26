@@ -65,8 +65,11 @@ a convenience, not a condition.
 
 ### 5. The page (an Angular page)
 
-`@jtools/web`'s `provideJTools()` in place of the page's own presence code. A page in plain JavaScript keeps its own:
-the protocol is the same three lines ([examples/hello](../examples/hello)).
+`@jtools/web`'s `provideJTools()` in place of the page's own presence code; `<jtools-menu-bar>` for the menus every
+program has, its own menus inside ([LIBRARIES.md](LIBRARIES.md)). Its Dark theme stamps `data-theme` on `<html>`: a
+page whose palette follows `prefers-color-scheme` alone gives it a `:root[data-theme='dark']` block, as the starter's
+`styles.css` does. A page in plain JavaScript keeps its own: the protocol is the same three lines
+([examples/hello](../examples/hello)).
 
 ---
 

@@ -115,8 +115,33 @@ List<Path> chosen = FileDialogs.chooseFilesToOpen("Open a book list", true, new 
 
 `@jtools/web`, TypeScript compiled with the project's page (jtools-parent unpacks it into `frontend/target/jtools-web`,
 `tsconfig.json`'s `paths` maps it): `provideJTools()` (the presence, started with the page), `PagePresenceService`,
-`apiErrorMessage()` (a refusal's `{"error"}` as a sentence). A page in plain JavaScript needs none of it — the
-presence is three lines ([examples/hello](../examples/hello)).
+`apiErrorMessage()` (a refusal's `{"error"}` as a sentence), `ProgramApiService` (`/api/about`, `/api/settings`,
+`/api/quit`, `/api/log/open`, which `WebApp` answers), `ThemeService` (the light or dark palette), and the menu bar:
+
+```html
+<jtools-menu-bar name="Bookshelf" (stopped)="stopped.set(true)">
+  <button fileItems type="button" (click)="open()">Open…</button>     <!-- File's own entries, above Quit -->
+  <jtools-menu label="Books">                                          <!-- the program's menus, after File -->
+    <button type="button" (click)="add()">Add a book</button>
+    <hr />
+    <button type="button" role="menuitemcheckbox" [attr.aria-checked]="sorted()" (click)="sort()">Sorted</button>
+  </jtools-menu>
+  <p about>What Bookshelf is for.</p>                                  <!-- About's own text -->
+  <button helpItems type="button" (click)="guide()">Guide…</button>    <!-- Help's own entries -->
+</jtools-menu-bar>
+```
+
+`MenuBar` gives every program the same menus: **File** ▸ Quit (the server stopped, then `stopped` emitted: the page
+says so); **Settings** ▸ Dark theme (kept in the browser), Stop the server when the last page is closed, Server port…;
+**Logs** ▸ Open the log, its file under it; **Help** ▸ Embedded Java runtime… (the runtime the distributions bundle,
+its licence and source, named after the server's Java), About (name, version, Java, log file). `Menu` is one menu:
+one open at a time, closed by a click anywhere; an `<hr>` separates groups, `role="menuitemcheckbox"` with
+`aria-checked` draws a switch's tick. Their texts are English. Their colours are the page's CSS variables — the
+starter's `styles.css`: `--background`, `--surface`, `--text`, `--muted`, `--border`, `--hover`, `--accent`,
+`--error-fill`, `--error-text`, `--ok-fill`, `--ok-text` —, the light palette's values where a page has none; Dark
+theme stamps `data-theme="light"` or `"dark"` on `<html>`, for the page's palette to switch on.
+
+A page in plain JavaScript needs none of it — the presence is three lines ([examples/hello](../examples/hello)).
 
 ---
 

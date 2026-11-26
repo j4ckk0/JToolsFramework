@@ -1,22 +1,23 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { apiErrorMessage } from '@jtools/web';
-import { About, ApiService } from './api.service';
+import { MenuBar, ProgramAbout, ProgramApiService, apiErrorMessage } from '@jtools/web';
 
-/** The frame of every page: the header and the footer, with what the server says the application is. */
+/** The frame of every page: the menu bar, the view, the footer, with what the server says the application is. */
 @Component({
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, MenuBar],
   selector: 'app-root',
   styleUrl: './app.css',
   templateUrl: './app.html',
 })
 export class App {
-  protected readonly about = signal<About | undefined>(undefined);
+  protected readonly about = signal<ProgramAbout | undefined>(undefined);
   /** Why the server did not answer, when it did not. */
   protected readonly error = signal<string | undefined>(undefined);
+  /** Set once File ▸ Quit has stopped the server: the page then says so and nothing else. */
+  protected readonly stopped = signal(false);
 
   constructor() {
-    inject(ApiService)
+    inject(ProgramApiService)
       .about()
       .subscribe({
         next: (about) => this.about.set(about),

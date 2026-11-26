@@ -1,24 +1,53 @@
-/* The page's colours, light and dark after the system's choice; the components use these and nothing else. */
+/* The page's colours, light and dark; the components use these and nothing else. The menu bar's
+   Settings ▸ Dark theme (@jtools/web's ThemeService) stamps data-theme on <html>; until it does, the
+   browser's preference applies. */
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
   --background: #f7f8fa;
   --surface: #ffffff;
   --text: #1d2330;
   --muted: #5d6677;
   --border: #dde1e8;
+  --hover: #e7e9ee;
   --accent: #2f6fde;
   --error: #c62828;
+  --error-fill: #fef2f2;
+  --error-text: #991b1b;
+  --ok-fill: #ecfdf5;
+  --ok-text: #166534;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --background: #14171d;
+  --surface: #1c2028;
+  --text: #e6e9ef;
+  --muted: #9aa3b2;
+  --border: #2c323d;
+  --hover: #272c34;
+  --accent: #6b9cff;
+  --error: #ef6b6b;
+  --error-fill: #331d1c;
+  --error-text: #fca5a5;
+  --ok-fill: #14271c;
+  --ok-text: #4ade80;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme]) {
+    color-scheme: dark;
     --background: #14171d;
     --surface: #1c2028;
     --text: #e6e9ef;
     --muted: #9aa3b2;
     --border: #2c323d;
+    --hover: #272c34;
     --accent: #6b9cff;
     --error: #ef6b6b;
+    --error-fill: #331d1c;
+    --error-text: #fca5a5;
+    --ok-fill: #14271c;
+    --ok-text: #4ade80;
   }
 }
 
@@ -27,7 +56,12 @@ body {
   margin: 0;
   background: var(--background);
   color: var(--text);
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
 }
 
 a {

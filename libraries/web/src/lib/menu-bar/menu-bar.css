@@ -1,0 +1,235 @@
+/* The menu bar, its menus and dialogs. Unencapsulated, so that the entries a program gives get them too: every rule is
+   scoped to jtools-menu-bar. The colours are the page's variables (the starter's styles.css), the light palette's
+   values when a page has none. */
+jtools-menu-bar {
+  display: block;
+}
+
+jtools-menu-bar [hidden] {
+  display: none !important;
+}
+
+jtools-menu-bar button,
+jtools-menu-bar input {
+  font: inherit;
+  color: inherit;
+}
+
+jtools-menu-bar .jtools-topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 44px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--border, #dde1e8);
+  background: var(--surface, #ffffff);
+}
+
+jtools-menu-bar .jtools-name {
+  margin-left: auto;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+jtools-menu-bar jtools-menu {
+  position: relative;
+}
+
+jtools-menu-bar .jtools-menubtn,
+jtools-menu-bar .jtools-dropdown button {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+jtools-menu-bar .jtools-menubtn:hover,
+jtools-menu-bar .jtools-dropdown button:hover {
+  background: var(--hover, #e7e9ee);
+}
+
+jtools-menu-bar .jtools-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: max-content;
+  min-width: 230px;
+  margin-top: 2px;
+  padding: 4px;
+  background: var(--background, #f7f8fa);
+  border: 1px solid var(--border, #dde1e8);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  z-index: 20;
+}
+
+/* an entry on one line: the menu is as wide as its longest entry */
+jtools-menu-bar .jtools-dropdown button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  text-align: left;
+  white-space: nowrap;
+}
+
+jtools-menu-bar .jtools-dropdown hr {
+  border: 0;
+  border-top: 1px solid var(--border, #dde1e8);
+  margin: 4px 6px;
+}
+
+/* a separator with nothing above it: the program gave no entries of its own there */
+jtools-menu-bar .jtools-dropdown > hr:first-child {
+  display: none;
+}
+
+/* a switch: a box at the left, ticked when on */
+jtools-menu-bar .jtools-dropdown [role='menuitemcheckbox']::before {
+  content: '';
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid var(--muted, #5d6677);
+  border-radius: 4px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+}
+
+jtools-menu-bar .jtools-dropdown [role='menuitemcheckbox'][aria-checked='true']::before {
+  content: '✓';
+  background: var(--accent, #2f6fde);
+  border-color: var(--accent, #2f6fde);
+}
+
+/* an entry beside the switches, its text aligned with theirs */
+jtools-menu-bar .jtools-dropdown .jtools-aligned {
+  padding-left: 33px;
+}
+
+jtools-menu-bar .jtools-menu-note {
+  padding: 4px 12px 6px;
+  font-size: 12px;
+  color: var(--muted, #5d6677);
+  max-width: 320px;
+  overflow-wrap: anywhere;
+}
+
+jtools-menu-bar .jtools-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px;
+  border-bottom: 1px solid var(--border, #dde1e8);
+  font-size: 13px;
+  background: var(--error-fill, #fef2f2);
+  color: var(--error-text, #991b1b);
+}
+
+jtools-menu-bar .jtools-status.jtools-info {
+  background: var(--ok-fill, #ecfdf5);
+  color: var(--ok-text, #166534);
+}
+
+jtools-menu-bar .jtools-status span {
+  flex: 1;
+  min-width: 0;
+}
+
+jtools-menu-bar .jtools-close {
+  border: none;
+  background: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--muted, #5d6677);
+  padding: 0 4px;
+}
+
+jtools-menu-bar .jtools-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 40;
+}
+
+jtools-menu-bar .jtools-dialog {
+  background: var(--background, #f7f8fa);
+  color: var(--text, #1d2330);
+  border-radius: 10px;
+  width: min(480px, 94vw);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+jtools-menu-bar .jtools-dialog-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border, #dde1e8);
+}
+
+jtools-menu-bar .jtools-dialog-head .jtools-close {
+  margin-left: auto;
+}
+
+jtools-menu-bar .jtools-dialog-body {
+  padding: 14px;
+  overflow: auto;
+}
+
+jtools-menu-bar .jtools-help {
+  color: var(--muted, #5d6677);
+  font-size: 12px;
+}
+
+jtools-menu-bar .jtools-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 6px 0;
+}
+
+jtools-menu-bar .jtools-row input {
+  padding: 3px 6px;
+  border: 1px solid var(--border, #dde1e8);
+  border-radius: 6px;
+  background: var(--background, #f7f8fa);
+}
+
+jtools-menu-bar .jtools-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+jtools-menu-bar .jtools-btn {
+  padding: 4px 10px;
+  border: 1px solid var(--border, #dde1e8);
+  border-radius: 6px;
+  background: var(--background, #f7f8fa);
+  cursor: pointer;
+}
+
+jtools-menu-bar .jtools-btn:hover {
+  background: var(--hover, #e7e9ee);
+}
+
+jtools-menu-bar .jtools-btn.jtools-primary {
+  background: var(--accent, #2f6fde);
+  color: #fff;
+  border-color: var(--accent, #2f6fde);
+}

@@ -31,4 +31,17 @@ describe('App', () => {
     await fixture.whenStable();
     expect((fixture.nativeElement as HTMLElement).querySelector('.error')?.textContent).toContain('cannot be reached');
   });
+
+  it('says the program has stopped once File ▸ Quit has stopped it', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    vi.spyOn(window, 'close').mockImplementation(() => undefined);
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+    const page = fixture.nativeElement as HTMLElement;
+    [...page.querySelectorAll('button')].find((b) => b.textContent?.includes('Quit'))?.click();
+    TestBed.inject(HttpTestingController).expectOne('api/quit').flush({ ok: true });
+    fixture.detectChanges();
+    expect(page.textContent).toContain('__APP_NAME__ stopped');
+    vi.restoreAllMocks();
+  });
 });

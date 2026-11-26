@@ -4,5 +4,11 @@
  * imports them as '@jtools/web' (tsconfig.json: "paths").
  */
 export { apiErrorMessage } from './api-error';
+export { Menu, MenuBarState } from './menu-bar/menu';
+export { MenuBar } from './menu-bar/menu-bar';
 export { PagePresenceService } from './page-presence.service';
+export { PORT_RANGE, ProgramApiService } from './program-api.service';
+export type { ProgramAbout, ProgramSettings } from './program-api.service';
 export { provideJTools } from './provide-jtools';
+export { ThemeService } from './theme.service';
+export type { Theme } from './theme.service';

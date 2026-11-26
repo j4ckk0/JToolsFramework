@@ -1,16 +1,27 @@
-<header>
-  <h1>{{ about()?.name ?? '__APP_NAME__' }}</h1>
-</header>
+@if (stopped()) {
+  <main class="stopped">
+    <p class="big">__APP_NAME__ stopped</p>
+    <p>The server has been shut down; you can close this window.</p>
+  </main>
+} @else {
+  <header>
+    <!-- the program's own menus go inside, between File and Settings: <jtools-menu label="…"> -->
+    <jtools-menu-bar [name]="about()?.name ?? '__APP_NAME__'" (stopped)="stopped.set(true)" />
+  </header>
 
-<main>
-  @if (error(); as error) {
-    <p class="error">{{ error }} Start the program again (scripts/linux/run.sh, or scripts\windows\run.bat), then reload this page.</p>
-  }
-  <router-outlet />
-</main>
+  <main>
+    @if (error(); as error) {
+      <p class="error">
+        {{ error }} Start the program again (scripts/linux/run.sh, or scripts\windows\run.bat), then
+        reload this page.
+      </p>
+    }
+    <router-outlet />
+  </main>
 
-<footer>
-  @if (about(); as about) {
-    <span>{{ about.name }} {{ about.version }}</span>
-  }
-</footer>
+  <footer>
+    @if (about(); as about) {
+      <span>{{ about.name }} {{ about.version }}</span>
+    }
+  </footer>
+}

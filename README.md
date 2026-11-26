@@ -94,7 +94,7 @@ project: its files in that folder, its development environment — a JDK, Maven 
 bookshelf/
 ├── core/       the business: Bookshelf.java, pure Java — every rule, every computation, every state
 ├── api/        its HTTP face: BookshelfApi.java — each endpoint asks core and turns its answer into JSON
-├── frontend/   the Angular page: a view, it decides nothing — api.service.ts is its one door to the server
+├── frontend/   the Angular page: a view, it decides nothing — api.service.ts is its one door to the API
 ├── app/        the program: Launcher.java, a WebApp serving the API; its one jar and its distributions
 ├── scripts/    linux/ and windows/: setup, build, ci, run, stop, package, release — and jtools
 └── CHANGELOG.md  what each version brought: release takes a version's notes from it
@@ -127,7 +127,7 @@ step 4, what to do when something goes wrong — in fifteen minutes.
 | `jtools-server` | the HTTP server: the program's endpoints (a `Map` or a `List` answered as JSON, a refusal as `{"error"}`), the page's files, the pages' presence, the Host and Origin checks | `WebServer`, `Exchange` |
 | `jtools-support` | JSON, the texts in each language (`Accept-Language` honoured), the installation's folder and version | `Json`, `Catalogue` |
 | `jtools-desktop` | native open, save and folder dialogs, for a program that wants them | `FileDialogs` |
-| `@jtools/web` | the Angular page's side: its presence, the API's refusals as sentences | `provideJTools()` |
+| `@jtools/web` | the Angular page's side: its presence, the API's refusals as sentences, the menu bar every program has (File ▸ Quit, Settings, Logs, Help ▸ About) | `provideJTools()`, `MenuBar` |
 
 A whole program, its page aside:
 
