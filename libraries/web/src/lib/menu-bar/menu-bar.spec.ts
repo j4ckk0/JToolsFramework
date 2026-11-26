@@ -85,8 +85,9 @@ describe('MenuBar', () => {
 
   it('flips the automatic stop on the server', async () => {
     await click('Settings ▾');
-    const autoStop = button('Stop the server when the last page is closed');
+    const autoStop = button('Automatic stop');
     expect(autoStop.getAttribute('aria-checked')).toBe('true');
+    expect(autoStop.title).toContain('once its last page is closed');
     autoStop.click();
     const request = http.expectOne('api/settings');
     expect(request.request.method).toBe('POST');

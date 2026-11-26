@@ -29,13 +29,13 @@
       role="menuitemcheckbox"
       [attr.aria-checked]="autoStop()"
       [title]="
-        'The server\'s automatic stop:\n• on — it exits by itself 15 seconds after the last page showing it has been closed (a reload or a restart of the browser is not a closed page);\n• off — it keeps running, as --keep-alive and --no-browser do, until File ▸ Quit ' +
+        'Stops the server by itself once its last page is closed.\n• On: it stops 15 seconds after the last page showing it has been closed (a reload, or a restart of the browser, is not a closed page).\n• Off: it keeps running, as --keep-alive and --no-browser make it, until File ▸ Quit ' +
         name() +
         ' or Ctrl+C.\nThe choice is kept for the next runs.'
       "
       (click)="toggleAutoStop()"
     >
-      Stop the server when the last page is closed
+      Automatic stop
     </button>
     <button
       type="button"

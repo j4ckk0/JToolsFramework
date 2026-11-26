@@ -119,7 +119,7 @@ export class MenuBar {
     return this.settings()?.autoStop !== false;
   }
 
-  /** Settings ▸ Stop the server when the last page is closed: flipped on the server, which keeps it. */
+  /** Settings ▸ Automatic stop: flipped on the server, which keeps it. */
   protected toggleAutoStop(): void {
     this.api.saveSettings({ autoStop: !this.autoStop() }).subscribe({
       next: (settings) => {

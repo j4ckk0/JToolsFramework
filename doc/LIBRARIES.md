@@ -132,7 +132,7 @@ List<Path> chosen = FileDialogs.chooseFilesToOpen("Open a book list", true, new 
 ```
 
 `MenuBar` gives every program the same menus: **File** ▸ Quit (the server stopped, then `stopped` emitted: the page
-says so); **Settings** ▸ Dark theme (kept in the browser), Stop the server when the last page is closed, Server port…;
+says so); **Settings** ▸ Dark theme (kept in the browser), Automatic stop (the server's stop once its last page is closed), Server port…;
 **Logs** ▸ Open the log, its file under it; **Help** ▸ Embedded Java runtime… (the runtime the distributions bundle,
 its licence and source, named after the server's Java), About (name, version, Java, log file). `Menu` is one menu:
 one open at a time, closed by a click anywhere; an `<hr>` separates groups, `role="menuitemcheckbox"` with
