@@ -127,6 +127,7 @@ List<Path> chosen = FileDialogs.chooseFilesToOpen("Open a book list", true, new 
     <hr />
     <button type="button" role="menuitemcheckbox" [attr.aria-checked]="sorted()" (click)="sort()">Sorted</button>
   </jtools-menu>
+  <button settingsItems type="button" (click)="prefs()">Shelves…</button> <!-- Settings' own entries, above its own -->
   <p about>What Bookshelf is for.</p>                                  <!-- About's own text -->
   <button helpItems type="button" (click)="guide()">Guide…</button>    <!-- Help's own entries -->
 </jtools-menu-bar>

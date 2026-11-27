@@ -83,3 +83,16 @@ browser has frozen while it waits for the lock.
 
 **What changes for a project**: an Angular page takes it with 1.7.2, through `provideJTools()`; a page in plain
 JavaScript holds its stream under the lock as examples/hello does.
+
+## 6. 1.7.2: the program's own settings
+
+**The need.** A program's settings had nowhere to go but a menu of its own beside the bar's Settings — two menus of
+settings, where the user looks for one.
+
+**The change.** `settingsItems`, like `fileItems` and `helpItems`: the entries a program gives with it are projected
+at the top of Settings, a separator under them, above the bar's own (Dark theme, Automatic stop, Server port…). What
+they open — a dialog, a page — is the program's.
+
+**What changes for a project**: none until it gives `settingsItems`; a program that had a menu of its own for its
+settings can move its entries there.
+

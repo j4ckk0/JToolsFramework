@@ -15,6 +15,7 @@ import { Menu, MenuBar, provideJTools } from './lib';
       <jtools-menu label="Things" hint="A program's own menu">
         <button type="button" role="menuitemcheckbox" aria-checked="true">A switch</button>
       </jtools-menu>
+      <button settingsItems type="button" role="menuitem">A setting…</button>
       <p about>What the harness is for.</p>
       <button helpItems type="button">Guide…</button>
     </jtools-menu-bar>

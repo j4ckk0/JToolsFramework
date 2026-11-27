@@ -30,6 +30,7 @@ type Dialog = 'about' | 'runtime' | 'port';
  *   <jtools-menu-bar name="Bookshelf" (stopped)="stopped.set(true)">
  *     <button fileItems type="button" (click)="open()">Open…</button>      ← File's own entries, above Quit
  *     <jtools-menu label="Books"> … </jtools-menu>                          ← the program's menus
+ *     <button settingsItems type="button" (click)="prefs()">Shelves…</button> ← Settings' own entries, above its own
  *     <p about>What Bookshelf is for.</p>                                   ← About's own text
  *     <button helpItems type="button" (click)="guide()">Guide…</button>    ← Help's own entries
  *   </jtools-menu-bar>
